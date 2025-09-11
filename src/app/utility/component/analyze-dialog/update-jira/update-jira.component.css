@@ -1,0 +1,93 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+body,
+*:not(.material-icons) {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+.mat-typography h1,
+.mat-typography h2,
+.mat-typography h3,
+.mat-typography h4,
+.mat-typography h5,
+.mat-typography h6 {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+::ng-deep.form-select:focus,
+.form-control:focus {
+  border-color: gray !important;
+  box-shadow: none !important;
+}
+.form-select,
+.form-control, .form-check-input{
+    border-color: gray !important;
+    font-size: 0.8rem;
+}
+.borders-btm {
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 15px;
+}
+.title {
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.close-btn, .create-btn {
+    background-color: #00b2dc;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 7px 20px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+
+  }
+.close-btn{
+    position: absolute;
+    bottom: 15px;
+    right: 115px;
+}
+.create-btn{
+    position: absolute;
+    bottom: 15px;
+    right: 25px;
+}
+.form-sec{
+    margin: auto;
+    height: 470px;
+    display: flex;
+    overflow-y: auto;
+}
+

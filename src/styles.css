@@ -1,0 +1,507 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/* You can add global styles to this file, and also import other style files */
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+html,
+body,
+*:not(.material-icons) {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+.mat-typography h1,
+.mat-typography h2,
+.mat-typography h3,
+.mat-typography h4,
+.mat-typography h5,
+.mat-typography h6 {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+.ag-header-cell,
+.ag-header-group-cell,
+.ag-header,
+.ag-header-row {
+  height: 38px !important;
+  min-height: 38px !important;
+}
+
+.material-icons {
+  font-family: "Material Icons" !important;
+}
+.light-footer1 {
+  fill: #00b2dc;
+}
+.light-footer2 {
+  fill: #0e6f87;
+}
+::ng-deep .multiline-tooltip .mat-mdc-tooltip {
+  white-space: pre-line; /* Enables \n to render as new lines */
+  max-width: 300px; /* Optional: Adjust tooltip width */
+  word-wrap: break-word; /* Optional: Handle long content */
+  --mdc-plain-tooltip-supporting-text-size: 10px;
+}
+/* darl-light theme css start  */
+.DARK {
+  mat-toolbar {
+    background-color: #272f3c;
+    color: #fff !important;
+    border-bottom: 1px solid #dddddd4d;
+  }
+  .header {
+    background-color: #272f3cf2;
+  }
+  .bg-container {
+    background-color: #1e2025fa;
+  }
+  .report-bg {
+    background-color: #1e2025fa;
+  }
+  [cdkDrag] {
+    background-color: #1e2025fa;
+    color: #fff;
+  }
+  .selectall{
+    background-color: #1e2025fa;
+    color: #fff;
+  }
+  .name-item{
+    background-color: transparent;
+    color: #fff;
+    border: 1px solid #ddd;
+  }
+  .mat-step-text-label {
+    color: #fff;
+  }
+  .mat-mdc-menu-panel .mat-mdc-menu-content {
+    --mat-menu-container-color: #272f3c !important;
+    color: #fff !important;
+  }
+  footer {
+    background-color: #272f3cf2;
+    border-top: 1px solid #dddddd4d;
+    border-left: none;
+    border-right: none;
+  }
+  .footer-title {
+    color: #fff;
+  }
+  .light-footer1 {
+    fill: gray;
+  }
+  .light-footer2 {
+    fill: #272f3c;
+  }
+  .active {
+    font-weight: 600 !important;
+    background-color: #fff;
+    color: black !important;
+    border-radius: 50px;
+    position: relative;
+    box-shadow: 1px 1px 1px #fff;
+  }
+  .nav-link {
+    color: #fff;
+  }
+  mat-drawer-container {
+    background-color: #272f3c;
+    padding-bottom: 10px;
+    min-height: 535px;
+  }
+  .title,
+  .search,
+  .device-search,
+  .device-name,
+  .icon-search,
+  .userbylabel,
+  .headingView,
+  .title2,
+  .streaming-details,
+  .collapse-icon,
+  .mat-mdc-select,
+  .titlemodule,
+  .falvor-label,
+  .view-label {
+    color: #fff;
+  }
+  ::ng-deep.mat-mdc-icon-button[disabled],
+  .mat-mdc-paginator-icon {
+    fill: #fff !important;
+  }
+  .table-heading,
+  .accordion-item,
+  .accordion-button,
+  .extra-icon,
+  .excel-icon {
+    background-color: #111212;
+    color: #fff;
+  }
+  .script-pagination {
+    background-color: #111212;
+    color: #fff;
+    border: 1px solid #fff;
+    border-radius: 5px;
+  }
+  .ag-theme-quartz {
+    --ag-header-background-color: #000;
+    --ag-background-color: #000;
+    --ag-foreground-color: #fff;
+    --ag-border-color: #fff;
+    --ag-font-size: 0.78rem;
+  }
+  .card-height,
+  .form-control,
+  .form-select,
+  .form-select:focus,
+  .container-box {
+    background-color: transparent;
+  }
+  .form-control,
+  .multiselect-dropdown,
+  .form-select,
+  .form-select:focus {
+    color: #fff;
+    font-size: 0.8rem !important;
+  }
+  .col-form-label,
+  .form-check-label,
+  .text-group,
+  .text-group a {
+    color: #fff;
+  }
+  input::placeholder {
+    color: #fff;
+    font-size: 0.8rem !important;
+  }
+  .form-select {
+    font-size: 0.8rem !important;
+  }
+  .chips-container {
+    background-color: #636979;
+  }
+  .newconfigfile,.drag-nodata {
+    color: #fff;
+  }
+  .thunder-hints {
+    color: #8db0f2;
+  }
+  .heading,
+  .filter-label {
+    color: #fff;
+  }
+  .mat-mdc-tab .mdc-tab__text-label {
+    color: #fff !important;
+  }
+  .ul-item li {
+    background-color: #1e2025fa;
+    border-bottom: 1px solid #3333333d;
+  }
+  .ul-item li:nth-child(odd) {
+    background-color: #272f3cf2;
+    /* background-image: linear-gradient(160deg, #ffffff 10%, #266e734a 100%); */
+    /* background-image: linear-gradient(160deg, #ffffff 10%, #1987542b 100%); */
+    border-bottom: 1px solid #3333333d;
+  }
+  .table-footer,
+  .pagination-sec {
+    background-color: #000;
+    color: #fff;
+  }
+  .mat-mdc-paginator-icon {
+    fill: #f6f6f6;
+  }
+  .mat-mdc-icon-button[disabled] .mat-mdc-paginator-icon {
+    fill: #808080 !important;
+  }
+  .mdc-tab--active {
+    border-bottom: 47px solid #000 !important;
+    border-right: 25px solid transparent !important;
+  }
+  .radiobox-row,
+  .card-combine {
+    background-color: #1e2025fa;
+  }
+  .mat-mdc-tab-body-content {
+    background-color: #000;
+  }
+}
+.LIGHT {
+  mat-toolbar {
+    background-color: #fff;
+    background-image: linear-gradient(160deg, #ffffff 10%, #00b2dc 100%);
+    color: #000;
+    box-shadow: 5px 5px 5px rgb(1 38 69 / 33%);
+  }
+  .bg-container {
+    background-color: #f6f6f6;
+  }
+  .report-bg {
+    background-color: #f6f6f6;
+  }
+  [cdkDrag] {
+    background-color: #fff;
+  }
+  footer {
+    background-color: #f6f6f6;
+    border: 1px solid #ddd;
+  }
+  .active {
+    font-weight: 600 !important;
+    background-color: #fff;
+    color: black !important;
+    border-radius: 50px;
+    position: relative;
+    box-shadow: 1px 1px 1px #00000075;
+  }
+  .selectall{
+     background-color: #d1d4d4;
+  }
+  .name-item{
+    background-color: #f0f0f0;
+  }
+
+  mat-drawer-container {
+    background-color: #fff;
+    padding-bottom: 10px;
+  }
+  .title{
+    color: #06667d;
+  }
+  .table-heading {
+    background-color: #d1d4d4;
+  }
+  .ag-theme-quartz {
+    --ag-header-background-color: rgb(209, 212, 212) !important;
+    --ag-background-color: #fff;
+    --ag-font-size: 0.78rem;
+  }
+  .custom-modalbox,
+  .ag-theme-quartz {
+    --ag-header-background-color: rgb(209, 212, 212) !important;
+    --ag-background-color: #fff;
+    --ag-font-size: 0.78rem;
+  }
+  .report-modalbox .ag-theme-quartz {
+    --ag-header-background-color: rgb(209, 212, 212) !important;
+    --ag-background-color: #fff;
+    --ag-font-size: 0.78rem;
+  }
+  input::placeholder {
+    font-size: 0.8rem !important;
+  }
+  .form-control {
+    border: 1px solid #80808099;
+    font-size: 0.8rem !important;
+  }
+  .form-select {
+    font-size: 0.8rem !important;
+    border: 1px solid #80808099;
+  }
+  ::ng-deep.form-select:focus,
+  .form-control:focus {
+    border-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .multiselect-dropdown {
+    border: 1px solid #80808099 !important;
+    border-radius: 5px !important;
+    font-size: 0.8rem !important;
+  }
+  .chips-container {
+    background-color: #92c849;
+  }
+  .newconfigfile {
+    color: #00273f;
+  }
+  .thunder-hints {
+    color: blue;
+  }
+  .collapse-icon {
+    color: #222;
+  }
+  .device-name {
+    color: #212529;
+  }
+  .extra-icon,
+  .excel-icon {
+    background-color: #fff;
+  }
+  ::ng-deep.mat-mdc-icon-button[disabled],
+  .mat-mdc-paginator-icon {
+    color: #333;
+  }
+  .light-footer1 {
+    fill: #00b2dc;
+  }
+  .light-footer2 {
+    fill: #0e6f87;
+  }
+  .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+    color: #06667d !important;
+    font-size: 0.87rem !important;
+    letter-spacing: 0px !important;
+  }
+  ::ng-deep.mdc-tab__text-label {
+    letter-spacing: 0px !important;
+  }
+  .ul-item li {
+    background-color: #F6f6f6; 
+    border-bottom: 1px solid #3333333d;
+  }
+  .ul-item li:nth-child(odd) {
+    background-color: #d6ebef; 
+    border-bottom: 1px solid #3333333d;
+  }
+  .mdc-tab--active {
+    border-bottom: 47px solid #fff !important;
+    border-right: 25px solid transparent !important;
+  }
+  .mat-mdc-tab-group,
+  .mat-mdc-tab-nav-bar {
+    --mdc-tab-indicator-active-indicator-color: transparent !important;
+    --mat-tab-header-active-focus-indicator-color: transparent !important;
+    --mat-tab-header-active-hover-indicator-color: transparent !important;
+  }
+  .radiobox-row,
+  .card-combine {
+    background-color: #f6f6f6;
+  }
+  .mat-mdc-tab-body-content {
+    background-color: #fff;
+  }
+}
+
+/* darl-light theme css end  */
+footer {
+  background-color: #f6f6f6;
+  border: 1px solid #ddd;
+  border-left: none;
+  border-right: none;
+}
+.col-form-label {
+  font-size: 0.8rem !important;
+}
+.ag-cell {
+  border: none !important;
+}
+::-webkit-scrollbar {
+  height: 6px;
+  width: 7px;
+  background: #d3d3d3;
+}
+
+::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px #9dc7d0;
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  -webkit-box-shadow: inset 0 0 6px #00000080;
+  background: #9dc7d0;
+}
+
+.mat-mdc-snack-bar-container {
+  &.success-msg {
+    --mdc-snackbar-container-color: rgb(4, 134, 4);
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+    position: absolute;
+    left: 73%;
+    top: -52%;
+  }
+}
+.mat-mdc-snack-bar-container {
+  &.err-msg {
+    --mdc-snackbar-container-color: red;
+    --mat-mdc-snack-bar-button-color: #fff;
+    --mdc-snackbar-supporting-text-color: #fff;
+    position: absolute;
+    left: 73%;
+    top: -52%;
+  }
+}
+.modal {
+  background: rgba(0, 0, 0, 0.5) !important;
+}
+.modal-backdrop {
+  display: none !important;
+}
+.view-btn {
+  background-color: #00b2dc !important;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 8px 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+.view-title {
+  color: #06667d;
+  font-size: 1rem !important;
+  text-align: center;
+  padding: 0px 0 10px 0;
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 25px;
+}
+.close {
+  font-size: 0.8rem !important;
+  padding: 8px 20px !important;
+}
+
+::ng-deep .mat-focused {
+  border: 1px solid #ddd !important;
+}
+.text-size {
+  font-size: 0.8rem !important;
+}
+::ng-deep .multiline-tooltip {
+  white-space: pre-line !important;
+  word-wrap: break-word !important;
+  width: 80px !important;
+}
+::ng-deep .ag-theme-quartz .ag-checkbox-wrapper .ag-checkbox-input {
+  transform: scale(0.5) !important;
+  margin: 0 !important;
+}
+::ng-deep .toggle-add {
+  --mdc-switch-selected-track-color: #4caf50 !important; /* Track when checked */
+  --mdc-switch-selected-handle-color: #ffc107 !important; /* Thumb when checked */
+  --mdc-switch-selected-hover-track-color: #388e3c !important; /* Track on hover */
+  --mdc-switch-unselected-track-color: #e0e0e0 !important; /* Track when unchecked */
+  --mdc-switch-unselected-handle-color: #757575 !important; /* Thumb when unchecked */
+}

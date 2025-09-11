@@ -1,0 +1,162 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/*
+ * Styles the header section with background color, text color, height, and shadow.
+ */
+.header {
+    background-color: #0e6f87;
+    color: #fff;
+    height: 60px;
+    box-shadow: 5px 5px 5px rgb(1 38 69 / 33%);
+  }
+
+
+/*
+ * Styles the logo image width.
+ */
+.logo-img {
+    width: 8%;
+  }
+
+  
+/*
+ * Styles the application title for color, size, weight, and margin.
+ */
+.apptitle {
+    color: #fff;
+    font-size: 1.5rem !important;
+    font-weight: 500;
+    margin-left: 15px;
+  }
+
+/*
+ * Adds a multi-color gradient border to the bottom of elements with borders-btm class.
+ */
+.borders-btm {
+    border-image: linear-gradient(
+      to right,
+      rgb(0, 178, 220) 25%,
+      rgb(253, 183, 59) 25%,
+      rgb(253, 183, 59) 50%,
+      rgb(146, 200, 73) 50%,
+      rgb(146, 200, 73) 75%,
+      rgb(245, 130, 51) 75%
+    );
+    border-image-slice: 1;
+    border-image-width: 0px 0px 4px 0px;
+    margin: 0 15px;
+  }
+
+/*
+ * Styles the title class for font size, alignment, and spacing.
+ */
+.title {
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 500;
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+
+
+/*
+ * Styles the form inside container-box for layout and appearance.
+ */
+.container-box form {
+    background-color: #fff;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    padding: 6px 18%;
+    height: 90%;
+    margin-top: 2px;
+  }
+
+  
+/*
+ * Styles the button inside container-box for appearance and interaction.
+ */
+.container-box button {
+    background-color: #00b2dc;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+  }
+
+/*
+ * Styles the back button for appearance and spacing.
+ */
+.back-btn{
+    background-color: #fff;
+    color: #fff;
+    border: 1px solid #00b2dc;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-right: 10px;
+  }
+
+/*
+ * Centers the reset password button.
+ */
+.resetpwdbtn {
+    text-align: center;
+  }
+
+    
+/*
+ * Sets position to relative for position-relative class.
+ */
+.position-relative {
+    position: relative;
+  }
+
+/*
+ * Styles the category row for layout and spacing.
+ */
+.category-row{
+    display: flex;
+    justify-content: center;
+    margin-top: 50px;
+  }
+
+/*
+ * Styles the category dropdown for font size.
+ */
+.cat-dropdown{
+  font-size: 0.8rem;
+ }
+
+/*
+ * Removes border and shadow on focus for form-select and form-control.
+ */
+::ng-deep.form-select:focus, .form-control:focus{
+  border-color: gray !important;
+  box-shadow: none !important;
+}

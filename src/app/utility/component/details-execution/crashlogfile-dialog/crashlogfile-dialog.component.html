@@ -1,0 +1,80 @@
+<!--
+If not stated otherwise in this file or this component's Licenses.txt file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+  Main container for the crash log file dialog component.
+-->
+
+<div class="container">
+    <!--
+      Row for the main content area.
+    -->
+
+    <div class="row mt-2">
+      <!--
+        Column for the main content, full width on medium and up.
+      -->
+
+      <div class="col-md-12">
+        <h1 class="view-title">Crash Log Files Details</h1>
+        <!--
+          Row for the details section and table.
+        -->
+
+        <div class="row">
+          <!--
+            Details section containing the log files table.
+          -->
+
+          <div class="details-sec">
+            <table class="details-table">
+                <thead>
+                  <tr>
+                    <th class="details-row heading">LogFile Name</th>
+                    <td class="details-row">Action</td>
+                  </tr>
+                </thead>
+               
+                <tbody>
+                  <tr *ngFor="let log of logFileNames">
+                    <td class="details-row heading">{{ log }}</td>
+                    <td class="details-row">
+                      <button class="btn btn-sm delete-btn" matTooltip="Download logFile" (click)="downloadCrashLogFile(log)">
+                        <i class="bi bi-cloud-arrow-down-fill extra-icon download"></i>
+                      </button>
+                    </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!--
+          Row for the close button section.
+        -->
+
+        <div class="row">
+          <!--
+            Container for the close button, right aligned.
+          -->
+
+          <div class="mt-2 text-end mb-2">
+            <button class="view-btn close" (click)="onClose()" *ngIf="!data.cancel">
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

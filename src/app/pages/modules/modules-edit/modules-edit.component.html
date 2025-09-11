@@ -1,0 +1,254 @@
+<!--
+If not stated otherwise in this file or this component's Licenses.txt file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for module update page -->
+<div class="container-fluid">
+  <!-- Row for form section -->
+  <div class="row mt-2">
+    <!-- Main form column -->
+    <div class="col">
+      <!-- Container box for form -->
+      <div class="container-box" id="container-box">
+        <!-- Form container for module update -->
+        <div class="form-container create-group">
+          <h1 class="title">Update {{ categoryName }} Module</h1>
+          <form
+            [formGroup]="updateModuleForm"
+            (ngSubmit)="moduleUpdate()"
+            data-bs-spy="scroll"
+          >
+            <!-- Row for module name input -->
+            <div class="row mb-3">
+              <!-- Column for module name input -->
+              <div class="col">
+                <!-- Row for module name label and input -->
+                <div class="row mb-3">
+                  <div class="col-md-12">
+                    <label for="moduleName" class="col-form-label"
+                      >Module Name<span style="color: red; margin-left: 0.75em"
+                        >*</span
+                      ></label
+                    >
+
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="moduleName"
+                      formControlName="moduleName"
+                      placeholder="Enter Module Name"
+                    />
+                    <!-- Error message for module name -->
+                    <div
+                      *ngIf="
+                        moduleFormSubmitted &&
+                        updateModuleForm.controls['moduleName']?.errors
+                      "
+                      class="text-danger"
+                    >
+                      <small
+                        *ngIf="updateModuleForm.controls['moduleName']?.errors?.['required']"
+                        >Please enter module name.</small
+                      >
+                    </div>
+                  </div>
+                </div>
+                <!-- Row for execution timeout input -->
+                <div class="row mb-3">
+                  <div class="col-md-12">
+                    <label for="executionTime" class="col-form-label"
+                      >Execution Timeout (in mins)
+                      <span style="color: red; margin-left: 0.75em"
+                        >*</span
+                      ></label
+                    >
+
+                    <input
+                      class="form-control"
+                      id="executionTime"
+                      formControlName="executionTime"
+                      placeholder="Enter Execution Timeout (in mins)"
+                      inputmode="numeric"
+                      oninput="this.value = this.value.replace(/\D+/g, '')"
+                    />
+                    <!-- Error message for execution timeout -->
+                    <div
+                      *ngIf="
+                        moduleFormSubmitted &&
+                        updateModuleForm.controls['executionTime']?.errors
+                      "
+                      class="text-danger"
+                    >
+                      <small
+                        *ngIf="updateModuleForm.controls['executionTime']?.errors?.['required']"
+                      >
+                        please enter execution timeout (in mins).
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <!-- Row for crash files input -->
+                <div class="row mb-3">
+                  <label for="crashFiles" class="col-form-label"
+                    >Crash Files Path</label
+                  >
+                  <!-- Chip group for crash files -->
+                  <div class="chip-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="crashFiles"
+                      formControlName="crashFiles"
+                      placeholder="Enter Crash Files Path"
+                    />
+                    <button
+                      type="button"
+                      class="back-btn chip-btn"
+                      (click)="addCrash()"
+                    >
+                      <i class="bi bi-plus-circle"></i>
+                    </button>
+                  </div>
+                  <!-- Chips for crash files -->
+                  @for (item of crashFilesArr; track $index) {
+                  <div class="chips-container">
+                    <span class="chip-text">{{ item }}</span>
+                    <button
+                      type="button"
+                      class="chip-cancel-btn"
+                      (click)="removeCrash($index)"
+                    >
+                      <i class="bi bi-x-circle"></i>
+                    </button>
+                  </div>
+                  }
+                </div>
+              </div>
+              <!-- Column for test group and log files -->
+              <div class="col offset-1">
+                <!-- Row for test group input -->
+                <div class="row mb-3">
+                  <div class="col-md-12">
+                    <label for="testGroup" class="col-form-label"
+                      >Test Group<span style="color: red; margin-left: 0.75em"
+                        >*</span
+                      ></label
+                    >
+
+                    <select
+                      class="form-select"
+                      aria-label="Default select example"
+                      formControlName="testGroup"
+                      id="testGroup"
+                    >
+                      <option value="" default>Select Test Group</option>
+                      @for (item of testGroupArr; track $index) {
+                      <option value="{{ item }}">{{ item }}</option>
+                      }
+                    </select>
+                    <!-- Error message for test group -->
+                    <div
+                      *ngIf="
+                        moduleFormSubmitted &&
+                        updateModuleForm.controls['testGroup']?.errors
+                      "
+                      class="text-danger"
+                    >
+                      <small
+                        *ngIf="updateModuleForm.controls['testGroup']?.errors?.['required']"
+                      >
+                        please select test group.
+                      </small>
+                    </div>
+                  </div>
+                </div>
+                <!-- Row for thunder enabled checkbox -->
+                <div class="row mb-3">
+                  <div class="col-md-6">
+                    <label for="isThunder" class="col-form-label"
+                      >Is Thunder Enabled</label
+                    >
+                    <div class="check-thunder">
+                      <div
+                        class="form-check form-check-inline form-check-reverse"
+                      >
+                        <input
+                          class="form-check-input thunder"
+                          type="checkbox"
+                          id="isThunder"
+                          formControlName="thundrShowHide"
+                          (change)="thundrEnable($event)"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Row for log files input -->
+                <div class="row mb-3">
+                  <label for="logFiles" class="col-form-label"
+                    >Log Files Path</label
+                  >
+                  <!-- Chip group for log files -->
+                  <div class="chip-group">
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="logFiles"
+                      formControlName="logFiles"
+                      placeholder="Enter Log Files Path"
+                    />
+                    <button
+                      type="button"
+                      class="back-btn chip-btn"
+                      (click)="addLogs()"
+                    >
+                      <i class="bi bi-plus-circle"></i>
+                    </button>
+                  </div>
+                  <!-- Chips for log files -->
+                  @for (item of logFilesArr; track $index) {
+                  <div class="chips-container">
+                    <span class="chip-text">{{ item }}</span>
+                    <button
+                      type="button"
+                      class="chip-cancel-btn"
+                      (click)="removeLogs($index)"
+                    >
+                      <i class="bi bi-x-circle"></i>
+                    </button>
+                  </div>
+                  }
+                </div>
+              </div>
+            </div>
+            <!-- Row for action buttons -->
+            <div class="row">
+              <!-- Container for action buttons -->
+              <div class="mt-2 createbtn text-end">
+                <button
+                  type="button"
+                  class="back-btn create-btn"
+                  (click)="goBack()"
+                >
+                  Back
+                </button>
+                <button type="submit" class="create-btn">Update</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

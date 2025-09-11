@@ -1,0 +1,125 @@
+<!--
+If not stated otherwise in this file or this component's Licenses.txt file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for function update page -->
+<div class="container-fluid">
+  <!-- Row for header and controls -->
+  <div class="row borders-btm">
+    <!-- Left column -->
+    <div class="col"></div>
+    <!-- Center column for title -->
+    <div class="col">
+      <h1 class="title">Update Function</h1>
+    </div>
+    <!-- Right column -->
+    <div class="col"></div>
+  </div>
+  <!-- Row for form section -->
+  <div class="row mt-2">
+    <!-- Main form column -->
+    <div class="col">
+      <!-- Container box for form -->
+      <div class="container-box" id="container-box">
+        <!-- Form container for function update -->
+        <div class="form-container create-group">
+          <form
+            [formGroup]="updateFunctionForm"
+            (ngSubmit)="updateFunctionSubmit()"
+            data-bs-spy="scroll"
+          >
+            <!-- Row for function name input -->
+            <div class="row mb-4">
+              <label for="functionName" class="col-md-3 col-form-label offset-1"
+                >Function Name<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <!-- Column for function name input -->
+              <div class="col-md-7">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="functionName"
+                  formControlName="functionName"
+                  placeholder="Enter Function Name"
+                />
+                <!-- Error message for function name -->
+                <div
+                  *ngIf="
+                    functionFormSubmitted &&
+                    updateFunctionForm.controls['functionName']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="updateFunctionForm.controls['functionName']?.errors?.['required']"
+                    >Please enter function name.</small
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Row for module name input -->
+            <div class="row mb-4">
+              <label for="module" class="col-md-3 col-form-label offset-1"
+                >Module<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+
+              <!-- Column for module name input -->
+              <div class="col-md-7">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="moduleName"
+                  formControlName="moduleName"
+                  placeholder="Enter Module Name"
+                />
+                <!-- Error message for module name -->
+                <div
+                  *ngIf="
+                    functionFormSubmitted &&
+                    updateFunctionForm.controls['moduleName']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="updateFunctionForm.controls['moduleName']?.errors?.['required']"
+                  >
+                    please enter module.
+                  </small>
+                </div>
+              </div>
+            </div>
+            <!-- Row for action buttons -->
+            <div class="row">
+              <!-- Container for action buttons -->
+              <div class="mt-2 createbtn">
+                <button
+                  type="button"
+                  class="back-btn create-btn"
+                  (click)="goBack()"
+                >
+                  Back
+                </button>
+                <button type="submit" class="create-btn">Update</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

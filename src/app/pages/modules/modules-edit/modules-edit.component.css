@@ -1,0 +1,171 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/*
+ * Container for main sections with bottom margin
+ */
+.container{
+    margin-bottom: 2rem;
+}
+
+/*
+ * Card element with fixed height and scrollable content
+ */
+.card-height{
+    height: 416px !important;
+    overflow-y: auto;
+    display: block;
+}
+
+/*
+ * Styles the title text for the page
+ */
+.title {
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 500;
+    padding: 0px 0 10px 0;
+    border-image: linear-gradient(to right, rgb(0, 178, 220) 25%, rgb(253, 183, 59) 25%, rgb(253, 183, 59) 50%, rgb(146, 200, 73) 50%, rgb(146, 200, 73) 75%, rgb(245, 130, 51) 75%);
+    border-image-slice: 1;
+    border-image-width: 0px 0px 4px 0px;
+    margin: 0 25px;
+}
+
+/*
+ * Styles the user form container with side margins
+ */
+.userform {
+    margin-left: 25px;
+    margin-right: 25px;
+}
+
+/*
+ * Styles the form inside the container box
+ */
+.container-box form {
+    margin: 10px 2rem;
+}
+
+/*
+ * Styles the create and reset buttons
+ */
+.create-btn,
+.reset-btn {
+    background-color: #00B2DC;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-right: 10px;
+}
+
+/*
+ * Adds right margin to reset button
+ */
+.reset-btn {
+    margin-right: 10px;
+}
+
+/*
+ * Styles the crash files container
+ */
+.crash-files{
+    width: 100%;
+}
+
+/*
+ * Styles the chip group for displaying chips
+ */
+.chip-group{
+    display :flex;
+}
+
+/*
+ * Styles the thunder border
+ */
+.thunder {
+    border: 1px solid gray;
+}
+
+/*
+ * Styles the chip button
+ */
+.chip-btn{
+    background-color: #00B2DC;
+    color: #fff;
+    font-size: 1rem;
+    border: 1px solid transparent;
+    border-radius: 3px;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+}
+
+/*
+ * Styles the chips container
+ */
+.chips-container{
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    margin: 0.5rem 0.5rem 0.5rem 0.7rem;
+    border-radius: 50px;
+    box-shadow: 1px 2px 2px #666565;
+    border: 1px solid #ccc;
+    width: auto;
+}
+
+/*
+ * Styles the chip text
+ */
+.chip-text{
+    margin-right: 0.5rem;
+    font-size: .8rem;
+    color: #fff;
+}
+
+/*
+ * Styles the chip cancel button
+ */
+.chip-cancel-btn{
+    background: none;
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+}
+
+/*
+ * Styles the check thunder line height
+ */
+.check-thunder {
+    line-height: 3;
+}
+
+/*
+ * Removes focus border and shadow for form-select and form-control
+ */
+::ng-deep.form-select:focus, .form-control:focus{
+    border-color: gray !important;
+    box-shadow: none !important;
+}

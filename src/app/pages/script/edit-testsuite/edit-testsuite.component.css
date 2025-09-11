@@ -1,0 +1,453 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/* Font family and size */
+body, *:not(.material-icons) {
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    font-size: 0.78rem;
+}
+
+/* Headings font */
+.mat-typography h1, 
+.mat-typography h2, 
+.mat-typography h3, 
+.mat-typography h4, 
+.mat-typography h5, 
+.mat-typography h6 {
+    font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+/* Container margin */
+.container {
+    margin-bottom: 2rem;
+}
+
+/* Multi-color border bottom */
+.borders-btm {
+    border-image: linear-gradient(
+        to right,
+        rgb(0, 178, 220) 25%,
+        rgb(253, 183, 59) 25%,
+        rgb(253, 183, 59) 50%,
+        rgb(146, 200, 73) 50%,
+        rgb(146, 200, 73) 75%,
+        rgb(245, 130, 51) 75%
+    );
+    border-image-slice: 1;
+    border-image-width: 0px 0px 4px 0px;
+    margin: 0 15px;
+}
+
+/* Title */
+.title {
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 500;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+
+/* Buttons */
+.create-btn,
+.reset-btn {
+    background-color: #00B2DC;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+}
+
+.reset-btn {
+    margin-right: 12px;
+}
+
+/* Form row */
+.form-row {
+    display: flex;
+    margin-right: 0;
+    margin-left: 0;
+    margin-top: 10px;
+    justify-content: start;
+    align-items: center;
+    width: 100%;
+    padding: 0 15px;
+}
+
+/* List containers */
+.name-list,
+.ritename-list {
+    height: 280px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    background-color: transparent;
+    overflow-y: auto;
+    position: relative;
+}
+
+/* List box */
+.list-box {
+    width: 100%;
+    height: 100%;
+}
+.list-box ul {
+    list-style: none;
+    padding-left: 0;
+}
+.list-box ul li {
+    padding: 0px 5px;
+    margin-bottom: 5px;
+    border: 1px solid #0000003b;
+    font-size: 0.7rem;
+}
+
+/* Sections */
+.left-sec,
+.right-sec {
+    position: relative;
+    padding-left: 15px;
+    padding-right: 20px;
+}
+.right-sec {
+    margin-left: 15px;
+    padding-right: 0;
+    padding-left: 20px;
+}
+
+/* Move buttons */
+.move-btns,
+.move-ritebtns {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    gap: 10px;
+    z-index: 10;
+}
+.move-btns {
+    left: 100%;
+    transform: translate(-50%, -50%);
+    padding-left: 20px;
+}
+.move-ritebtns {
+    right: -55px;
+}
+
+/* Arrow button */
+.arrow-btn {
+    background: #1976d2 !important;
+    border: 2px solid #1976d2;
+    border-radius: 6px;
+    color: #fff;
+    padding: 4px 10px;
+    margin: 0 4px;
+    transition: box-shadow 0.2s;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    cursor: pointer;
+    border: none !important;
+}
+.arrow-btn:disabled {
+    background: #b0b0b0 !important;
+    border-color: #ccc;
+    color: #fff !important;
+    cursor: not-allowed;
+}
+.arrow-btn:disabled .icon-move {
+    color: #f7f0f0 !important;
+}
+
+/* Move icon */
+.icon-move {
+    font-size: 1.3rem;
+    color: #fff;
+}
+
+/* No data */
+.nodata {
+    display: flex;
+    justify-content: center;
+    margin-top: 20%;
+}
+/*
+ * Styles the search row with float and margin
+ */
+.searchrow {
+    float: left;
+    margin-bottom: 5px;
+    margin-right: 8px;
+}
+/*
+ * Styles the search script input width
+ */
+.searchscript {
+    width: 220px;
+}
+/*
+ * Styles the sort search alignment
+ */
+.sort-search {
+    text-align: start;
+    padding-left: 18px;
+}
+/*
+ * Styles the sort button
+ */
+.sort-button {
+    margin: 3px 10px 0 0;
+    background-color: #fff;
+    border: 1px solid gray;
+    border-radius: 4px;
+}
+/*
+ * Styles the sort icon
+ */
+.sort-icon {
+    font-size: 1.4rem;
+}
+/*
+ * Styles the selected item
+ */
+.selected {
+    background-color: #007bff;
+    color: white;
+}
+/*
+ * Styles the info icon
+ */
+.info-icon {
+    font-size: 25px;
+    color: #00B2DC;
+    position: absolute;
+    margin: 4px 0px 0px 0px;
+}
+/*
+ * Styles the script error message
+ */
+.script-err {
+    color: #dc3545;
+    font-size: 0.8rem;
+}
+/*
+ * Removes border and shadow on focus for form controls
+ */
+::ng-deep.form-select:focus, .form-control:focus {
+    border-color: gray !important;
+    box-shadow: none !important;
+}
+
+/* Responsive grid and layout */
+.col-md-6,
+.col-md-12 {
+    padding-right: 15px;
+}
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+.row.mb-1 {
+    margin-left: 0;
+    margin-right: 0;
+}
+.row.mb-1 > .col-md-2 {
+    padding-left: 15px;
+}
+.row.mb-1 > .col-md-10 {
+    padding-left: 0;
+    padding-right: 15px;
+}
+.col form {
+    height: 100%;
+}
+.container-fluid {
+    padding: 0 20px;
+}
+
+/* Script headers and list containers */
+.script-headers {
+    display: flex;
+    width: 100%;
+    padding: 0 15px;
+    margin-bottom: 5px;
+}
+.script-header-left,
+.script-header-right {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+}
+.script-header-left {
+    margin-right: 30px;
+}
+.list-container {
+    display: flex;
+    width: 100%;
+    padding: 0 15px;
+}
+.list-left-container,
+.list-right-container {
+    flex: 1;
+    position: relative;
+}
+.list-left-container {
+    margin-right: 30px;
+}
+.row.script-list-row {
+    margin: 0;
+    width: 100%;
+    display: flex;
+}
+.move-btns-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 -15px;
+    z-index: 10;
+    position: relative;
+}
+
+/* Input fields */
+.input-desc,
+.form-control {
+    width: 100%;
+}
+
+/* No side padding utility */
+.no-side-padding {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Loader container */
+.loader-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(255, 255, 255, 0.9);
+    z-index: 9999;
+}
+
+/* Responsive loader scaling */
+@media (min-width: 1440px) {
+    .loader-container app-loader {
+        transform: scale(1.2);
+    }
+}
+@media (max-width: 1200px) and (min-width: 992px) {
+    .loader-container app-loader {
+        transform: scale(0.9);
+    }
+}
+@media (max-width: 992px) and (min-width: 768px) {
+    .loader-container app-loader {
+        transform: scale(0.85);
+    }
+}
+@media (max-width: 768px) {
+    .loader-container app-loader {
+        transform: scale(0.75);
+    }
+}
+@media (max-height: 768px) {
+    .loader-container app-loader {
+        transform: scale(0.7);
+    }
+}
+@media (max-height: 600px) {
+    .loader-container app-loader {
+        transform: scale(0.65);
+    }
+}
+
+/* Responsive list height */
+@media (min-height: 900px) {
+    .name-list,
+    .ritename-list {
+        height: calc(60vh - 50px);
+        min-height: 280px;
+    }
+}
+@media (min-height: 1200px) {
+    .name-list,
+    .ritename-list {
+        height: calc(60vh - 80px);
+        min-height: 350px;
+    }
+}
+
+@media (min-height: 500px) {
+    .name-list,
+    .ritename-list {
+        height: calc(70vh - 80px);
+        min-height: 350px;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 992px) {
+    .name-list,
+    .ritename-list {
+        height: 250px;
+    }
+    .move-btns,
+    .move-ritebtns {
+        flex-direction: row;
+        top: 100%;
+        margin-top: 10px;
+    }
+    .move-btns {
+        left: 50%;
+        transform: translateX(-50%);
+        padding-left: 10px;
+    }
+    .move-ritebtns {
+        right: 50%;
+        transform: translateX(50%);
+    }
+    .script-header-left {
+        margin-right: 0;
+    }
+    .list-left-container {
+        margin-right: 0;
+    }
+    .script-headers,
+    .list-container {
+        flex-direction: column;
+    }
+    .move-btns-container {
+        margin: 10px 0;
+    }
+}

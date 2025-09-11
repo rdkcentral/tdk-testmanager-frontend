@@ -1,0 +1,25 @@
+[
+ 
+            {
+                "name": "Devices",
+                "childData": [
+                  { "name": "0aml__jj", "isthunder": true},
+                  { "name": "1RG_sercom", "isthunder": true},
+                  { "name": "AAML_TDK_PVS", "isthunder": false},
+                  { "name": "aarthika_amlogic", "isthunder": true},
+                  { "name": "Aarthika_RPI", "isthunder": false},
+                  { "name": "AMINO1", "isthunder": false},
+                  { "name": "AMLlogic_TDK_TV_215", "isthunder": true},
+                  { "name": "AMLL_TDK_3", "isthunder": false},
+                  { "name": "Amlogic_22", "isthunder": true},
+                  { "name": "Amlogic_Certification2", "isthunder": false},
+                  { "name": "AMLOGIC_CI_AMZN", "isthunder": false},
+                  { "name": "AMLOGIC_DEVICE", "isthunder": true},
+                  { "name": "AMLOGIC_DEVICE_165_MVS", "isthunder": true}
+                ]
+              }
+
+        
+       
+   
+  ]

@@ -1,0 +1,103 @@
+<!--
+If not stated otherwise in this file or this component's Licenses.txt file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for the RDK certification list page -->
+<div class="container-fluid">
+    <!-- Row for header and action buttons -->
+    <div class="row borders-btm">
+        <!-- Left column for spacing -->
+        <div class="col">
+        </div>
+        <!-- Center column for title -->
+        <div class="col">
+          <h1 class="title">RDK Certification</h1>
+        </div>
+        <!-- Right column for action buttons -->
+        <div class="col">
+          <!-- Button group for navigation and actions -->
+          <div class="btns-group">
+            <button class="back-btn" (click)="goBack()" matTooltip="Back"><i
+                class="bi bi-arrow-return-left icon-size"></i></button>
+        <button type="button" class="download-btn" matTooltip="Upload Configuration File" data-bs-toggle="modal"
+            data-bs-target="#certificateModal">
+            <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
+        </button>
+        <button class="create-btn" (click)="createRdkCertification()" matTooltip="Create RDK Certification">
+            <i class="bi bi-plus-circle-fill icon-size"></i>
+        </button>
+          </div>
+        </div>
+      </div>
+      <!-- Loader row for showing loading spinner -->
+      <div class="row loader-row" *ngIf="showLoader">
+        <app-loader></app-loader>
+    </div> 
+    <!-- Table section for ag-grid -->
+    <div class="grid-container" [class]="themeClass">
+        <!-- ag-grid for displaying certification data -->
+        <ag-grid-angular style="width: 100%; height: 100%;" [columnDefs]="columnDefs" [defaultColDef]="defaultColDef"
+            [suppressRowClickSelection]="true" [rowSelection]="rowSelection" [rowData]="rowData" [class]="themeClass"
+            [pagination]="true" [paginationPageSize]="paginationPageSize"
+            [paginationPageSizeSelector]="paginationPageSizeSelector" (gridReady)="onGridReady($event)"
+            [tooltipShowDelay]="tooltipShowDelay" [animateRows]="true" [context]="this">
+        </ag-grid-angular>
+
+    </div>
+</div>
+<!-- Modal for uploading configuration file -->
+<div class="modal fade" #certificateModal id="certificateModal" data-bs-backdrop="static" data-bs-keyboard="false"
+    tabindex="-1" aria-labelledby="certificateModalLabel" aria-hidden="true">
+    <!-- Modal dialog container -->
+    <div class="modal-dialog custom-modal">
+        <!-- Modal content container -->
+        <div class="modal-content">
+            <!-- Form for uploading configuration file -->
+            <form [formGroup]="uploadConfigurationForm" (ngSubmit)="uploadConfigurationSubmit()">
+                <!-- Modal header section -->
+                <div class="modal-header modaltitle">
+                    <h1 class="modal-title custom-title" id="certificateModalLabel">Upload Configuration File</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="resetUploadForm()"></button>
+                </div>
+                <!-- Modal body section -->
+                <div class="modal-body">
+                    <!-- Container for file input -->
+                    <div class="container mt-4">
+                        <!-- Row for file input and validation -->
+                        <div class="row mb-3">
+                            <label for="uploadfile" class="col-md-4  col-form-label">Select Config Python File<span
+                                    style="color:red; margin-left: 0.75em;">*</span></label>
+                            <!-- Column for file input and error messages -->
+                            <div class="col-md-8">
+                                <input class="form-control form-control-sm" id="uploadfile" type="file"
+                                    formControlName="uploadConfig" (change)="onFileChange($event)">
+                                <div *ngIf="uploadFormSubmitted && uploadConfigurationForm.controls['uploadConfig']?.errors"
+                                    class="text-danger">
+                                    <small
+                                        *ngIf="uploadConfigurationForm.controls['uploadConfig']?.errors?.['required']">Please
+                                        select the python file.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal footer section -->
+                <div class="modal-footer">
+                    <button type="button" class="modal-btns" data-bs-dismiss="modal" (click)="resetUploadForm()">Close</button>
+                    <button type="submit" class="modal-btns">Upload Config File</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

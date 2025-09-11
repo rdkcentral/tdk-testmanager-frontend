@@ -1,0 +1,257 @@
+<!--
+If not stated otherwise in this file or this component's Licenses.txt file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div class="container-fluid" style="overflow-x: hidden">
+  <div class="row mt-2 mb-4">
+    <div class="col-12">
+      <h1 class="view-title">Upgrade Backend Service</h1>
+    </div>
+  </div>
+  <div class="row mb-3">
+    <mat-tab-group
+      #tabGroup
+      [(selectedIndex)]="selectedTabIndex"
+      animationDuration="0ms"
+      mat-align-tabs="start"
+      (selectedTabChange)="onTabClick($event)"
+      [disableRipple]="true"
+      [disablePagination]="true"
+    >
+      <mat-tab class="tab-label">
+        <ng-template mat-tab-label>
+          <div class="step-container">
+            <div
+              class="step-number"
+              [ngClass]="{ active: selectedTabIndex === 0 }"
+            >
+              1
+            </div>
+            <span>War Upload</span>
+          </div>
+        </ng-template>
+        <form [formGroup]="uploadForm">
+          <div class="row mt-4 mb-3">
+            <div class="col-md-4">
+              <label for="uploadfile" class="form-label">
+                Select the War file<span style="color: red; margin-left: 0.25em"
+                  >*</span
+                >
+              </label>
+            </div>
+            <div class="col-md-6">
+              <input
+                class="form-control form-control-sm"
+                id="uploadfile"
+                type="file"
+                #fileInput
+                (change)="onFileChange($event)"
+                formControlName="uploadForm"
+                accept=".war"
+              />
+              <div class="text-danger" *ngIf="uploadAttempted && !fileSelected">
+                <small>Please select a .war file to upload.</small>
+              </div>
+              <div *ngIf="uploading" class="mt-2">
+                <mat-progress-bar
+                  mode="determinate"
+                  [value]="progress"
+                ></mat-progress-bar>
+                <div class="text-center mt-1">
+                  <small>Uploading... {{ progress }}%</small>
+                </div>
+              </div>
+              <div *ngIf="uploadComplete" class="text-success mt-2">
+                <small>Upload completed successfully!</small>
+              </div>
+            </div>
+            <div class="col-md-2 d-flex align-items-start">
+              <button
+                class="modal-btns"
+                (click)="uploadFile()"
+                matTooltip="Upload the War file"
+                [disabled]="uploadComplete || uploading"
+              >
+                Upload
+              </button>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-12 d-flex justify-content-center">
+              <button
+                class="close-btns"
+                style="margin-right: 8px"
+                matTooltip="Close the tab"
+                (click)="close()"
+              >
+                Close
+              </button>
+              <button
+                class="close-btns"
+                matTooltip="Move to next tab"
+                (click)="nextTab()"
+                [disabled]="!uploadComplete"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </form>
+      </mat-tab>
+      <mat-tab class="tab-label" matTooltip="Complete step 1 and click on next">
+        <ng-template mat-tab-label>
+          <div class="step-container">
+            <div
+              class="step-number"
+              [ngClass]="{ active: selectedTabIndex === 1 }"
+            >
+              2
+            </div>
+            <span>Upgradation</span>
+          </div>
+        </ng-template>
+        <form [formGroup]="upgradeForm">
+          <div class="row mt-4 mb-3">
+            <div class="col-md-4">
+              <label for="backupLocation" class="form-label">
+                Backup Location
+              </label>
+              <i
+                class="bi bi-info-circle info-icon"
+                matTooltip="If you want to store the backup in a particular location, Please add that location. Otherwise the  backup location will be the one configured in the backend configuration"
+              ></i>
+            </div>
+            <div class="col-md-8">
+              <input
+                type="text"
+                id="backupLocation"
+                class="form-control"
+                placeholder="Enter backup location"
+              />
+            </div>
+          </div>
+          <div class="row mb-3">
+            <div class="col-md-4">
+              <label for="warLocation" class="form-label"> War Location </label>
+            </div>
+            <div class="col-md-8">
+              <input
+                type="text"
+                id="warLocation"
+                class="form-control"
+                placeholder="Enter war location"
+                formControlName="warLocation"
+                style="background-color: #e1e5e9"
+                readonly
+              />
+              <div
+                class="text-danger"
+                *ngIf="upgradeFormSubmitted && upgradeForm.get('warLocation')?.errors?.['required']"
+              >
+                <small>War location is required</small>
+              </div>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="buttn-grp">
+              <button
+                class="modal-btns"
+                style="margin-right: 8px"
+                (click)="upgrade()"
+                [disabled]="upgradeInProgress"
+              >
+                Upgrade
+              </button>
+              <button
+                class="modal-btns"
+                (click)="close()"
+                [disabled]="upgradeInProgress && !isBackendUp"
+              >
+                Close
+              </button>
+            </div>
+
+            <div class="logsection">
+              <span class="sub-titel" style="color: #06667d"
+                >Upgradation logs</span
+              >
+              <!-- Section for execution logs and loader -->
+              <div class="execution-result">
+                <div class="logs-content">
+                  <ng-container *ngIf="upgradationlogs; else noLogs">
+                    <pre class="upgradation-logs">{{ upgradationlogs }}</pre>
+
+                    <div *ngIf="isBackendUp" class="alert alert-success mt-3">
+                      <i class="bi bi-check-circle-fill me-2"></i>
+                      App upgrade is complete.
+                    </div>
+
+                    <!-- Progress message when backend upgrade is in progress -->
+                    <div
+                      *ngIf="isBackendServiceNotUpgraded && !isBackendUp"
+                      class="alert alert-info mt-3"
+                    >
+                      <i class="bi bi-hourglass-split me-2"></i>
+                      App upgrade is in progress. Please wait.
+                    </div>
+
+                    <div class="mt-3" *ngIf="isBackendUp">
+                      <a
+                        href="javascript:void(0)"
+                        (click)="toggleDeploymentLogs()"
+                        class="deployment-logs-link"
+                      >
+                        <i class="bi bi-file-text me-1"></i>
+                        {{ showDeploymentLogs ? "Hide" : "Show" }} Deployment
+                        Logs
+                      </a>
+                    </div>
+                    <div
+                      *ngIf="showDeploymentLogs"
+                      class="deployment-logs mt-2"
+                    >
+                      <div class="card">
+                        <div class="card-header bg-light">
+                          <span class="fw-bold">Deployment Logs</span>
+                        </div>
+                        <div class="card-body logs-content">
+                          <ng-container
+                            *ngIf="deploymentLogs; else noDeploymentLogs"
+                          >
+                            {{ deploymentLogs }}
+                          </ng-container>
+                          <ng-template #noDeploymentLogs>
+                            <div class="text-muted">
+                              No deployment logs available at this time.
+                            </div>
+                          </ng-template>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                  <ng-template #noLogs>
+                    <!-- <div class="text-muted">
+                      No logs available. Logs will appear here during the
+                      upgrade process.
+                    </div> -->
+                  </ng-template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

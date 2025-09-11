@@ -1,0 +1,940 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/*
+ * Applies the default font family and size to the body and all elements except material icons
+ */
+body, *:not(.material-icons) {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 0.78rem;
+}
+/*
+ * Sets the font family for all heading elements inside .mat-typography
+ */
+.mat-typography h1, 
+.mat-typography h2, 
+.mat-typography h3, 
+.mat-typography h4, 
+.mat-typography h5, 
+.mat-typography h6 {
+font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+/*
+ * Styles the main container with bottom margin
+ */
+.container-fluid{
+  margin-bottom: 1rem;
+}
+
+/*
+ * Enables text selection for table container and its children
+ */
+.table-container,
+.table-container * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+/*
+ * Styles the download row alignment
+ */
+.download-row{
+  text-align: right;
+}
+/*
+ * Styles the heading and headingView classes
+ */
+.heading,.headingView{
+  font-size: 0.78rem;
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-weight: 500;
+}
+/* .headingView{
+  margin-left: 80px;
+} */
+/*
+ * Styles the rdkgroup and viewgroup classes
+ */
+.rdkgroup,.viewgroup{
+  margin-left: 10px;
+  font-weight: 500;
+}
+/*
+ * Styles the radio button border
+ */
+.rdkradio{
+  border: 2px solid #0e6f87;
+}
+/*
+ * Styles the radio box container
+ */
+.radiobox {
+  display: flex;
+  justify-content: start;
+  align-items: baseline;
+  padding: 0 30px;
+  font-size: 0.78rem;
+}
+
+/*
+ * Styles the heading class
+ */
+.heading {
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+/*
+ * Styles the rdkgroup class
+ */
+.rdkgroup {
+  margin-left: 10px;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+/*
+ * Centers the main section
+ */
+.main-sec{
+    margin: auto;
+}
+/*
+ * Styles the radio button border (duplicate selector)
+ */
+.rdkradio {
+  border: 2px solid #0e6f87;
+}
+/*
+ * Styles the inline form checkboxes
+ */
+.form-check-inline {
+  margin-right: 1rem;
+}
+/*
+ * Styles checked form check inputs
+ */
+.form-check-input:checked {
+  background-color: #0e6f87;
+  border-color: #0e6f87;
+}
+/*
+ * Styles the flavor row
+ */
+.falvor-row{
+  display: flex;
+  align-items: baseline;
+  margin-top: 5px;
+  padding-left: 0;
+}
+/*
+ * Styles the flavor label
+ */
+.falvor-label{
+  width: 75px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+/*
+ * Styles the view label
+ */
+.view-label{
+  width: 45px;
+  margin-left: 25px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+/*
+ * Styles the RDK dropdown
+ */
+.rdk-dropdown{
+  width: 120px;
+}
+/*
+ * Styles the view dropdown
+ */
+.view-dropdown{
+  width: 120px;
+}
+/*
+ * Adds a multi-color border to the bottom of the element
+ */
+.borders-btm {
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 15px;
+  /* padding-bottom: 4px; */
+}
+/*
+ * Styles the title text
+ */
+.title {
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+/*
+ * Styles the button group at the top right
+ */
+.btns-grp {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+}
+/*
+ * Styles the top flavor section
+ */
+.top-flavor {
+  display: flex;
+  align-items: baseline;
+  position: absolute;
+  top: 0;
+  right: 40%;
+}
+/*
+ * Styles the top flavor suite section
+ */
+.top-flavor-suite{
+  display: flex;
+  align-items: baseline;
+  position: absolute;
+  top: 0;
+  right: 46%;
+}
+/*
+ * Styles the top section
+ */
+.top-sec {
+  display: flex;
+  align-items: baseline;
+  position: absolute;
+  top: 0;
+  right: 18%;
+}
+/*
+ * Styles the top section suite
+ */
+.top-sec-suite{
+  display: flex;
+  align-items: baseline;
+  position: absolute;
+  top: 0;
+  right: 24%;
+}
+/*
+ * Styles the button group
+ */
+.btns-group{
+  /* position: absolute;
+  right: 10px;
+  top: 5px; */
+  text-align: end;
+  margin-top: 5px;
+}
+/*
+ * Styles the test suite button
+ */
+.testsuite-btn{
+  /* position: absolute;
+  right: 10px;
+  top: 5px; */
+  text-align: end;
+  margin-top: 5px;
+}
+/*
+ * Styles the example header
+ */
+.example-header {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+}
+/*
+ * Styles the search row
+ */
+.search{
+  font-size: 0.8rem;
+  display: flex;
+  margin-right: 5px;
+}
+/*
+ * Styles the search header
+ */
+.search-header {
+  margin-bottom: 1px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  padding-left: 16px;
+}
+/*
+ * Styles the search input width
+ */
+.seach-input{
+  width: 45%;
+}
+/*
+ * Styles the info icon
+ */
+.info-icon{
+  font-size: 20px;
+  color: #00B2DC;
+  margin-left: 8px;
+}
+/*
+ * Styles the filter input on focus
+ */
+.fiter-input:focus{
+  border: 1px solid gray;
+  box-shadow: none;
+}
+/*
+ * Removes border and shadow on focus for form controls
+ */
+::ng-deep.form-select:focus, .form-control:focus{
+  border-color: gray !important;
+  box-shadow: none !important;
+}
+/*
+ * Styles the download button
+ */
+.download-btn{
+  background-color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-left: 15px;
+  box-shadow: 0px 3px 6px #0000005e;
+}
+/*
+ * Styles the create button
+ */
+.create{
+  background-color: #00B2DC;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 7px 20px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+/*
+ * Styles the upload icon
+ */
+.upload-icon{
+  color: #00B2DC;
+  font-weight: bold;
+  font-size: 18px;
+}
+/*
+ * Styles the download icon
+ */
+.download-icon{
+  color: #00B2DC;
+  font-weight: bold;
+  font-size: 18px;
+}
+/*
+ * Styles the upload button
+ */
+.uploadbtn{
+  background-color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: 1px solid gray;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+/*
+ * Styles the table title
+ */
+.tabletitle{
+  font-size: 1rem;
+  text-align: center;
+}
+/*
+ * Styles the delete button
+ */
+.delete-btn{
+  border: none;
+  padding: 0px;
+  margin-right:10px;
+  border-radius: 50px;
+}
+/*
+ * Styles the extra and excel icons
+ */
+.extra-icon, .excel-icon{
+/* background-color: white; */
+font-size: 1rem;
+display: flex;
+justify-content: center;
+align-items: center;
+height:19px;
+width:19px;
+}
+
+/*
+ * Styles the edit icon
+ */
+.edit{
+  color: #00B2DC;
+  font-size: 1.3rem;
+}
+/*
+ * Styles the delete icon
+ */
+.delete-icon{
+  color: #808080;
+  font-size: 1.3rem;
+}
+/*
+ * Styles the download icon
+ */
+.download{
+  color: #00B2DC;
+  font-size: 1.3rem;
+  padding-left: 5px;
+}
+/*
+ * Styles the download xlsx icon
+ */
+.download-xlsx{
+  height: 19px;
+  width: 19px;
+  padding-left: 5px;
+}
+/*
+ * Styles the new excel icon
+ */
+.new-excel{
+  margin-left: 9px;
+}
+/*
+ * Styles the material table header row
+ */
+.mat-mdc-header-row{
+  background-color: #d1d4d4;
+  height: 36px;
+  font-size: 0.78rem;
+}
+/*
+ * Styles the material data table content
+ */
+.mdc-data-table__content{
+  font-size: 0.78rem;
+  height: 40px;
+}
+/*
+ * Styles the material table
+ */
+.mat-mdc-table {
+  box-shadow: none;
+  border: 1px solid #ddd;
+  
+}
+/*
+ * Styles the material paginator container
+ */
+::ng-deep.mat-mdc-paginator-container {
+  min-height: 40px !important;
+}
+/*
+ * Styles the footer table
+ */
+.footer-table{
+  border: 1px solid #ddd;
+}
+/*
+ * Styles the parent node
+ */
+.parentnode{
+  position: absolute;
+  margin-top: 0.5rem;
+}
+/*
+ * Styles the material tree viewport
+ */
+.mat-tree-viewport {
+  height: 310px; 
+  width: 100%;
+}
+/*
+ * Styles the container drag area
+ */
+.containerdrag {
+  margin: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  width: 200px;
+  display: inline-block;
+  vertical-align: top;
+}
+
+/*
+ * Styles the name list box
+ */
+.name-list {
+  min-height: 200px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  background-color: #f9f9f9;
+}
+
+/*
+ * Styles draggable items
+ */
+[cdkDrag] {
+  padding: 5px;
+  margin-bottom: 5px;
+  border: 1px solid #0000003b;
+  background-color: #fff;
+  cursor: move;
+}
+/*
+ * Styles the dropdown toggle arrow
+ */
+.dropdown-toggle::after {
+  margin-left: .4em;
+  vertical-align: .02em;
+  font-size: 1.3rem;
+}
+/*
+ * Styles the dropdown menu list items
+ */
+.dropdown-menu li{
+  cursor: pointer;
+}
+/*
+ * Styles the material table row
+ */
+.mat-mdc-row {
+  height: auto;
+  line-height: 1.6;
+}
+/*
+ * Styles the material icon button
+ */
+.mat-mdc-icon-button.mat-mdc-button-base {
+  width: 30px;
+  height: 30px;
+  padding: 5px;
+}
+/*
+ * Styles the radio box container (duplicate selector)
+ */
+.radiobox{
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+}
+/*
+ * Styles the material expansion panel header
+ */
+.mat-expansion-panel-header{
+  height: 38px;
+  font-weight: 400;
+}
+/*
+ * Styles the table heading
+ */
+.table-heading{
+  margin: 0;
+  height: 35px;
+  display: flex;
+  align-items: center;
+}
+/*
+ * Styles the sort button
+ */
+.sort-button{
+  background:none;
+  border: none;
+}
+/*
+ * Styles the sorting icon
+ */
+.icon-sortng{
+  font-size: 1rem;
+}
+/*
+ * Styles the sorting icon on hover
+ */
+.icon-sortng:hover{
+  font-size: 1rem;
+}
+/*
+ * Styles the search div popup
+ */
+.search-div{
+  position: absolute;
+  z-index: 1;
+  height: 80px;
+  width: 200px;
+  background-color: #fff;
+  box-shadow: 1px 1px 1px 1px #ddd;
+  border-radius: 5px;
+  border: 1px solid #c9c8c8;
+  left: 20%;
+}
+/*
+ * Styles the search input inside the popup
+ */
+.search-input{
+    position: relative;
+    display: flex;
+    align-items: center;
+    top: 30%;
+    margin: 0 10px 0 10px;
+    width: 90%;
+}
+/*
+ * Styles the search side button
+ */
+.search-side{
+  border: 1px solid gray;
+  background: none;
+}
+/*
+ * Styles the xlsx button
+ */
+.xlsx-btm{
+  margin-left: 45px;
+}
+/*
+ * Hides the arrow for no-arrow class
+ */
+.no-arrow::after {
+  display: none;
+}
+/*
+ * Styles the no-arrow class
+ */
+.no-arrow{
+  cursor: pointer;
+}
+/*
+ * Styles the accordion row
+ */
+.accord-row{
+  margin: 0;
+  cursor: pointer;
+}
+/*
+ * Styles the accordion head
+ */
+.accord-head{
+  margin-bottom: 0;
+}
+/*
+ * Styles the accordion title
+ */
+.accor-title{
+  padding: 0 0 0 0px;
+  cursor: pointer;
+  z-index: 0;
+}
+/*
+ * Styles the accordion count
+ */
+.accor-count{
+  padding-left: 20px !important;
+}
+/*
+ * Styles the accordion description
+ */
+.accor-desc{
+  padding-left: 35px !important;
+}
+/*
+ * Styles the accordion test group
+ */
+.accor-testgroup{
+  padding: 0 0 0 35px;
+  cursor: pointer;
+  z-index: 0;
+}
+/*
+ * Removes box shadow on accordion button focus
+ */
+.accordion-button:focus{
+  box-shadow: none;
+}
+
+/*
+ * Styles the border column
+ */
+.border-column{
+  border-right: 1px solid #aaa;
+}
+/*
+ * Styles the filter button
+ */
+.filter-btn{
+  float: inline-end;
+}
+/*
+ * Styles the collapse icon
+ */
+.collapse-icon{
+  font-size: 1rem;
+  transition: transform 0.3s ease;
+  transform: rotate(180deg);
+}
+/*
+ * Styles the material option in dropdown
+ */
+::ng-deep.mat-mdc-option{
+  min-height: 35px !important;
+  font-size: 0.8rem !important;
+  border-bottom: 1px solid #ddd;
+}
+/*
+ * Styles the accordion body
+ */
+.accordion-body{
+  padding-top: 0px !important;
+  display: flex;
+  justify-content: center;
+}
+/*
+ * Styles the dropdown toggle arrow (duplicate selector)
+ */
+.dropdown-toggle::after {
+  margin-left: .5em;
+  vertical-align: .1em;
+  font-size: 1.3rem;
+  color: #00B2DC;
+}
+/*
+ * Styles the modal footer
+ */
+.modal-footer{
+  border-top: none;
+  padding: 1rem 1.45rem 2rem 2rem;
+}
+/*
+ * Styles the custom modal
+ */
+.custom-modal{
+  max-width: 800px;
+  margin-top: 100px;
+}
+/*
+ * Styles the modal title
+ */
+.modaltitle{
+  margin: 0 10px 0px 10px;
+  border-image: linear-gradient(to right, rgb(0, 178, 220) 25%, rgb(253, 183, 59) 25%, rgb(253, 183, 59) 50%, rgb(146, 200, 73) 50%, rgb(146, 200, 73) 75%, rgb(245, 130, 51) 75%);
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  padding: 10px 5px 5px 5px;
+}
+/*
+ * Styles the no record message
+ */
+.noRecord{
+  width: 100%; 
+  height: 250px; 
+  margin-top: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #ddd;
+}
+/*
+ * Styles the modal buttons
+ */
+.modal-btns {
+  background-color: #00B2DC;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+/*
+ * Styles the custom title
+ */
+.custom-title{
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+/*
+ * Styles the error upload message
+ */
+.errorupload{
+  color: #dc3545;
+  font-size: 0.8rem;
+}
+/*
+ * Styles the script table head
+ */
+.script-table-head{
+  font-weight: 500;
+}
+/*
+ * Styles the script pagination
+ */
+.script-pagination{
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+/*
+ * Styles the notched outline for material components
+ */
+::ng-deep .mdc-notched-outline{
+  position: absolute !important;
+  top: 2px !important;
+  height: 90% !important;
+}
+/*
+ * Styles the loader row
+ */
+.loader-row{
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+}
+
+/* For ag-Grid cells */
+/*
+ * Enables text selection for ag-Grid cells
+ */
+.ag-cell, .ag-cell-value, .ag-row, .ag-center-cols-container {
+  user-select: text !important;
+}
+
+/* For accordion content */
+.accordion-body, .accordion-header, .accordion-button {
+  user-select: text !important;
+}
+
+/* Enable text selection for all ag-Grid content */
+/*
+ * Enables text selection for all ag-Grid content
+ */
+.ag-root,
+.ag-root * {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+
+/*
+ * Enables text selection for ag-Grid unselectable elements
+ */
+.ag-unselectable {
+    -moz-user-select: text;
+    -webkit-user-select: text;
+    -ms-user-select: text;
+    user-select: text !important;
+}
+
+/* Update dynamic-table-container to have scrolling */
+.dynamic-table-container {
+  width: 100%;
+  height: 400px !important; /* Fixed height */
+  min-height: 300px;
+  overflow: auto !important; /* Enable scrolling - this is key */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ensure ag-Grid takes full height of container */
+.dynamic-table-container ag-grid-angular {
+  width: 100%;
+  height: 100%;
+  flex: 1;
+}
+
+/* Fix accordion body to allow scrolling */
+.accordion-body {
+  padding-top: 0px !important;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.table-container {
+  position: relative;
+  min-height: 60vh; /* Ensure enough space for content and pagination */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Position the loader in the center of the container */
+.loader-row {
+  position: absolute;
+ top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.script-paginator {
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  margin-top: auto; /* Push to bottom of flex container */
+  z-index: 5; /* Ensure it's above other content */
+  background-color: white; /* Add background to prevent content showing through */
+}
+
+/* Ensure content area is scrollable */
+.accordion-content-area {
+  flex: 1;
+  overflow-y: auto; /* Enable vertical scrolling */
+  max-height: calc(70vh - 80px); /* Calculate height minus pagination */
+}
+
+/* Hide border of noRecord when loader is visible */
+.loader-row ~ .noRecord,
+.noRecord:only-child {
+  border-bottom: none !important;
+}

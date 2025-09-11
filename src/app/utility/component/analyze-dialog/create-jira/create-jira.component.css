@@ -1,0 +1,132 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+body,
+*:not(.material-icons) {
+  /*
+   * Base font family for the application, excluding material icons.
+   */
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+.mat-typography h1,
+.mat-typography h2,
+.mat-typography h3,
+.mat-typography h4,
+.mat-typography h5,
+.mat-typography h6 {
+  /*
+   * Typography font family for all heading levels.
+   */
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+::ng-deep.form-select:focus,
+.form-control:focus {
+  /*
+   * Remove default focus border and shadow for form elements.
+   */
+  border-color: gray !important;
+  box-shadow: none !important;
+}
+.form-select,
+.form-control, .form-check-input{
+  /*
+   * Style for form select, control, and check input elements.
+   */
+    border-color: gray !important;
+    font-size: 0.8rem;
+}
+.borders-btm {
+  /*
+   * Gradient border for bottom border effect.
+   */
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 15px;
+}
+.title {
+  /*
+   * Title styling for section headers.
+   */
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+.close-btn, .create-btn {
+  /*
+   * Button styling for close and create actions.
+   */
+    background-color: #00b2dc;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 7px 20px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+
+  }
+.close-btn{
+  /*
+   * Positioning for the close button.
+   */
+    position: relative;
+    bottom: 15px;
+    right: 15px;
+}
+.create-btn{
+  /*
+   * Positioning for the create button.
+   */
+    position: relative;
+    bottom: 15px;
+    right: 0px;
+}
+.form-sec{
+  /*
+   * Section styling for form container.
+   */
+    margin: auto;
+    height: auto;
+    display: flex;
+    overflow-y: visible;
+}
+
+.readonly-field[readonly] {
+  /*
+   * Styling for readonly input fields.
+   */
+  background-color: #f0f0f0 !important;
+  color: #212529 !important;   /* Brighter/darker text */
+  cursor: not-allowed;
+  pointer-events: none;
+}

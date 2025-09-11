@@ -1,0 +1,202 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/*
+ * Styles the main container with bottom margin
+ */
+.container{
+    margin-bottom: 2rem;
+}
+/*
+ * Sets max height for modal content
+ */
+.exsit-modal-content {
+    max-height: 100vh;
+}
+/*
+ * Styles the card with fixed height and scroll
+ */
+.card-height{
+    height: 500px !important;
+    overflow-y: auto;
+    display: block;
+}
+/*
+ * Adds a multi-color border to the bottom of the element
+ */
+.borders-btm {
+    border-image: linear-gradient(
+      to right,
+      rgb(0, 178, 220) 25%,
+      rgb(253, 183, 59) 25%,
+      rgb(253, 183, 59) 50%,
+      rgb(146, 200, 73) 50%,
+      rgb(146, 200, 73) 75%,
+      rgb(245, 130, 51) 75%
+    );
+    border-image-slice: 1;
+    border-image-width: 0px 0px 4px 0px;
+    margin: 0 15px;
+    /* padding-bottom: 4px; */
+  }
+/*
+ * Styles the title text
+ */
+  .title {
+    font-size: 1rem;
+    text-align: center;
+    font-weight: 500;
+    margin-top: 5px;
+    margin-bottom: 10px;
+  }
+/*
+ * Styles the row with flex and center alignment
+ */
+.row{
+    display: flex;
+    justify-content: center;
+}
+/*
+ * Styles the user form with left and right margins
+ */
+.userform{
+    margin-left: 25px;
+    margin-right: 25px;
+}
+/*
+ * Styles the create and reset buttons
+ */
+.create-btn,
+.reset-btn {
+    background-color: #00B2DC;
+    color: #fff !important;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-right: 15px;
+}
+/*
+ * Styles the download button
+ */
+.download-btn{
+    background-color: #00B2DC;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 7px 20px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    margin-top: 15px;
+    margin-right: 10px;
+}
+/*
+ * Adds right margin to the reset button
+ */
+.reset-btn {
+    margin-right: 10px;
+}
+/*
+ * Removes border and shadow on focus for form controls
+ */
+::ng-deep.form-select:focus, .form-control:focus{
+    border-color: gray !important;
+    box-shadow: none !important;
+}
+/*
+ * Sets max width for selected items in multiselect dropdown
+ */
+.multiselect-dropdown .dropdown-btn .selected-item-container .selected-item{
+    max-width: 130px !important;
+}
+/*
+ * Styles the thunder class with border
+ */
+.thunder{
+    border: 1px solid gray;
+}
+/*
+ * Styles the long test row
+ */
+.longtest{
+    display: flex;
+    align-items: end;
+}
+/*
+ * Styles the test case button
+ */
+.btn-testcase{
+    border: 1px solid gray;
+    font-size: 0.8rem !important;
+    background-color: white;
+    border-radius: 4px;
+    padding: 5px 10px 5px 10px;
+}
+/*
+ * Removes background color for focused cdk program
+ */
+::ng-deep.cdk-program-focused{
+    background-color: transparent !important;
+}
+/* ::ng-deep.mat-step-icon-selected{
+    background-color: #00B2DC !important;
+} */
+/*
+ * Styles the step icon for mat-stepper
+ */
+::ng-deep.mat-step-icon, .mat-step-icon-state-number {
+    background-color: #00B2DC !important;
+    cursor: pointer !important;
+}
+/*
+ * Styles the horizontal rule
+ */
+hr{
+    margin-top: 0;
+}
+/*
+ * Styles the temporary title
+ */
+.temp-title{
+    font-size: 0.8rem;
+}
+/*
+ * Styles the disabled next button
+ */
+.next-btn:disabled{
+    background-color: gray;
+}
+/*
+ * Sets width for selected items in multiselect dropdown
+ */
+::ng-deep .multiselect-dropdown span.selected-item{
+    width: 100% !important;
+    max-width: 100% !important;
+}
+/*
+ * Styles the demo stepper background
+ */
+.demo-stepper{
+    background-color: transparent !important;
+}

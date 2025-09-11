@@ -1,0 +1,290 @@
+/*
+* If not stated otherwise in this file or this component's Licenses.txt file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/* loader-1 CSS  Start*/
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+/**
+ * Styles for all div elements (loader container).
+ */
+
+div{
+    height: 23vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+/**
+ * Styles for ul inside div (loader dots container).
+ */
+
+div ul{
+    display: flex;
+    border-bottom: 3px dotted #0e6f87;
+}
+/**
+ * Styles for li inside ul inside div (loader dots).
+ */
+
+div ul li{
+    width: 10px;
+    height: 10px;
+    list-style: none;
+    margin: auto 5px;
+    border-radius: 50px;
+    animation: bouncy 1s linear infinite ;
+}
+
+@keyframes bouncy {
+    0%{
+        transform: translateY(0);
+    }
+    50%{
+        transform: translateY(-30px);
+    }
+    100%{
+        transform: translateY(0);
+    }
+}
+div ul li:nth-child(1){
+    animation-delay: 0.1s;
+    background-color: rgb(0, 178, 220);
+}
+div ul li:nth-child(2){
+    animation-delay: 0.4s;
+    background-color: rgb(253, 183, 59);
+}
+div ul li:nth-child(3){
+    animation-delay: 0.6s;
+    background-color: rgb(146, 200, 73);
+}
+div ul li:nth-child(4){
+    animation-delay: 0.8s;
+    background-color: rgb(245, 130, 51);
+}
+/**
+ * Styles for the loader text below the loader.
+ */
+
+.load-txt {
+    position: absolute;
+    bottom: -12px;
+}
+/**
+ * Styles for span inside loader text.
+ */
+
+.load-txt span{
+    font-size: 0.75rem;
+}
+
+/* loader-1 CSS  end*/
+
+/* loader-2 CSS  start*/
+/**
+ * Styles for the loader-2 main container.
+ */
+
+.loader{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+}
+/**
+ * Styles for each span (dot) in loader-2.
+ */
+
+.loader > span{
+    display: inline-block;
+    background-color: rgb(0, 178, 220);
+    width: 0px;
+    height: 0px;
+    border-radius: 50%;
+    margin: 0 5px;
+    transform: translate3d(0);
+    animation: bounce 0.6s infinite alternate;
+}
+/**
+ * Styles for the second dot in loader-2.
+ */
+
+.loader > span:nth-child(2){
+    background-color: rgb(253, 183, 59);
+    animation-delay: 0.2s;
+}
+/**
+ * Styles for the third dot in loader-2.
+ */
+
+.loader > span:nth-child(3){
+    animation-delay: 0.4s;
+    background-color: rgb(146, 200, 73);
+}
+/**
+ * Styles for the fourth dot in loader-2.
+ */
+
+.loader > span:nth-child(4){
+    animation-delay: 0.6s;
+    background-color: rgb(245, 130, 51);
+}
+@keyframes bounce{
+    to{
+        width: 10px;
+        height: 10px;
+        transform: translate3d(0, -10px, 0);
+    }
+}
+/**
+ * Styles for the loader-2 text below the loader.
+ */
+
+.load2-txt{
+    position: absolute;
+    bottom: 15px;
+}
+/**
+ * Styles for span inside loader-2 text.
+ */
+
+.load2-txt span{
+    font-size: 0.75rem;
+}
+
+/**
+ * Styles for the page container centering content.
+ */
+
+.page{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* position: absolute;
+    top: 50%;
+    right: 50%; */
+
+}
+/**
+ * Styles for the loader container.
+ */
+
+.container{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+/**
+ * Styles for the loader title text.
+ */
+
+.load-title{
+    color: black;
+    font-size: 0.6rem;
+}
+/**
+ * Styles for the animated ring elements in loader.
+ */
+
+.ring{
+    width:80px;
+    height: 80px;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    position: absolute;
+}
+/**
+ * Styles for the first animated ring.
+ */
+
+.ring:nth-child(1){
+    border-bottom: 5px solid rgb(0, 178, 220);
+    animation:  rotate1 2s linear infinite
+}
+@keyframes rotate1 {
+    from {
+        transform: rotateX(50deg) rotateZ(110deg);
+      }
+      to {
+        transform: rotateX(50deg) rotateZ(470deg);
+      }
+}
+/**
+ * Styles for the second animated ring.
+ */
+
+.ring:nth-child(2) {
+    border-bottom: 5px solid rgb(253, 183, 59);
+    animation: rotate2 2s linear infinite;
+  }
+  
+  @keyframes rotate2 {
+    from {
+      transform: rotateX(20deg) rotateY(50deg) rotateZ(20deg);
+    }
+    to {
+      transform: rotateX(20deg)rotateY(50deg)  rotateZ(380deg);
+    }
+  }
+
+/**
+ * Styles for the third animated ring.
+ */
+
+.ring:nth-child(3) {
+    border-bottom: 5px solid rgb(146, 200, 73);
+    animation: rotate3 2s linear infinite;
+  }
+  
+  @keyframes rotate3 {
+    from {
+      transform: rotateX(40deg) rotateY(130deg) rotateZ(450deg);
+    }
+    to {
+      transform: rotateX(40deg) rotateY(130deg) rotateZ(90deg);
+    }
+  }
+/**
+ * Styles for the fourth animated ring.
+ */
+
+.ring:nth-child(4) {
+    border-bottom: 5px solid rgb(245, 130, 51);
+    animation: rotate4 2s linear infinite;
+  }
+  
+  /* Animates the fourth ring with a rotation effect.
+   * The animation rotates the ring around the X and Z axes.
+   */
+  /* loader-2 CSS  end*/
+  @keyframes rotate4 {
+    from {
+      transform: rotateX(70deg) rotateZ(270deg);
+    }
+    to {
+      transform: rotateX(70deg)  rotateZ(630deg);
+    }
+  }
+  
