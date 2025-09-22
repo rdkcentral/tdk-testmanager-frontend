@@ -15,8 +15,9 @@ Licensed under the Apache License, Version 2.0
 
 --------------------------------------------------------------------------------------
 
-Icon image src/assets/excel.png
-Image by Fateh Muhammad Raja from Pixabay
+There is the directory within this component (../src/assets/icons) containing images
+which are licensed under the Pixabay license. This directory  cntains its own license file,
+called LICENSE, which describes the licensing of the material under the directory.
 --------------------------------------------------------------------------------------
 
 
