@@ -1,0 +1,278 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<div class="container-fluid">
+<!-- Main container for configure page -->
+    <div class="row borders-btm">
+    <!-- Row for header and title -->
+        <div class="col-md-5">
+        <!-- Column for flavor selection -->
+            <div class="row ">
+            <!-- Row for flavor dropdown -->
+              <div class="falvor-row">
+                <span for="falvor" class="falvor-label">RDK flavor :</span>
+                    <select class="form-select rdk-dropdown" aria-label="Default select example" id="preferCategoty"
+                    [(ngModel)]="selectedCategory" (change)="categoryChange($event)">
+                        <option value="RDKV">Video</option>
+                        <option value="RDKB">Broadband</option>
+                    </select>
+              </div>
+              </div>
+        </div>
+        <div class="col-md-2">
+        <!-- Column for configure title -->
+            <h1 class="title">Configure</h1>
+        </div>
+        <div class="col-md-5">
+        <!-- Empty column for spacing -->
+        </div>
+      </div>
+    <div class="row mt-3">
+    <!-- Row for main configuration sections -->
+        <div class="row showrdkgrouprow" *ngIf="rdkvVisible">
+        <!-- Row for RDKV configuration options (conditional) -->
+            <div class="row">
+            <!-- Row for RDKV configuration cards -->
+                <div class="col">
+                <!-- Column for device type, OEM, SoC -->
+                    <div class="card-height-3" routerLink="/configure/list-devicetype">
+                        <span class="circle"><i class="bi bi-hdd-fill icon-conf"></i></span>
+                        <div class="text-group">
+                            <a  class="category-title3" routerLinkActive="active" (click)="navigationToUser('devicetype')">Device Type</a>    
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to add device type</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-height-3" routerLink="/configure/list-oem">
+                        <span class="circle"><i class="bi bi-gear-wide-connected icon-conf"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('oem')">OEM</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to add oem</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-height-3" routerLink="/configure/list-soc">
+                        <span class="circle"><i class="bi bi-cpu-fill icon-right"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('socvendors')">SoC</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to add SoC</span> 
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col">
+                <!-- Column for primitive test, modules, certification -->
+                    <div class="card-height-3" routerLink="/configure/list-primitivetest">
+                        <span class="circle"><i class="bi bi-align-top icon-right"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('prmitivetest')">Primitive Test</a>
+                            <i class="bi bi-arrow-right-short arrow-icon-right"></i>
+                            <div>
+                                <span class="desc">Option to add Primitive Test</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-height-3" routerLink="/configure/modules-list">
+                        <span class="circle"><i class="bi bi-border icon-conf"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('modules')">Modules</a>
+                            <i class="bi bi-arrow-right-short arrow-icon-right"></i>
+                            <div>
+                                <span class="text-center desc">Configure Information about Component Interface Modules</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-height-3" routerLink="/configure/list-rdk-certifications">
+                        <span class="circle"><i class="bi bi-award-fill icon-right"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('rdkcertification')">RDK Certification</a>
+                            <i class="bi bi-arrow-right-short arrow-icon-right"></i>
+                            <div>
+                                <span class="desc">Option to add rdk certification</span> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4" *ngIf="privileges == 'admin'">
+            <!-- Row for common configuration section (admin only) -->
+                <div class="text-start ">
+                    <h3 class="heading commonheading">Common Configuration</h3>
+                </div>
+                <div class="col" >
+                     <!-- TODO: Can be changed later -->
+                    <!-- <div class="card-height-3" routerLink="/configure/create-group">
+                        <span class="circle"><i class="bi bi-people-fill icon-conf"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('groups')">Groups</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to add Groups</span>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="card-height-3" routerLink="/app-upgrade">
+                          <span class="circle">
+                            <i class="bi bi-rocket-takeoff-fill icon-conf"></i>
+                        </span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('upgrade')">App upgrade</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to deploy app</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" >
+                    <div class="card-height-3" routerLink="/configure/user-management">
+                        <span class="circle"><i class="bi bi-person-fill-gear icon-right"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('usermanagement')">User Management</a>
+                            <i class="bi bi-arrow-right-short arrow-icon-right"></i>
+                            <div>
+                                <span class="desc">Option to manages users</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row showrdkgrouprow" *ngIf="rdkbVisible">
+        <!-- Row for RDKB configuration options (conditional) -->
+            <div class="row">
+            <!-- Row for RDKB configuration cards -->
+                <div class="col">
+                <!-- Column for device type, OEM, SoC -->
+                    <div class="card-height-3" routerLink="/configure/list-devicetype">
+                        <span class="circle"><i class="bi bi-hdd-fill icon-conf"></i></span>
+                        <div class="text-group">
+                            <a  class="category-title3" routerLinkActive="active" (click)="navigationToUser('devicetype')">Device Type</a>    
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to add device type</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-height-3" routerLink="/configure/list-oem">
+                        <span class="circle"><i class="bi bi-gear-wide-connected icon-conf"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('oem')">OEM</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to add oem</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-height-3" routerLink="/configure/list-soc">
+                        <span class="circle"><i class="bi bi-cpu-fill icon-right"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('socvendors')">SoC</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to add SoC</span> 
+                            </div>
+                        </div>
+                    </div>
+                
+                </div>
+                <div class="col">
+                    <div class="card-height-3" routerLink="/configure/list-primitivetest">
+                        <span class="circle"><i class="bi bi-align-top icon-right"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('prmitivetest')">Primitive Test</a>
+                            <i class="bi bi-arrow-right-short arrow-icon-right"></i>
+                            <div>
+                                <span class="desc">Option to add Primitive Test</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-height-3" routerLink="/configure/modules-list">
+                        <span class="circle"><i class="bi bi-border icon-conf"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('modules')">Modules</a>
+                            <i class="bi bi-arrow-right-short arrow-icon-right"></i>
+                            <div>
+                                <span class="text-center desc">Configure Information about Component Interface Modules</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-height-3 rdkBcertify">
+                        <span class="circle bc-circle"><i class="bi bi-award-fill icon-right"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3 rdkBlink" >RDK Certification</a>
+                            <i class="bi bi-arrow-right-short arrow-icon-right"></i>
+                            <div>
+                                <span class="desc">Option to add rdk certification</span> 
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4" *ngIf="privileges == 'admin'">
+            <!-- Row for common configuration section (admin only) -->
+                <div class="text-start ">
+                    <h3 class="heading commonheading">Common Configuration</h3>
+                </div>
+                <div class="col" >
+                    <!-- Feature requirement as discuss with ABHIJA -->
+                    <!-- <div class="card-height-3" routerLink="/configure/create-group">
+                        <span class="circle"><i class="bi bi-people-fill icon-conf"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('groups')">Groups</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to add Groups</span>
+                            </div>
+                        </div>
+                    </div> -->
+                    <div class="card-height-3" routerLink="/app-upgrade">
+                        <span class="circle">
+                            <img src="assets/icons/app.png" class="app-icon"/>
+                        </span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('upgrade')">App upgrade</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Option to deploy app</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col" >
+                    <div class="card-height-3" routerLink="/configure/user-management">
+                        <span class="circle"><i class="bi bi-person-fill-gear icon-right"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" routerLinkActive="active" (click)="navigationToUser('usermanagement')">User Management</a>
+                            <i class="bi bi-arrow-right-short arrow-icon-right"></i>
+                            <div>
+                                <span class="desc">Option to manages users</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

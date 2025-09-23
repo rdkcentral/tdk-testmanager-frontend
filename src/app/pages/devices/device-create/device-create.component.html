@@ -1,0 +1,553 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for device creation page -->
+<div class="container-fluid">
+  <!-- Row for header and form sections -->
+  <div class="row borders-btm">
+    <!-- Column for left section -->
+    <div class="col">
+      <!-- Row for flavor row -->
+      <div class="row">
+        <!-- Flavor row (empty) -->
+        <div class="falvor-row">
+        </div>
+      </div>
+    </div>
+    <!-- Column for title -->
+    <div class="col">
+      <h1 class="title">Create {{categoryName}} Device</h1>
+    </div>
+    <!-- Column for right section (empty) -->
+    <div class="col">
+    </div>
+  </div>
+    <!-- Row for main form area -->
+    <div class="row mt-1">
+        <!-- Column for form content -->
+        <div class="col-md-12">
+                  <!-- Section for Create Form V -->
+                  <div *ngIf="showHideCreateFormV">
+                    <form [formGroup]="deviceForm" (ngSubmit)="deviceVSubmit()" class="userform mt-3">
+                        <!-- Row for form fields (V) -->
+                        <div class="row">
+                            <!-- Column for left form fields (V) -->
+                            <div class="col">
+                                <!-- Row for device name input -->
+                                <div class="row mb-3">
+                                    <label for="devicename" class="col-md-3 col-form-label">Stb Name<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <!-- Column for device name input field -->
+                                    <div class="col-md-8">
+                                      <input type="text" class="form-control" id="devicename" formControlName="devicename" autocomplete="off" placeholder="Enter device name" 
+                                      [(ngModel)]="stbNameChange" (keyup)="valuechange($event)" maxlength="20">
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['devicename']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['devicename']?.errors?.['required']">Please enter device name.</small>
+                                            <small *ngIf="deviceForm.controls['devicename']?.errors?.['pattern']">
+                                              Invalid device name. Only alphabets, numbers, and underscores are allowed.
+                                            </small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for device IP input -->
+                                  <div class="row mb-3">
+                                    <label for="deviceip" class="col-md-3 col-form-label">Stb IP<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <!-- Column for device IP input field -->
+                                    <div class="col-md-8">
+                                      <input type="text" class="form-control" id="deviceip" formControlName="deviceip" autocomplete="off" placeholder="Enter device ip">
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['deviceip']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['deviceip']?.errors?.['required']">Please enter device IP.</small>
+                                            <small *ngIf="deviceForm.controls['deviceip']?.errors?.['pattern']">Please enter valid device IP.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for MAC address input -->
+                                  <div class="row mb-3">
+                                    <label for="macaddr" class="col-md-3 col-form-label">Mac Address<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <!-- Column for MAC address input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="macaddr" formControlName="macaddr"
+                                        autocomplete="off" placeholder="Enter mac address">
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['macaddr']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['macaddr']?.errors?.['required']">Please enter mac addr.</small>
+                                            <small *ngIf="deviceForm.controls['macaddr']?.errors?.['pattern']">Please enter valid mac address (e.g. AA:BB:CC:DD:EE:FF).</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for device type select -->
+                                  <div class="row mb-3">
+                                    <label for="devicetype" class="col-md-3 col-form-label">Device Type<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <!-- Column for device type select field -->
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="devicetype" formControlName="devicetype" (change)="devicetypeChange($event)" >
+                                            <option value="" default>Select</option>
+                                            @for (item of allDeviceType; track $index) {
+                                                <option value="{{item.deviceTypeName}}">{{item.deviceTypeName}}</option>
+                                            }
+                                          </select>
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['devicetype']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['devicetype']?.errors?.['required']">Please select device type.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                 
+                                  <!-- Row for Thunder enabled checkbox -->
+                                  <div class="row mb-3">
+                                    <span  class="col-md-3 col-form-label">Is Thunder Enabled <span class="thunder-info"></span></span>
+                                    <!-- Column for Thunder enabled checkbox -->
+                                    <div class="col-md-8 check-thunder">
+                                        <div class="form-check form-check-inline form-check-reverse">
+                                            <input class="form-check-input thunder" type="checkbox" id="isthunderEnabled" formControlName="isThunder"
+                                             (change)="thunderChecked($event)">
+                                          </div>
+                                          <span class="thunder-hints">
+                                          </span>
+                                    </div>
+                                  </div>
+                                  <!-- Row for Thunder port input (conditional) -->
+                                  <div class="row mb-3" *ngIf="showPortFile"> 
+                                    <span class="col-md-3 col-form-label">Thunder Port<span style="color:red; margin-left: 0.75em;">*</span>
+                                    <span class="thunderport-info"><i class="bi bi-info-circle" matTooltip ="Thunder Port"></i></span>
+                                  </span>
+                                    <!-- Column for Thunder port input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="thunderport" formControlName="thunderport" autocomplete="off" placeholder="Ex: 8080">
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['thunderport']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['thunderport']?.errors?.['required']">Please enter thunder port.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for device config file section -->
+                                  <div class="row mb-3"> 
+                                    <span for="deviceconfigfile" class="col-md-3  col-form-label">Device Config File :<mat-icon class="info-icon"
+                                        matTooltip="Add a device config file to the device. If you don't have a config file, you can create a new one.">info</mat-icon>
+                                      <!-- <span class="deviceconfig-info"><i class="bi bi-info-circle" matTooltip ="Device Config File"></i></span> -->
+                                    </span>
+                                    <!-- Column for device config file buttons -->
+                                    <div class="col-md-8">
+                                      <div class="configbtngrp" *ngIf="stbNameChange">
+                                        <button type="button" class="btn btn-outline-secondary newconfigfile" (click)="existDeviceDialog(configFileName)">
+                                          <span>{{
+                                            configFileName === "sampleDevice.config"
+                                            ? "Create New Device Config"
+                                            : configFileName
+                                            }}</span>
+                                          File
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary newconfigfile" *ngIf="visibleDeviceconfigFile"
+                                          (click)="openNewDeviceDialog()">
+                                          Create New Device Config File
+                                        </button>
+                                      </div>
+                                    </div>
+                                  </div>
+                            </div>
+                            <!-- Column for right form fields (V) -->
+                            <div class="col">
+                              <!-- Row for OEM select -->
+                              <div class="row mb-3">
+                                <label for="oem" class="col-md-3 offset-1 col-form-label">OEM</label>
+                                <!-- Column for OEM select field -->
+                                <div class="col-md-8">
+                                    <select class="form-select" aria-label="Default select example"  id="oem" formControlName="oem">
+                                        <option value="" default>Select</option>
+                                        @for (item of alloem; track $index) {
+                                            <option value="{{item.oemName}}">{{item.oemName}}</option>
+                                        }
+                                    </select>
+                                    <div *ngIf="deviceFormSubmitted && deviceForm.controls['oem']?.errors" class="text-danger">
+                                        <small *ngIf="deviceForm.controls['oem']?.errors?.['required']">Please select oem.</small>
+                                    </div>
+                                </div>
+                              </div>
+                                  <!-- Row for SoC select -->
+                                  <div class="row mb-3">
+                                    <label for="soc" class="col-md-3 offset-1 col-form-label">SoC</label>
+                                    <!-- Column for SoC select field -->
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example"  id="soc" formControlName="soc">
+                                            <option value="" default>Select</option>
+                                            @for (item of allsoc; track $index) {
+                                                <option value="{{item.socName}}">{{item.socName}}</option>
+                                            }
+                                          </select>
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['soc']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['soc']?.errors?.['required']">Please select soc vendor.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for configure device ports checkbox -->
+                                  <div class="row mb-3">
+                                    <label for="configuredevicePorts" class="col-md-3 offset-1 col-form-label">Configure Device Ports</label>
+                                    <!-- Column for configure device ports checkbox -->
+                                    <div class="col-md-8">
+                                        <div class="form-check form-check-inline form-check-reverse">
+                                            <input class="form-check-input thunder" type="checkbox" id="configuredevicePorts"  formControlName="configuredevicePorts"
+                                             (change)="isConfigDevicePorts($event)">
+                                          </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for agent port input (conditional) -->
+                                  <div class="row mb-3" *ngIf="showConfigPort"> 
+                                    <label for="agentport" class="col-md-3 offset-1 col-form-label">Agent Port</label>
+                                    <!-- Column for agent port input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="agentport" formControlName="agentport" autocomplete="off" [(ngModel)]="agentport">
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['agentport']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['agentport']?.errors?.['required']">Please enter agent port.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for agent status port input (conditional) -->
+                                  <div class="row mb-3" *ngIf="showConfigPort"> 
+                                    <label for="agentstatusport" class="col-md-3 offset-1 col-form-label">Agent Status Port</label>
+                                    <!-- Column for agent status port input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="agentstatusport" formControlName="agentstatusport" autocomplete="off" [(ngModel)]="agentStatusPort">
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['agentstatusport']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['agentstatusport']?.errors?.['required']">Please enter agent status port.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for agent monitor port input (conditional) -->
+                                  <div class="row mb-3" *ngIf="showConfigPort"> 
+                                    <label for="agentmonitorport" class="col-md-3 offset-1 col-form-label">Agent Monitor Port</label>
+                                    <!-- Column for agent monitor port input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="agentmonitorport" formControlName="agentmonitorport" autocomplete="off" [(ngModel)]="agentMonitoPort">
+                                        <div *ngIf="deviceFormSubmitted && deviceForm.controls['agentmonitorport']?.errors" class="text-danger">
+                                            <small *ngIf="deviceForm.controls['agentmonitorport']?.errors?.['required']">Please enter agent monitor port.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
+                        <!-- Row for form action buttons (V) -->
+                        <div class="row">
+                            <!-- Container for form action buttons (V) -->
+                            <div class="mt-1 mb-3 text-end">
+                                <button class="reset-btn" (click)="goBack()" matTooltip="Back">Back</button>
+                                <button class="reset-btn" (click)="reset()" matTooltip="Reset the values">Reset</button>
+                                <button type="submit" class="create-btn" matTooltip="Create new device">Create</button>
+                            </div>
+                        </div>
+                    </form>
+                  </div>
+                    <!-- Section for Create Form B -->
+                    <div *ngIf="showHideCreateFormB">
+                      <form [formGroup]="rdkBForm" (ngSubmit)="deviceBSubmit()" class="userform mt-5">
+                        <!-- Row for form fields (B) -->
+                        <div class="row">
+                            <!-- Column for left form fields (B) -->
+                            <div class="col">
+                                <!-- Row for gateway name input -->
+                                <div class="row mb-3">
+                                    <label for="gatewayName" class="col-md-3 col-form-label">Gateway Name<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <!-- Column for gateway name input field -->
+                                    <div class="col-md-8">
+                                      <input type="text" class="form-control" id="gatewayName" formControlName="gatewayName" autocomplete="off" placeholder="Enter gateway name" maxlength="20">
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['gatewayName']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['gatewayName']?.errors?.['required']">Please enter gateway name.</small>
+                                            <small *ngIf="rdkBForm.controls['gatewayName']?.errors?.['pattern']">
+                                              Invalid gateway name. Only alphabets, numbers, and underscores are allowed.
+                                            </small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for gateway IP input -->
+                                  <div class="row mb-3">
+                                    <label for="gatewayIp" class="col-md-3 col-form-label">Gateway IP<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <!-- Column for gateway IP input field -->
+                                    <div class="col-md-8">
+                                      <input type="text" class="form-control" id="gatewayIp" formControlName="gatewayIp" autocomplete="off" placeholder="Enter gateway ip">
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['gatewayIp']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['gatewayIp']?.errors?.['required']">Please enter gateway ip.</small>
+                                            <small *ngIf="rdkBForm.controls['gatewayIp']?.errors?.['pattern']">Please enter valid gateway ip.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for MAC address input -->
+                                  <div class="row mb-3">
+                                    <label for="macaddr" class="col-md-3 col-form-label">Mac Address<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <!-- Column for MAC address input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="macaddr" formControlName="macaddr"
+                                        autocomplete="off" placeholder="Enter mac address">
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['macaddr']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['macaddr']?.errors?.['required']">Please enter mac addr.</small>
+                                            <small *ngIf="rdkBForm.controls['macaddr']?.errors?.['pattern']">Please enter valid mac address (e.g. AA:BB:CC:DD:EE:FF).</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for device type select -->
+                                  <div class="row mb-3">
+                                    <label for="devicetype" class="col-md-3 col-form-label">Device Type<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <!-- Column for device type select field -->
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="devicetype" formControlName="devicetype" (change)="devicetypeChange($event)">
+                                            <option value="" default>Select</option>
+                                            @for (item of allDeviceType; track $index) {
+                                                <option value="{{item.deviceTypeName}}">{{item.deviceTypeName}}</option>
+                                            }
+                                          </select>
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['devicetype']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['devicetype']?.errors?.['required']">Please select device type.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for OEM select -->
+                                  <div class="row mb-3">
+                                    <label for="oem" class="col-md-3 col-form-label">OEM</label>
+                                    <!-- Column for OEM select field -->
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example"  id="oem" formControlName="oem">
+                                            <option value="" default>Select</option>
+                                            @for (item of alloem; track $index) {
+                                                <option value="{{item.oemName}}">{{item.oemName}}</option>
+                                            }
+                                          </select>
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['oem']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['oem']?.errors?.['required']">Please select oem.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                            </div>
+                            <!-- Column for right form fields (B) -->
+                            <div class="col">
+                           
+                                  <!-- Row for SoC select -->
+                                  <div class="row mb-3">
+                                    <label for="soc" class="col-md-3 offset-1 col-form-label">SoC</label>
+                                    <!-- Column for SoC select field -->
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example"  id="soc" formControlName="soc">
+                                            <option value="" default>Select</option>
+                                            @for (item of allsoc; track $index) {
+                                                <option value="{{item.socName}}">{{item.socName}}</option>
+                                            }
+                                          </select>
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['soc']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['soc']?.errors?.['required']">Please select soc vendor.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for configure device ports checkbox -->
+                                  <div class="row mb-3">
+                                    <label for="configuredevicePortB" class="col-md-3 offset-1 col-form-label">Configure Device Ports</label>
+                                    <!-- Column for configure device ports checkbox -->
+                                    <div class="col-md-8">
+                                        <div class="form-check form-check-inline form-check-reverse">
+                                            <input class="form-check-input thunder" type="checkbox" id="configuredevicePortB" 
+                                             formControlName="configuredevicePortB" (change)="isCheckedConfigB($event)">
+                                          </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for agent port input (conditional) -->
+                                  <div class="row mb-3" *ngIf="showConfigPortB"> 
+                                    <label for="agentPortb" class="col-md-3 offset-1 col-form-label">Agent Port</label>
+                                    <!-- Column for agent port input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="agentPortb" formControlName="agentPortb" autocomplete="off" [(ngModel)]="agentport">
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['agentPortb']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['agentPortb']?.errors?.['required']">Please enter agent port.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for agent status port input (conditional) -->
+                                  <div class="row mb-3" *ngIf="showConfigPortB"> 
+                                    <label for="agentStatusportB" class="col-md-3 offset-1 col-form-label">Agent Status Port</label>
+                                    <!-- Column for agent status port input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="agentStatusportB" formControlName="agentStatusportB" autocomplete="off" [(ngModel)]="agentStatusPort">
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['agentStatusportB']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['agentStatusportB']?.errors?.['required']">Please enter agent status port.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                                  <!-- Row for agent monitor port input (conditional) -->
+                                  <div class="row mb-3" *ngIf="showConfigPortB"> 
+                                    <label for="agentMonitorportB" class="col-md-3 offset-1 col-form-label">Agent Monitor Port</label>
+                                    <!-- Column for agent monitor port input field -->
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="agentMonitorportB" formControlName="agentMonitorportB" autocomplete="off" [(ngModel)]="agentMonitoPort">
+                                        <div *ngIf="rdkbFormSubmitted && rdkBForm.controls['agentMonitorportB']?.errors" class="text-danger">
+                                            <small *ngIf="rdkBForm.controls['agentMonitorportB']?.errors?.['required']">Please enter agent monitor port.</small>
+                                        </div>
+                                    </div>
+                                  </div>
+                            </div>
+                        </div>
+                        <!-- Row for form action buttons (B) -->
+                        <div class="row">
+                            <!-- Container for form action buttons (B) -->
+                            <div class="mt-2 text-end">
+                                <button class="reset-btn" matTooltip="Go back" (click)="goBack() ">Back</button>
+                                <button class="reset-btn" matTooltip="Reset the values"(click)="resetFormB()">Reset</button>
+                                <button type="submit" matTooltip="Create new device" class="create-btn">Create</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+ 
+        </div>
+    </div>
+</div>
+
+
+ <!-- Modal Start-->
+<ng-template #dialogTemplate>
+  <mat-dialog-content class="exsit-modal-content">
+    <div class="config-modal">
+      <div class="config-content">
+        <form [formGroup]="uploadConfigForm" (ngSubmit)="configFileUpload()">
+        <div class="config-header">
+          <input type="text" id="configFilename" class="form-control config-input" formControlName="editorFilename" readonly />
+          <button type="button" class="btn btn-outline-primary btn-sm delete-config config-editbtn"
+            (click)="toggleFileNameDialog()" matTooltip="Toggle FileName" *ngIf="
+                              deviceForm.value.devicename &&
+                              deviceForm.value.devicetype &&
+                              visibleDeviceconfigFile == true &&
+                              configFileName != 'sampleDevice.config'
+                            ">
+            <i class="bi bi-toggles2 toogle-name"></i>
+          </button>
+          <div *ngIf="
+                          visibleDeviceconfigFile == false &&
+                          configFileName !== 'sampleDevice.config'
+                        ">
+            <button type="button" class="btn btn-outline-primary btn-sm delete-config"
+              (click)="deleteDeviceConfigFile(configFileName)" matTooltip="Delete Config File">
+              <i class="bi bi-trash-fill delete-fill"></i>
+            </button>
+          </div>
+
+          
+          <button type="button" class="btn btn-outline-primary btn-sm delete-config"  matTooltip ="Download config file" (click)="downloadConfigFile()">
+            <i class="bi bi-download download-icon"></i>
+          </button>
+        </div>
+        <div class="existModal-body">
+          <div class="row">
+            <div class="col changefile-name">
+            </div>
+            <div class="col uploadconfig">
+              <button type="button" class="download-btn backEditor" (click)="backToExistingEditor()" *ngIf="backToExistEditorbtn" matTooltip="Go back">Back</button>
+              <button type="button" class="download-btn" (click)="openExistingModal('Upload Configuration File')" *ngIf="showExistUploadButton" matTooltip="Upload file">Upload Configuration File</button>
+            </div>
+          </div>
+            <div class="editor-container mt-4 exist-config" *ngIf="existingConfigEditor">
+              <ngx-monaco-editor [options]="editorOptions" formControlName="editorContent" (onInit)="onEditorInit($event)">
+              </ngx-monaco-editor>
+              <div *ngIf="existConfigSubmitted && uploadConfigForm.controls['editorContent']?.errors" class="text-danger">
+                <small *ngIf="uploadConfigForm.controls['editorContent']?.errors?.['required']">Please add some content</small>
+            </div>  
+            </div>
+  
+            <div class="container mt-5 upload-container" *ngIf="uploadExistingConfig">
+              <div class="row mb-3"> 
+                  <label for="uploadFileModal" class="col-md-4  col-form-label" style="  font-size: 1em; font-family: Roboto;font-weight: 500;">Upload Configuration file<span style="color:red; margin-left: 0.75em;">*</span></label>
+                      <div class="col-md-8">
+                          <input class="form-control form-control-sm" id="uploadFileModal" type="file" formControlName="uploadFileModal" (change)="onExistConfigChange($event)">
+                          <div *ngIf="existConfigSubmitted && uploadConfigForm.controls['uploadFileModal']?.errors?.['required']" class="text-danger">
+                             <small>Please select a configuration file.</small>
+                          </div>
+                  </div>
+              </div>
+              <div class="modal-btns">
+                <button type="button" class="download-btn" (click)="closeDialog()" matTooltip="Close">Close</button>
+                <button type="submit" class="download-btn" matTooltip="Upload Config File">Upload</button>
+              </div>
+          </div>
+        </div>
+        <div class="modal-btns" *ngIf="!uploadExistingConfig">
+          <button type="button" class="download-btn" (click)="closeDialog()" matTooltip="Close">Close</button>
+          <button type="submit" class="download-btn" matTooltip="Update Config File">Update</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </mat-dialog-content>
+</ng-template>
+ <!-- Modal End -->
+
+ <!-- Device Modal Start-->
+<ng-template #newDeviceTemplate>
+  <mat-dialog-content class="exsit-modal-content">
+    <div class="config-modal">
+      <div class="config-content">
+        <form [formGroup]="uploadDeviceConfigForm" (ngSubmit)="configDeviceFileUpload()">
+        <div class="config-header newdevice-header">
+          <h1 class="modal-title device-title" id="staticBackdropLabel">{{uploadCreateHeading}}</h1>
+        </div>
+        <div class="existModal-body">
+          <div class="row">
+            <div class="col changefile-name">
+              <input type="text" id="configFilename" class="form-control config-input device-input" formControlName="editorFilename"  [readOnly]="!isEditingFile">
+              <button type="button" class="btn bbtn-outline-primary btn-sm delete-config config-editbtn" (click)="toggleIsEdit()" 
+                matTooltip="Change FileName" >
+              <i [class]=" 'bi ' + (isEditingFile ? 'bi-check-circle' : 'bi-pencil') "></i>
+            </button>
+            <!-- Toggle filename button: just toggles between device/boxtype names -->
+             
+            <button type="button" class="btn btn-outline-primary btn-sm delete-config config-editbtn" (click)="toggleFileName()"
+              matTooltip="Toggle FileName" *ngIf="
+                                deviceForm.value.devicename &&
+                                deviceForm.value.devicetype &&
+                                visibleDeviceconfigFile == false &&
+                                configFileName == 'sampleDevice.config'
+                              ">
+              <i class="bi bi-toggles2 toogle-name"></i>
+            </button>
+            </div>
+            <div class="col uploadconfig">
+              <button type="button" class="download-btn backEditor" (click)="backToEditor('Create New Device Config File')" *ngIf="backToEditorbtn" matTooltip="Go back">Back</button>
+              <button type="button" class="download-btn" (click)="openUploadFile('Upload Configuration File')" *ngIf="showUploadButton" matTooltip="Upload file">Upload Configuration File</button>
+            </div>
+          </div>
+  
+            <div class="device-container mt-4 device-editor" *ngIf="deviceEditor">
+              <ngx-monaco-editor [options]="editorOptions" formControlName="editorContent" (onInit)="onEditorInit($event)">
+              </ngx-monaco-editor>
+              <div *ngIf="submitted && uploadDeviceConfigForm.controls['editorContent']?.errors" class="text-danger">
+                <small *ngIf="uploadDeviceConfigForm.controls['editorContent']?.errors?.['required']">Please add some content</small>
+            </div>  
+            </div>
+  
+            <div class="container mt-5 upload-container" *ngIf="uploadConfigSec">
+              <div class="row mb-3"> 
+                  <label for="uploadConfigFileModal" class="col-md-4  col-form-label"style="  font-size: 1em; font-family: Roboto;font-weight: 500;">Upload Configuration file<span style="color:red; margin-left: 0.75em;">*</span></label>
+                      <div class="col-md-8">
+                          <input class="form-control form-control-sm" id="uploadConfigFileModal" type="file" formControlName="uploadConfigFileModal" (change)="onModalFileChange($event)">
+                          <div *ngIf="submitted && uploadDeviceConfigForm.controls['uploadConfigFileModal']?.errors?.['required']" class="text-danger">
+                             <small>Please select a configuration file.</small>
+                          </div>
+                  </div>
+              </div>
+               <div class="modal-btns">
+                <button type="button" class="download-btn" (click)="closeNewDeviceDialog()" matTooltip="Close">Close</button>
+                <button type="submit" class="download-btn" matTooltip="Upload Config File">Upload</button>
+              </div>
+          </div>
+  
+        </div>
+        <div class="modal-btns" *ngIf="!uploadConfigSec">
+          <button type="button" class="download-btn" matTooltip="Close" (click)="closeNewDeviceDialog()">Close</button>
+          <button type="submit" class="download-btn" matTooltip="Create the config file">Create</button>
+        </div>
+        </form>
+      </div>
+    </div>
+  </mat-dialog-content>
+</ng-template>
+ <!-- Device Modal End-->

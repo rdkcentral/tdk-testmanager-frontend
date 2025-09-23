@@ -1,0 +1,496 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!--
+  Main container for the execution result details dialog.
+-->
+<div class="container-fluid">
+    <!--
+      Row for the main content area.
+    -->
+    <div class="row mt-2">
+      <!--
+        Column for the main content, full width on medium and up, printable area.
+      -->
+      <div class="col-md-12" #printableArea>
+        <!--
+          Title for the execution result details view.
+        -->
+        <h1 class="view-title">Execution Result Details</h1>
+        <!--
+          Dropdown section for download and refresh buttons.
+        -->
+        <div class="download-dropdown">
+          <button type="button" class="download-btn refresh" matTooltip="Click here to update" (click)="dataUpdate()"
+          *ngIf ="data.executionStatus === 'INPROGRESS'">
+            <i class="bi bi-arrow-clockwise download-icon"></i>
+          </button>
+          <button class="btn btn-sm top-download" matTooltip="Download Reports" (click)="showPopup()">
+            <i class="bi bi-cloud-arrow-down-fill extra-icon download"></i>
+          </button>
+        </div>
+        <div *ngIf="showPopupFlag" class="popup">
+          <button class="close-button" (click)="closePopup()">&times;</button>
+          <div class="btns-grps">
+            <button class="menuitem-download" matTooltip="Excel- Raw report" (click)="rawReportDownload()"><img src="assets/icons/excel.png" class="icons excel"/> </button>
+            <button class="menuitem-download" matTooltip="Excel - Consolidated report" (click)="consolidatedReport()"><img src="assets/icons/excel.png" class="icons excel"/></button>
+            <button class="menuitem-download" matTooltip="Result XML" (click)="XMLReportDownload()"><i class="bi bi-filetype-xml xml "></i></button>
+            <button class="menuitem-download" matTooltip="Execution logs - zip" (click)="resultsZIP()"><i class="bi bi-file-earmark-zip-fill zip"></i></button>
+            <button class="menuitem-download" *ngIf="showFailedZipOption" matTooltip="Execution logs for failure - zip" (click)="failResultsZIP()"><i class="bi bi-file-earmark-zip-fill zip"></i></button>  
+            <button class="menuitem-download" (click)="downloadAsHtml()" matTooltip="HTML-Report"><i  class="bi bi-filetype-html dot-icon"></i></button>
+            <button class="menuitem-download" ><i  class="bi bi-three-dots-vertical dot-icon" [matMenuTriggerFor]="nestedMenu"></i></button>
+          </div>
+        </div>
+        <mat-menu #nestedMenu="matMenu"  xPosition="before" class="nested-download">
+          <button mat-menu-item class="download-all"   (click)="downLoadAll()"> <span class="logout-text">Download All</span></button>
+        </mat-menu>
+        <div>
+          <div class="row mt-2">
+            <div class="col-md-6" >
+                <mat-card class=" info-card">
+                  <div class="main-info">
+                    <div class="col-md-7 left-info">
+                      <div class="mt-2">
+                        <span class="details-row heading">Device Name :</span>
+                        <span class="details-row">{{data.deviceName}}</span>
+                      </div>
+                      <div class="space-between">
+                        <span class="details-row heading">IP / MAC :</span>
+                        <span class="details-row">{{data.deviceIP}} / {{data.deviceMac}}</span>
+                      </div>
+                      <div class="space-between">
+                        <span class="details-row heading">Image Details :</span>
+                        <span class="details-device">
+                          <span class="content" [innerHtml]="displayContent" >
+                          </span>
+                          <a class="showmore" *ngIf="deviceDetails.length > maxLength" (click)="toggleMoreLess()">{{isExpanded?'Show Less':'Show More'}}
+                          </a>
+                        </span> 
+                      </div>
+                    </div>
+                    <div class="col-md-5 right-info">
+                      <div class="mt-2">
+                        <span class="details-row heading">Date of Execution :</span>
+                        <span class="details-row">{{convertDate(data.dateOfExecution)}}</span>
+                      </div>
+                      <div class="space-between">
+                        <span class="details-row heading">Total execution time(min) :</span>
+                        <span class="details-row">{{data.totalExecutionTime}}</span>
+                      </div>
+                      <div class="space-between">
+                        <span class="details-row heading">Overall Result :</span>
+                        <span class="details-row" class="details-row" [ngClass]="  data.result === 'SUCCESS' ? 'success-status' : 
+                        data.result === 'FAILURE' ? 'failure-status' : 
+                        data.result === 'INprogress' ? 'inprogress-status' : 
+                        'default-class'">{{data.result}}</span>
+                      </div>
+                    </div>
+                  </div>
+                </mat-card>
+            </div>
+            <div class="col-md-1 last">
+              <mat-card class="summary-card common-card" >
+                <div class="showtext" >
+                  <span class="number-na">{{data.summary.totalScripts}}</span>
+                  <p class="number-title">Total</p>
+              </div>
+              </mat-card>
+            </div>
+            <div class="col-md-1 first">
+              <mat-card class="summary-card common-card">
+                <div class="showtext">
+                    <span class="number-txt">{{ data.summary.success}}</span>
+                    <p class="number-title">Success</p>
+                </div>
+              </mat-card>
+            </div>
+            <div class="col-md-1 second">
+              <mat-card class="summary-card common-card">
+                <div class="showtext">
+                  <span class="number-fail">{{ data.summary.failure}}</span>
+                  <p class="number-title">Failure</p>
+              </div>
+              </mat-card>
+            </div>
+  
+            <div class="col-md-3">
+              <mat-card class="summary-card">
+                <apx-chart
+                    [series]="chartOptions.series"
+                    [chart]="chartOptions.chart"
+                    [labels]="chartOptions.labels"
+                    [legend]="chartOptions.legend"
+                    [colors]="chartOptions.dcolors!" 
+                    [dataLabels]="chartOptions.dataLabels">
+                  </apx-chart>
+                  <div class="total">
+                    <span>Total Scripts : {{data.summary.totalScripts}} </span>
+                    <span class="overall" >Overall Pass % : <span [ngClass]="data.summary.successPercentage < 40 ? 'red-status' : 
+                      data.summary.successPercentage < 70 ? 'orange-status' : 
+                      data.summary.successPercentage > 70 ? 'green-status' : 
+                      'default-class'">{{data.summary.successPercentage}}</span> </span>
+                  </div>
+              </mat-card>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="anlysis-sec">
+              <mat-tab-group animationDuration="0ms" mat-align-tabs="start" (selectedTabChange)="onTabClick($event)">
+                <mat-tab label="Result Summary" class="result-label">
+                    <div class="report-section">
+                      <table class="module-table bold-table">
+                        <thead>
+                          <tr class="method-head">
+                            <th>Module Name</th>
+                            <th>Total Scripts</th>
+                            <th>Success</th>
+                            <th>Failure</th>
+                            <th>Aborted</th>
+                            <th>Executed</th>
+                            <th>In Progress</th>
+                            <th>NA</th>
+                            <th>Pending</th>
+                            <th>Skipped</th>
+                            <th>Timeout</th>
+                            <th>Success %</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr  class="method" *ngFor="let key of moduleTableTitle">
+                            <td>{{key.name }}</td>
+                            <td>{{ key.totalScripts}}</td>
+                            <td>{{ key.success}}</td>
+                            <td>{{ key.failure}}</td>
+                            <td>{{ key.aborted}}</td>
+                            <td>{{ key.executed}}</td>
+                            <td>{{ key.inProgressCount}}</td>
+                            <td>{{ key.na}}</td>
+                            <td>{{ key.pending}}</td>
+                            <td>{{ key.skipped}}</td>
+                            <td>{{ key.timeout}}</td>
+                            <td class="passvalue">{{ key.successPercentage}}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                </mat-tab>
+                <mat-tab label="Analysis Summary">
+                  <table class="module-table bold-table">
+                    <thead>
+                      <tr class="method-head" >
+                        <th>Module Name</th>
+                        <th>Script Issue</th>
+                        <th>RDK Issue</th>
+                        <th>Interface Change</th>
+                        <th>ENV Issue</th>
+                        <th>Other Issue</th>
+                        <th>Total Failures</th>
+                        <th>Analysed</th>
+                        <th>Not Analysed</th>
+                        <th>Analysis %</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr  class="method" *ngFor="let key of analysisSummaryData">
+                        <td>{{key.name }}</td>
+                        <td>{{key.scriptIssue }}</td>
+                        <td>{{key.rdkIssue }}</td>
+                        <td>{{key.interfaceChange }}</td>
+                        <td>{{key.envIssue }}</td>
+                        <td>{{key.otherIssue }}</td>
+                        <td>{{key.failure }}</td>
+                        <td>{{key.analysed }}</td>
+                        <td>{{key.notAnalysed }}</td>
+                        <td class="passvalue">{{key.percentageAnalysed}}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </mat-tab>
+            </mat-tab-group> 
+            </div>
+          </div>  
+          <div class="col-md-12 mt-3">
+            <span class="summary-label mt-3">Detailed Results</span>
+            <div class="table-container mt-2" >
+              <div
+              class="row align-items-center seach-section"
+              *ngIf="data.executionStatus === 'COMPLETED'"
+            >
+              <!-- Repeat / Rerun Section (3/12) -->
+              <div class="col-md-3 d-flex align-items-center toolbar-section">
+                <div class="col-md-8">
+                  <span class="script-head">Rerun All / Failures:</span>
+                  <button
+                    type="button"
+                    class="btn btn-link p-0 ms-2 info-blue"
+                    matTooltip="Rerun all scripts or rerun failures on the same device"
+                    style="font-size: 1.2em"
+                    tabindex="-1"
+                  >
+                    <i class="bi bi-info-circle"></i>
+                  </button>
+                </div>
+                <div class="col-md-2">
+                  <button
+                    type="button"
+                    class="script-btn ms-2"
+                    matTooltip="Rerun All"
+                    (click)="repeatExecution()"
+                  >
+                    <i class="bi bi-arrow-repeat download-icon"></i>
+                    <!-- <span class="fw-bold ms-1">Repeat All</span> -->
+                  </button>
+                </div>
+                <div
+                  class="col-md-2"
+                  *ngIf="
+                    data.executionType !== 'SINGLESCRIPT' &&
+                    data.result !== 'SUCCESS'
+                  "
+                >
+                  <button
+                    type="button"
+                    class="script-btn ms-2"
+                    matTooltip="Rerun failures"
+                    (click)="rerunFailure()"
+                  >
+                    <i class="bi bi-arrow-repeat download-icon text-danger"></i>
+                    <!-- <span class="fw-bold ms-1">ReRun Failures</span> -->
+                  </button>
+                </div>
+              </div>
+              <!-- Filtered Execution Section (9/12) -->
+              <div
+                class="col-md-9 d-flex align-items-center toolbar-section-filter"
+                *ngIf="data.executionType !== 'SINGLESCRIPT'"
+                >
+            
+                  <span class="script-head">Filtered Execution :</span>
+                  <button
+                    type="button"
+                    class="btn btn-link p-0 ms-2 info-blue"
+                    matTooltip="Select script based on the status or by checkbox and trigger execution of the scripts in another device or the same device."
+                    style="font-size: 1.2em"
+                    tabindex="-1"
+                  >
+                    <i class="bi bi-info-circle"></i>
+                  </button>
+                  <label for="filterStatus" class="me-1 mb-0 filter-label" style="margin-left: 10px;"
+                    >Filter by:</label
+                  >
+                  <select
+                    id="filterStatus"
+                    class="form-select form-select-sm d-inline-block w-auto me-3"
+                    style="min-width: 120px"
+                    [(ngModel)]="filterStatus"
+                    (change)="applyFilter()"
+                  >
+                    <option value="all">All</option>
+                    <option value="SUCCESS">SUCCESS</option>
+                    <option value="FAILURE">FAILURE</option>
+                  </select>
+                  <label for="filterStatus" class="me-1 mb-0">Device :</label>
+                  <ng-multiselect-dropdown
+                    id="deviceSelect"
+                    [settings]="dropdownSettings"
+                    [data]="deviceList"
+                    [(ngModel)]="selectedDevices"
+                    (onSelect)="onDeviceSelect($event)"
+                    (onDeSelect)="onDeviceDeSelect($event)"
+                    (onSelectAll)="onSelectAll($event)"
+                    (onDeSelectAll)="onDeSelectAll($event)"
+                    [placeholder]="'Select Device'"
+                    class="device-dropdown"
+                    style="width: 225px !important"
+                  >
+                  </ng-multiselect-dropdown>
+                  <button
+                    type="button"
+                    class="view-btn close trigger-btn ms-2"
+                    matTooltip="Trigger Execution"
+                    (click)="triggerExecution()"
+                    [disabled]="
+                      !deviceListArray || deviceListArray.length === 0
+                    "
+                  >
+                    <span style="font-weight: normal">Execute Now</span>
+                  </button>
+                
+              </div>
+            </div>
+
+              <div class="row table-heading">
+                <div class="col-md-1 border-column">
+                  <span><input type="checkbox" id="selectAll" [checked]="allChecked" 
+                    (change)="toggleAll($event)" /></span>
+                </div>
+                <div class="col-md-6 border-column">
+                  <span class="script-head">Script Name</span>
+                </div>
+                <div class="col-md-2 border-column script-head"><span>Status</span></div>
+                <div class="col-md-3 script-head">Action
+                </div>
+              </div>
+              <div class="row">
+                <div class="accordion" id="accordionExample">
+                  <div class="row accord-row">
+                    <div class="accordion-item" *ngFor="let parent of filteredData; let i = index">
+                   
+                        <h2 class="accordion-header d-flex align-items-center accord-head">
+                          <div class="col-md-1">
+                            <input type="checkbox" [checked]="parent.checked" 
+                            (change)="toggleCheckbox(i, $event)"/>                                 
+                          </div>
+                          <div class="col-md-6">
+                            <button class="accordion-button no-arrow collapsed flex-grow-1 accor-title" type="button" (click)="$event.stopPropagation()">
+                              {{ parent.name }} 
+                            </button>                                    
+                          </div>
+                          <div class="col-md-2">
+                          <button class="accordion-button no-arrow collapsed flex-grow-1 accor-testgroup" type="button" (click)="$event.stopPropagation()">
+                            {{ parent.status }} 
+                          </button>
+                          </div>
+                          <div class="col-md-3">
+                            <button  class="btn btn-sm delete-btn" matTooltip="Download Script" (click)="scriptDownload(parent)" >
+                              <i class="bi bi-cloud-arrow-down-fill extra-icon download"></i>
+                            </button>
+                            <button class="btn btn-sm view-icon" [matTooltip]="parent.expanded ? 'Hide Deatils' : 'View Details' "  (click)="togglePanel(parent, parent.executionResultID, i)">
+                              <i class="bi collapse-icon details" [ngClass]="parent.expanded ? 'bi-journal-minus' : 'bi-journal-plus'"></i>
+                            </button>
+                            <a  *ngIf="parent.status === 'FAILURE' && parent.analysisTicket == null" class="ticketLink" (click)="openAnalyzeDialog(parent)" >Analyze</a>
+                            <a  *ngIf="parent.status === 'FAILURE' && parent.analysisTicket !== null" class="ticketLink" (click)="openAnalyzeLinkDialog(parent, parent.analysisTicket)">{{parent.analysisTicket}}</a>
+                          </div>
+                        </h2>
+                      <div [class.show]="parent.expanded" class="accordion-collapse collapse">
+                        <div class="accordion-body" >
+                          <mat-card class="details-card"  [ngClass]="{'loading-card': parent.detailsLoading}">
+                            <div class="row loader-row" *ngIf="parent.detailsLoading">
+                              <app-loader></app-loader>
+                            </div>
+                            <ng-container *ngIf="!parent.detailsLoading">
+                            <div class="method-sec mt-3">
+                              <mat-accordion>
+                                <mat-expansion-panel class="method-panel">
+                                  <mat-expansion-panel-header class="panel-head">
+                                    <mat-panel-title class="result-label">Method Results</mat-panel-title>
+                                  </mat-expansion-panel-header>
+                                  <table class="module-table" *ngIf="parent.details">
+                                    <thead>
+                                      <tr class="method-head">
+                                        <th>Function Name</th>
+                                        <th>ExpectedResult</th>
+                                        <th>ActualResult</th>
+                                        <th>Status</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody class="method-table-body"> 
+                                      <tr *ngFor="let obj of parent.details.executionMethodResult" class="method">
+                                        <td> {{obj.functionName}} </td>
+                                        <td> {{obj.expectedResult}} </td>
+                                        <td> {{obj.actualResult}} </td>
+                                        <td> {{obj.resultStatus}} </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                </mat-expansion-panel>
+                              </mat-accordion>
+                            </div>
+                            <h2 class="details-heading mt-2">Execution details</h2>
+                              <div class="details-sec">
+                                <table class="script-table" *ngIf="parent.details">
+                                  <tbody >
+                                    <tr >
+                                      <th class="details-row trend-heading ">Script Trend</th>
+                                      <td class="details-row ">
+                                        <div class="trend-container">
+                                          <div *ngFor="let trend of parent.details.executionTrend" class="status-item">
+                                              <div
+                                              class="status-circle"
+                                              [ngClass]="{
+                                                'success': trend === 'SUCCESS',
+                                                'failure': trend === 'FAILURE'
+                                              }"
+                                              [matTooltip]="trend === 'SUCCESS' ? 'Success' : 'Failure' "></div>
+                                          </div>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                        <tr *ngFor="let key of detailKeys">  
+                                          <ng-container *ngIf="parent.details[key]"> <th class="details-row" [ngClass]="{
+                                          'count-heading': key === 'testCaseCount',
+                                          'time-heading': key === 'timeTaken',
+                                          'logs-heading': key === 'logs'
+                                        }">
+                                          <ng-container *ngIf="key === 'testCaseCount'">Test Step Count</ng-container>
+                                          <ng-container *ngIf="key === 'timeTaken'">Time Taken (min)</ng-container>
+                                          <ng-container *ngIf="key === 'logs'">Execution Log <a class="log-link" matTooltip="Click here to get detailed execution logs" (click)="openDynamicLink(parent.executionResultID)"><i class="bi bi-box-arrow-up-right"></i></a>
+                                          </ng-container>
+                                        </th>
+                                        <td class="details-row script-td">
+                                          <ng-container *ngIf="key === 'logs' && parent.status !== 'INPROGRESS'">
+                                            <div [innerHTML]="parent.formatLogs" class="format-text"></div>
+                                          </ng-container>
+                                          <ng-container *ngIf="key === 'logs' && parent.status === 'INPROGRESS'">
+                                            <button type="button" class="download-btn log-btn" matTooltip="Live Logs" (click)="liveLogs()">
+                                              View Live Logs
+                                            </button>
+                                          </ng-container>
+                                          <ng-container *ngIf="key !== 'logs'">{{ parent.details[key] }}</ng-container>
+                                        </td>
+                                      </ng-container>
+                                    </tr>
+                                    <tr *ngFor="let detail of parent.details | keyvalue">
+                                      <div *ngIf="detail.key === 'deviceLogsAvailable'" class="logs-table">
+                                        <th class="details-row logadd-heading">Additional Logs</th>
+                                        <td *ngIf="detail.value === false" class="details-row script-td">No Additional Logs available</td>
+                                        <td *ngIf="detail.value === true" class="details-row script-td">
+                                          <button type="button" class="download-btn log-btn"  matTooltip="Log Files" (click)="logFiles()">
+                                            View Additional logs
+                                          </button>
+                                        </td>
+                                      </div>
+                                    </tr>
+                                  </tbody>
+                              </table>
+                                  <div class="close-sec text-center">
+                                    <a (click)="togglePanel(parent, parent.executionResultID, i)"><i class="bi bi-chevron-up"></i></a>
+                                  </div>
+                              </div>
+                              </ng-container>
+                          </mat-card>
+
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mt-2 text-end mb-2">
+              <button class="view-btn close" (click)="onClose()">
+                Close
+              </button>
+                <!-- <button class="view-btn close-script" (click)="closeLastExpanded()" *ngIf="expandedIndexes.length > 0">
+                  Close Script Panel
+                </button> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

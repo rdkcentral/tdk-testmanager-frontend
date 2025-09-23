@@ -1,0 +1,479 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/**
+ * Sets the default font family for the body and all elements except .material-icons.
+ */
+
+body,
+*:not(.material-icons) {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/**
+ * Styles for the view title element.
+ */
+
+.view-title{
+    margin-bottom: 0;
+    padding-bottom: 0;
+    font-weight: 500;
+}
+
+/**
+ * Styles for the save button.
+ */
+
+.save-btn {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 7px 20px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 2px;
+  right: 110px;
+  }
+
+/**
+ * Styles for the log success message.
+ */
+
+.log-success {
+  color: green;
+  font-weight: bold;
+  }
+/**
+ * Styles for the close button.
+ */
+
+.close-btn {
+    background-color: #00b2dc;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 7px 20px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    position: absolute;
+    right: 25px;
+    z-index: 1;
+  }
+/**
+ * Styles for the active tab text label (ng-deep).
+ */
+
+::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label{
+  color: #06667d !important;
+}
+/**
+ * Styles for focused form select and form control elements (ng-deep).
+ */
+
+::ng-deep.form-select:focus, .form-control:focus{
+  border-color: gray !important;
+  box-shadow: none !important;
+}
+/**
+ * Styles for the text label.
+ */
+
+.text-label{
+  font-size: 0.8rem;
+  margin-right: 10px;
+}
+/**
+ * Styles for the custom modalbox dialog container (ng-deep).
+ */
+
+::ng-deep .custom-modalbox .mdc-dialog__container{
+  background-color: #00B2DC;
+}
+
+/**
+ * Styles for the dialog surface (ng-deep).
+ */
+
+::ng-deep .mdc-dialog__surface{
+  background-color: #F6F6F6 !important;
+}
+/**
+ * Styles for the active tab (ng-deep).
+ */
+
+::ng-deep .mdc-tab--active {
+  border-bottom: 47px solid #fff !important;
+  border-right: 25px solid transparent !important;
+}
+/**
+ * Styles for the tab group and tab nav bar (ng-deep).
+ */
+
+::ng-deep .mat-mdc-tab-group,
+.mat-mdc-tab-nav-bar {
+  --mdc-tab-indicator-active-indicator-color: transparent !important;
+  --mat-tab-header-active-focus-indicator-color: transparent !important;
+  --mat-tab-header-active-hover-indicator-color: transparent !important;
+}
+/**
+ * Styles for the tab (ng-deep).
+ */
+
+::ng-deep .mat-mdc-tab.mdc-tab {
+  flex-grow: 0 !important;
+}
+/**
+ * Styles for the tab body content (ng-deep).
+ */
+
+::ng-deep .mat-mdc-tab-body-content{
+  background-color: #fff !important;
+ 
+}
+/**
+ * Styles for the active tab (ng-deep).
+ */
+
+::ng-deep .mat-mdc-tab.mdc-tab--active {
+  font-size: 0.87rem !important;
+  letter-spacing: 0px !important;
+}
+/**
+ * Styles for the tab text label (ng-deep).
+ */
+
+::ng-deep .mdc-tab__text-label {
+  font-size: 0.87rem !important;
+  letter-spacing: 0px !important;
+}
+/**
+ * Styles for tab and tab label containers (ng-deep).
+ */
+
+::ng-deep .mdc-tab,
+.mat-mdc-tab-label-container,
+.mdc-tab__content,
+.mat-mdc-tab {
+  height: 50px !important;
+}
+/**
+ * Styles for tab labels (ng-deep).
+ */
+
+::ng-deep.mat-mdc-tab-labels {
+  height: 35px !important;
+  letter-spacing: 0 !important;
+}
+/**
+ * Styles for the icon button touch target (ng-deep).
+ */
+
+::ng-deep.mat-mdc-icon-button .mat-mdc-button-touch-target {
+  height: 30px !important;
+  width: 30px !important;
+}
+
+/**
+ * Styles for the execution select dropdown.
+ */
+
+.execution-select {
+  text-align: center;
+  background: #00b2dc;
+  border: #00b2dc;
+  color: #fff;
+  border-radius: 5px;
+  font-size: 0.8rem;
+  padding: 8px 35px;
+}
+/**
+ * Styles for the execution drop container.
+ */
+
+.execution-drop{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+}
+/**
+ * Styles for the second section container.
+ */
+
+.second-sec{
+  display: flex;
+  justify-content: center;
+}
+/**
+ * Styles for the execution result display area.
+ */
+
+.execution-result {
+  height: 190px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 0px;
+  display: block;
+  overflow-y: auto;
+  margin: 0px 10px 0px 10px;
+}
+/**
+ * Styles for the select title label.
+ */
+
+.select-title{
+  padding-left: 10px;
+  color: #06667d;
+}
+/**
+ * Styles for the package title label.
+ */
+
+.package-title{
+  padding-left: 10px;
+  color: #06667d;
+  font-weight: 500;
+}
+/**
+ * Styles for the install button.
+ */
+
+.install-btn{
+  margin-right: 90px;
+}
+/**
+ * Styles for the log section container.
+ */
+
+.logsection{
+  padding-left: 10px;
+  margin-bottom: 12px;
+  margin-top: 12px;
+}
+/**
+ * Styles for the button group container.
+ */
+
+.btns-grp{
+  position: absolute;
+  right: 0;
+  bottom: 25px;
+}
+/**
+ * Styles for the check section container.
+ */
+
+.check-sec{
+  padding-left: 15px;
+  padding-top: 5px;
+  display: flex;
+}
+/**
+ * Styles for the label check element.
+ */
+
+.label-check{
+  padding-left: 5px;
+}
+
+/**
+ * Styles for the loading message.
+ */
+
+.loading-message {
+  margin-top: 1px;
+  padding: 8px;
+}
+
+/**
+ * Styles for the logs content area.
+ */
+
+.logs-content {
+  font-size: 1em;
+  line-height: 1.3;
+  padding: 20px;
+  margin-top: 2px;
+  white-space: pre-wrap;
+  font-family: Consolas, Menlo, Monaco, 'Liberation Mono', 'Courier New', monospace !important;
+}
+
+/**
+ * Styles for the display message.
+ */
+
+.display-message {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/**
+ * Styles for the upload message.
+ */
+
+.upload-message {
+  margin: 0;
+  text-align: left;
+  margin-right: 40px;
+}
+
+/**
+ * Styles for the button group.
+ */
+
+.button-grp{
+  margin-top: 5px;
+}
+
+/**
+ * Styles for the title section.
+ */
+
+.title-sec{
+  margin-top: 0.9rem !important;
+  margin-bottom: 12px;
+}
+/* ::ng-deep .mat-typography p {
+  margin: 0 rem !important;
+} */
+
+/**
+ * Styles for disabled buttons.
+ */
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6; /* Make the button appear visually disabled */
+}
+
+/**
+ * Styles for the modal title.
+ */
+
+.modaltitle {
+  margin: 0 10px 0px 10px;
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+}
+
+/**
+ * Styles for the custom modal container.
+ */
+
+.custom-modal {
+  max-width: 800px;
+  margin-top: 100px;
+}
+
+/**
+ * Styles for the custom title.
+ */
+
+.custom-title {
+  margin-bottom: 0;
+  font-size: 1rem;
+  color: #06667d;
+}
+
+
+
+/**
+ * Styles for the modal footer.
+ */
+
+.modal-footer {
+  border-top: none;
+  padding: 1rem 1.45rem 2rem 2rem;
+}
+
+/**
+ * Styles for the error upload message.
+ */
+
+.errorupload {
+  color: #dc3545;
+  font-size: 0.8rem;
+}
+
+/**
+ * Styles for dropdown menu list items.
+ */
+
+.dropdown-menu li{
+  cursor: pointer;
+  display: block;
+  font-size: small;
+  width: 175px;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+/**
+ * Styles for dropdown menu list items on hover.
+ */
+
+.dropdown-menu li:hover {
+  background-color: #f0f0f0; /* Highlight the item with a light gray background */
+  color: #007bff; /* Change text color to blue on hover */
+}
+
+/**
+ * Styles for dropdown menu list items with a preceding sibling.
+ */
+
+.dropdown-menu li + li {
+  border-top: 1px solid #ddd; /* Add a light gray border between items */
+  margin-top: 5px; /* Optional: Add spacing between items */
+}
+
+/**
+ * Styles for modal buttons.
+ */
+
+.modal-btns {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+/**
+ * Styles for the active tab body content (ng-deep).
+ */
+
+::ng-deep .mat-mdc-tab-body.mat-mdc-tab-body-active.mat-mdc-tab-body-content{
+  overflow-y: hidden !important;
+}

@@ -1,0 +1,256 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!-- Main container for execution page -->
+<div class="container-fluid bg-container">
+    <!-- Main row for layout -->
+    <div class="row ">
+        <!-- Sidebar column -->
+        <div class="col-sidebar">
+            <!-- Sidebar navigation -->
+            <div class="sidebar">
+                <!-- Execution dropdown section -->
+                <div class="execution-drop">
+                    <button type="button" class="download-btn  execution-select" (click)="openDialog('normalExecutionClick')" >
+                        {{executeName}}
+                    </button>
+                </div>
+                <!-- Accordion for device status -->
+                <div class="accordion accor-margin" id="accordionExample">
+                    <div class="row accord-row">
+                      <div class="accordion-item device-section" *ngFor="let parent of filteredDeviceStausArray">
+                          <h2 class="accordion-header d-flex align-items-center accord-head">
+                            <div class="col">
+                              <i class="bi bi-folder-fill folder-icon"></i><span> {{ parent.name }} </span>
+                              <div class="row-arrows">
+                                <button type="button" class="refresh-btn" matTooltip="Refresh" (click)="refreshDevice()">
+                                  <i class="bi bi-arrow-clockwise refresh-icon" ></i>
+                              </button>
+                                <button class="btn btn-link ms-auto" (click)="togglePanel(parent)">
+                                    <i class="bi collapse-icon" [ngClass]="parent.isOpen ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                                </button>
+                              </div>
+                            </div>
+                          </h2>
+                        <div [class.show]="parent.isOpen" class="accordion-collapse collapse show">
+                          <div class="col-md-12 mb-2">
+                            <input type="text" #deviceSearchInput class="form-control seach-device" [value]="searchDevice" (input)="searchDevices($event)"
+                            placeholder="Search by device, ip, mac">
+                            <button class="clear-btn mt-1" *ngIf="searchTerm" (click)="clearSearch()">Clear</button>
+                            <span class="sort-label">Sort :</span>
+                            <button (click)="toggleSortOrder()" class="sort-btn">
+                              <i class="bi sort-icon icon-sortng" [ngClass]="sortOrder === 'asc' ? 'bi-sort-up-alt' : 'bi-sort-down-alt'  "></i>
+                            </button>
+                          </div>
+                          <div *ngIf="filteredDeviceStausArray.length === 0" class="no-results">
+                            No matching devices found.
+                          </div>
+                            <div class="accordion-body status-group">
+                                <ul class="ul-item">
+                                    <li class="li-item" *ngFor="let child of parent.childData" >
+                                      <span *ngIf="child.status === 'BUSY'">
+                                        <div class="spinner-border spinner-border-sm text-warning spinner" role="status">
+                                          <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                      </span>
+                                      <span *ngIf="child.status === 'IN_USE'">
+                                        <div class="spinner-border spinner-border-sm text-warning spinner" role="status">
+                                          <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                      </span>
+                                      <span *ngIf="child.status === 'FREE'"><span class="free"></span></span>
+                                      <span *ngIf="child.status === 'NOT_FOUND'"><span class="busy"></span></span>
+                                      <span *ngIf="child.status === 'HANG'"><span class="hang"></span></span>
+
+                                        <a class="device-name" [matTooltip]="'Name: ' + child.deviceName + '\nIP: ' + child.ip + '\nDeviceType: ' + child.deviceType + '\nStatus: ' + child.status"
+                                        matTooltipClass="multiline-tooltip" [matTooltipPosition]="'right'" (click)="openModalExecute(child)"
+                                           >
+                                            {{child.deviceName}}
+                                        </a>
+
+                                        <button mat-icon-button [matMenuTriggerFor]="menu" class="context-btn">
+                                            <mat-icon class="dot-icon">more_vert</mat-icon>
+                                        </button>
+                                          <mat-menu #menu="matMenu" class="mat-contxtmenu">
+                                            <button mat-menu-item class="context-item" *ngIf="child.thunderEnabled === false" (click)="enableDisable(child.ip)">
+                                              <span>Enable Thunder</span>
+                                            </button>
+                                            <button mat-menu-item class="context-item" *ngIf="child.thunderEnabled === true" (click)="enableDisable(child.ip)">
+                                              <span>Disable Thunder</span>
+                                            </button>
+                                            <button mat-menu-item class="context-item" (click)="copyToClipboard(child.ip)">
+                                              <span>Copy Device IP</span>
+                                            </button>
+                                            <button mat-menu-item class="context-item" (click)="installTDKModal(child.deviceName)">
+                                                <span>Install TDK</span>
+                                              </button>
+                                          </mat-menu>
+                                    </li>
+                                
+                                </ul>
+                            </div>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Main content column -->
+        <div class="col-md-10">
+          <!-- Row for header and controls -->
+          <div class="row borders-btm">
+            <div class="col">
+                <div class="row ">
+                  <div class="falvor-row">
+                    <span for="falvor" class="falvor-label">RDK flavor :</span>
+                        <select class="form-select rdk-dropdown" aria-label="Default select example" id="preferCategoty"
+                        [(ngModel)]="selectedDfaultCategory" (change)="onCategoryChange($event)">
+                            <option value="RDKV">Video</option>
+                            <option value="RDKB">Broadband</option>
+                        </select>
+                  </div>
+                  </div>
+            </div>
+            <div class="col">
+                <h1 class="title">Execution</h1>
+            </div>
+            <div class="col">
+            </div>
+        </div>
+            <!-- Example header for tabs -->
+            <div class="col-md-12 example-header" *ngIf="tabName !=='Execution Schedules'">
+              <!-- Filter by section -->
+              <div class="filterby">
+                <label for="filterDropdown" class="filter-label">Filter By:</label>
+                <div class="filter-drop-down">
+                  <select id="filterDropdown" class="form-select" (change)="onFilterChange($event)">
+                    <option value="" default>Select</option>
+                    <option value="ExecutionName">Execution Name</option>
+                    <option value="Scripts/Testsuite">Scripts/Testsuite</option>
+                    <option value="Device">Device</option>
+                    <option value="User">User</option>
+                  </select>
+                </div>
+              </div>
+              <!-- Search bar section -->
+              <div class="search-bar" *ngIf="selectedCategory === 'Device' || selectedCategory === 'Scripts/Testsuite' || selectedCategory === 'ExecutionName'">
+                <label *ngIf="selectedCategory === 'ExecutionName'" class="search">Enter Execution Name</label>
+                <label *ngIf="selectedCategory === 'Scripts/Testsuite'" class="search">Enter Scripts/Testsuite</label>
+                <label *ngIf="selectedCategory === 'Device'" class="device-search">Enter Device Name</label>
+                <div class="searchby">
+                  <input type="text"  #tableSearchInput class="form-control seach-input" id="filter-text-box" [(ngModel)]="searchValue"
+                    placeholder="">
+                    <button class="btn btn-sm search-btn" (click)="onSearchClick()"><i class="bi bi-search icon-search"></i></button>
+                </div>
+              </div>
+
+              <!-- Search user section -->
+              <div class="search-user" *ngIf="selectedCategory === 'User'">
+                <div class="userby">
+                  <label for="dynamicDropdown" class="userbylabel">Select User Name</label>
+                  <div class="user-drop-down">
+                    <select id="dynamicDropdown" class="form-select user-dropdown" [(ngModel)]="selectedOption" (change)="onUserChange()">
+                      <option value="" default>Select</option>
+                      <option *ngFor="let item of dynamicList" [value]="item">{{ item }}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Container for tabs and grids -->
+            <div class="container table-container mt-3">
+                <!-- TABS CONTAINER -->
+                <mat-tab-group animationDuration="0ms" mat-align-tabs="start" (selectedTabChange)="onTabClick($event)">
+                    <mat-tab label="Execution History" class="tab-label">
+                        <div class="dynamic-table-container" [class]="themeClass">
+                          <div class="row loader-row" *ngIf="showLoader">
+                            <app-loader></app-loader>
+                          </div>
+                          <ag-grid-angular
+                            #historyTable
+                            style="width: 100%;"
+                            [rowData]="rowData"
+                            [columnDefs]="columnDefs"
+                            [defaultColDef]="defaultColDef"
+                            [pagination]="false"
+                            [rowHeight]="47"
+                            rowSelection="multiple"
+                            (gridReady)="onGridReady($event)"
+                            (selectionChanged)="onSelectionChange()"
+                            
+                          ></ag-grid-angular>
+                        </div>
+                        <div class="table-footer">
+                          <div class="col-md-3">
+                            <div class="header-container">
+                              <div class="btn-border">
+                                <button class="btn btn-sm delete-btn" (click)="deleteSelectedRows()">
+                                  <i class="bi bi-trash-fill delete-icon"></i>
+                                </button>
+                                <button class="btn btn-sm arrow-btn" (click)="deleteDateModal()" matTooltip="Delete execution with date">
+                                  <i class="bi bi-caret-down-fill arrow-icon"></i>
+                                </button>
+                              </div>
+                             
+                                <button type="button" *ngIf="exeRefresh" class="download-btn refresh-history" matTooltip="Click here to refresh"
+                                 (click)="refreshExeHistory()">
+                                  <i class="bi bi-arrow-clockwise history-icon"></i>
+                                </button>
+                             
+                            </div>
+                          </div>
+                          <div class="col-md-9">
+                            <mat-paginator
+                            class="pagination-sec"
+                            [length]="totalItems"
+                            [pageSize]="pageSize"
+                            [pageSizeOptions]="[10, 20, 50]"
+                            (page)="onPageChange($event)"
+                            [showFirstLastButtons]="true"
+                          ></mat-paginator>
+                          </div>
+                        </div>
+                    </mat-tab>
+                    <mat-tab label="Execution Schedules" class="tab-label">
+                        <div class="dynamic-table-container" [class]="themeClass">
+                          <div class="row loader-row" *ngIf="showLoader">
+                            <app-loader></app-loader>
+                          </div>
+                          <div class="row loader-row" style="top: 45%;left:47%" *ngIf="isNoDataVisible">
+                           <span>{{noDataFound}}</span>
+                          </div>
+                            <ag-grid-angular
+                                style="width: 100%;"
+                                [columnDefs]="columnSchudle"
+                                [defaultColDef]="{sortable: true}"
+                                [rowData]="rowDataSchudle"
+                                [pagination]="true"
+                                [paginationPageSize]="schedulePageSize"
+                                [paginationPageSizeSelector]="schedulePageSizeSelector"
+                                [animateRows]="true"
+                                [context]="this"
+                                [gridOptions]="gridOptions"
+                            ></ag-grid-angular>
+                        </div>
+                        <div class="schedule-btnsec" *ngIf="scheduleRefresh">
+                          <button type="button" class="download-btn refresh-history" matTooltip="Click here to refresh"
+                           (click)="refreshSchedule()">
+                            <i class="bi bi-arrow-clockwise history-icon"></i>
+                          </button>
+                        </div>
+                    </mat-tab>
+                </mat-tab-group>
+            </div>
+    </div>
+</div>

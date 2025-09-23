@@ -1,0 +1,331 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/* Global font family for body and all elements except material icons */
+body,
+*:not(.material-icons) {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Typography styles for headings */
+.mat-typography h1,
+.mat-typography h2,
+.mat-typography h3,
+.mat-typography h4,
+.mat-typography h5,
+.mat-typography h6 {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+
+/* Row for radio box section */
+.radiobox-row {
+  height: 479px;
+}
+
+/* Card combine section */
+.card-combine {
+  height: auto;
+  max-height: 800px;
+}
+
+/* Radio box styles */
+.radiobox {
+  display: flex;
+  justify-content: start;
+  align-items: baseline;
+  padding: 0 30px;
+  font-size: 0.78rem;
+}
+
+
+/* Heading styles */
+.heading {
+  margin-top: 8px;
+  margin-bottom: 0;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+/* RDK group styles */
+.rdkgroup {
+  margin-left: 10px;
+  font-weight: 500;
+  font-size: 0.8rem;
+}
+
+/* Main section container */
+.main-sec {
+  margin: auto;
+}
+
+/* RDK radio styles */
+.rdkradio {
+  border: 2px solid #0e6f87;
+}
+
+
+/* Button group styles */
+.btns-grp {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+}
+
+/* Top section styles */
+.top-sec {
+  display: flex;
+  align-items: baseline;
+  position: absolute;
+  top: 0;
+}
+
+/* Download button styles */
+.download-btn {
+  background-color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-right: 15px;
+  box-shadow: 0px 3px 6px #0000005e;
+}
+
+/* Download icon styles */
+.download-icon {
+  color: #00b2dc;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Inline form check styles */
+.form-check-inline {
+  margin-right: 1rem;
+}
+
+
+.rdkradio {
+  border: 2px solid #0e6f87;
+}
+::ng-deep.form-select:focus,
+.form-control:focus {
+  border-color: gray !important;
+  box-shadow: none !important;
+}
+/* Row alignment styles */
+.row-align {
+  display: flex;
+  justify-content: left;
+  align-items: baseline;
+}
+
+.form-check-inline {
+  margin-right: 1rem;
+}
+/* Checked form check input styles */
+.form-check-input:checked {
+  background-color: #0e6f87;
+  border-color: #0e6f87;
+}
+
+/* Flavor row styles */
+.falvor-row {
+  display: flex;
+  align-items: baseline;
+  margin-top: 5px;
+  padding-left: 0;
+}
+
+/* Flavor label styles */
+.falvor-label {
+  width: 75px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+
+/* RDK dropdown styles */
+.rdk-dropdown {
+  width: 120px;
+  background-color: transparent;
+}
+
+
+/* Bottom border gradient styles */
+.borders-btm {
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 15px;
+  /* padding-bottom: 4px; */
+}
+
+/* Title styles */
+.title {
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+/* Main margin styles */
+.main-margin {
+  margin: 0;
+}
+
+/* Common style for flex center */
+.common-style {
+  display: flex;
+  justify-content: center;
+}
+
+/* View group styles */
+.viewgroup {
+  font-size: 0.8rem;
+  margin-left: 23px;
+}
+
+::ng-deep .mat-mdc-tab.mdc-tab {
+  flex-grow: 0 !important;
+}
+::ng-deep .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  font-size: 0.87rem !important;
+  font-weight: 500;
+  letter-spacing: 0px;
+}
+::ng-deep .mat-mdc-tab .mdc-tab__text-label {
+  font-size: 0.87rem !important;
+  font-weight: 500;
+  letter-spacing: 0px;
+}
+::ng-deep .mdc-tab,
+.mat-mdc-tab-label-container,
+.mdc-tab__content,
+.mat-mdc-tab {
+  height: 35px !important;
+}
+::ng-deep.mat-mdc-tab-labels {
+  height: 35px !important;
+}
+::ng-deep .height-comp {
+  height: 375px !important;
+}
+
+/* Report section styles */
+.report-section {
+  margin: 15px 5px 5px 15px;
+}
+
+/* First row styles */
+.first-row {
+  width: 101%;
+}
+
+/* Filter button styles */
+.filter-btn {
+  margin-left: -12px;
+}
+
+/* Create button styles */
+.create-btn {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 7px 15px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+/* Or text styles */
+.ortext {
+  margin-right: 50px;
+}
+
+/* Info icon styles */
+.info-icon {
+  font-size: 15px;
+  color: #00b2dc;
+  margin-left: 8px;
+}
+
+/* Report button styles */
+.reportbtn {
+  width: 99%;
+}
+
+::ng-deep .ag-theme-quartz .ag-icon-filter {
+  font-size: 0.7rem !important;
+  width: 10px !important;
+  height: 10px !important;
+}
+::ng-deep .ag-theme-quartz .ag-checkbox-input-wrapper {
+  font-size: 0.8rem !important;
+  width: 12px !important;
+  height: 12px !important;
+  line-height: 1 !important;
+}
+::ng-deep .ag-theme-quartz .ag-ltr .ag-selection-checkbox {
+  margin-right: 0px;
+}
+::ng-deep .ag-theme-quartz, .ag-cell {
+  text-align: center !important;
+}
+::ng-deep .ag-theme-quartz .header-center .ag-header-cell-label {
+  text-align: center !important;
+  justify-content: center;
+}
+/* Error message report styles */
+.errmsg-report {
+  color: rgb(210, 64, 64);
+  font-size: 0.8rem;
+  margin-left: 5px;
+}
+
+/* Loader row styles */
+.loader-row{
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  right: 50%;
+}
+
+/* Grid container styles */
+.grid-container {
+  width: 100%;
+  height: calc(100vh - 200px); /* Adjust based on viewport height */
+  min-height: 300px;
+  margin-top: 5px;
+  margin-bottom: 12px;
+}
