@@ -97,7 +97,8 @@ export class ParameterEditComponent {
         parameterName: this.updateParameterForm.value.parameterName,
         parameterDataType: this.updateParameterForm.value.parameterType,
         parameterRangeVal: this.updateParameterForm.value.rangeVal,
-        function: this.dynamicFunctionName
+        function: this.dynamicFunctionName,
+        parameterCategory:this.configureName
       }
       this.moduleservice.updateParameter(data).subscribe({
         next: (res) => {

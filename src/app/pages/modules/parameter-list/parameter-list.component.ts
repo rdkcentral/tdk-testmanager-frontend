@@ -194,7 +194,7 @@ export class ParameterListComponent {
    */
   parameterByFunction(): void {
     this.showLoader = true;
-    this.moduleservice.findAllByFunction(this.dynamicFunctionName).subscribe({
+    this.moduleservice.findAllByFunction(this.dynamicFunctionName,this.configureName).subscribe({
       next: (data) => {
         this.rowData = data.data;
         if (

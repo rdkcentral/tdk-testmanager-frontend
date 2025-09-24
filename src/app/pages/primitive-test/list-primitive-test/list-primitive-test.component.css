@@ -144,3 +144,13 @@ http://www.apache.org/licenses/LICENSE-2.0
   margin-top: 5px;
   margin-bottom: 12px;
 }
+/*
+ * Allow text selection in AG Grid cells for easier copy-paste and debugging.
+ */
+::ng-deep .ag-theme-quartz .ag-cell {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text;
+}

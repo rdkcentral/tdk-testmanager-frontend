@@ -257,7 +257,8 @@ export class CreatePrimitiveTestComponent {
         primitiveTestModuleName: this.selectedValue,
         primitiveTestfunctionName: this.selectedFunctionValue,
         primitiveTestUserGroup: this.userGroupName.userGroupName,
-        primitiveTestParameters: this.parameterListMapObj
+        primitiveTestParameters: this.parameterListMapObj,
+        primitiveTestCategory:this.configureName
       }
       this.service.createPrimitiveTest(data).subscribe({
         next: (res) => {

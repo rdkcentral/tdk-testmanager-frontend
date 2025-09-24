@@ -131,11 +131,13 @@ limitations under the License.
                                 <!-- List of all scripts -->
                                 <div class="list-box">
                                     <ul>
-                                        <li *ngFor=" let scripts of filteredLeftList"
-                                            (click)="toggleSec(scripts, 'left')"
-                                            [class.selected]="selectedLeft.has(scripts.id)">
-                                            {{scripts.name}}
-                                        </li>
+                                        <li *ngFor="let scripts of filteredLeftList; let i = index"
+    (mousedown)="onLeftScriptMouseDown(i, $event)"
+    (mouseenter)="onLeftScriptMouseEnter(i)"
+    (mouseup)="onLeftScriptMouseUp()"
+    [class.selected]="selectedLeft.has(scripts.id)">
+  {{scripts.name}}
+</li>
                                     </ul>
                                 </div>
                             </div>
@@ -162,8 +164,10 @@ limitations under the License.
                                 <!-- List of selected scripts -->
                                 <div class="list-box">
                                     <ul>
-                                        <li *ngFor=" let scripts of container2ScriptArr; let i = index"
-                                            (click)="toggleSec(scripts, 'right')"
+                                        <li *ngFor="let scripts of container2ScriptArr; let i = index"
+                                            (mousedown)="onRightScriptMouseDown(i, $event)"
+                                            (mouseenter)="onRightScriptMouseEnter(i)"
+                                            (mouseup)="onRightScriptMouseUp()"
                                             [class.selected]="selectedRight.has(scripts.id)">
                                             {{scripts.name}}
                                         </li>

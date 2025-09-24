@@ -32,11 +32,12 @@ import { SocService } from '../../../services/soc.service';
 import { AuthService } from '../../../auth/auth.service';
 import saveAs from 'file-saver';
 import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
+import { LoaderComponent } from '../../../utility/component/loader/loader.component';
 
 @Component({
   selector: 'app-device-edit',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MonacoEditorModule, MaterialModule],
+  imports: [CommonModule, ReactiveFormsModule, MonacoEditorModule, MaterialModule ,LoaderComponent],
   templateUrl: './device-edit.component.html',
   styleUrl: './device-edit.component.css',
 })
@@ -123,6 +124,7 @@ export class DeviceEditComponent {
   editorInitialized = false;
   monacoEditorInstance: any;
   dialogOpened = false;
+  isEditorLoading: boolean = true;
 
   /**
    * Constructor for DeviceEditComponent.
@@ -1290,7 +1292,10 @@ export class DeviceEditComponent {
    * @param fileName - Name of the file to open
    */
   existDeviceDialog(fileName: any): void {
-
+    this.isEditorLoading = true;
+    setTimeout(() => {
+      this.isEditorLoading = false;
+    }, 3000);
     this.showExistUploadButton = true;
     this.existingConfigEditor = true;
     this.uploadExistingConfig = false;
@@ -1341,7 +1346,10 @@ export class DeviceEditComponent {
    * No parameters.
    */
   openNewDeviceDialog(): void {
-
+    this.isEditorLoading = true;
+    setTimeout(() => {
+      this.isEditorLoading = false;
+    }, 3000);
     this.showUploadButton = true;
     this.deviceEditor = true;
     this.uploadConfigSec = false;

@@ -58,8 +58,12 @@ limitations under the License.
                             <div class="row">
                                 <!-- Container for monaco editor -->
                                 <div style="width: 100%;" class="editor-container">
-                                    <ngx-monaco-editor [options]="editorOptions" formControlName="pythonEditor">
-                                    </ngx-monaco-editor>
+                                <div class="editor-loader-container" *ngIf="isEditorLoading">
+                                    <app-loader></app-loader>
+                                </div>
+                                
+                                <ngx-monaco-editor [options]="editorOptions" formControlName="pythonEditor" [ngClass]="{'invisible': isEditorLoading}">
+                                </ngx-monaco-editor>
                                     <div *ngIf="submitted && certificationFormGroup.controls['pythonEditor']?.errors" class="text-danger">
                                         <small *ngIf="certificationFormGroup.controls['pythonEditor']?.errors?.['required']">
                                             Please enter some content in the editor.

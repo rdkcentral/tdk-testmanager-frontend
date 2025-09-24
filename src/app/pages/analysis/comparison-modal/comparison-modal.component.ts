@@ -240,6 +240,7 @@ export class ComparisonModalComponent {
         fromDate: ['', Validators.required],
         toDate: ['', Validators.required],
         deviceType: ['', Validators.required],
+        deviceName: [''],
         scriptType: ['', Validators.required],
         category: [{ value: this.data.category, disabled: true }],
         scriptSingle: [''],
@@ -402,6 +403,7 @@ export class ComparisonModalComponent {
       // Get values from the form
       const scriptSingle = this.filterForm.get('scriptSingle')?.value;
       const testSuiteSingke = this.filterForm.get('testSuiteSingke')?.value;
+      const deviceName = this.filterForm.get('deviceName')?.value;
 
       // Set scriptTestSuite based on execution type
       let scriptTestSuite = '';
@@ -417,6 +419,7 @@ export class ComparisonModalComponent {
         executionType: this.executionTypeName,
         scriptTestSuite: scriptTestSuite,
         deviceType: this.deviceName,
+        deviceName: deviceName,
         category: this.selectedDfaultCategory,
       };
       this.showLoader = true;

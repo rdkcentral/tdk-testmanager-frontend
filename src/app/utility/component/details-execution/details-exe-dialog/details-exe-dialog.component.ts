@@ -113,6 +113,9 @@ export class DetailsExeDialogComponent {
   dropdownSettings = {}
   deviceListArray: any[] = [];
   selectedDevices: any[] = [];
+  execName='';
+  isChartLoading: boolean = true;
+  isAnalysisLoading: boolean = true;
 
   constructor(
     public dialogRef: MatDialogRef<DetailsExeDialogComponent>,
@@ -135,6 +138,8 @@ export class DetailsExeDialogComponent {
   ngOnInit(): void {
     this.loggedinUser = JSON.parse(localStorage.getItem('loggedinUser') || '{}');
     this.resultDetails();
+    this.isAnalysisLoading = true;
+    this.isChartLoading = true;
     this.pieChartData();
     this.modulewiseExeSummary();
     this.analysisSummary();
@@ -143,7 +148,7 @@ export class DetailsExeDialogComponent {
     let details = this.data.deviceDetails
     this.deviceDetails = details.replace(/\n/g, '<br>');
     this.changeDetectorRef.detectChanges();
-
+    this.execName = this.data.executionName;
     this.getDeviceByCategory(this.data.category, this.data.deviceThunderEnabled);
 
     this.dropdownSettings = {
@@ -232,6 +237,7 @@ export class DetailsExeDialogComponent {
    * @returns {void}
    */
   pieChartData(): void {
+    this.isChartLoading = true;
     const summaryData = this.data?.summary || {};
     const fullLabels = [
       'Success',
@@ -297,6 +303,10 @@ export class DetailsExeDialogComponent {
         }
       },
     };
+    setTimeout(() => {
+    this.isChartLoading = false; // Hide loader after chart is ready
+    this.changeDetectorRef.detectChanges();
+    }, 500);
   }
   /**
    * Converts a date string into a localized date and time string.
@@ -364,7 +374,11 @@ export class DetailsExeDialogComponent {
           next: (res) => {
             parent.details = res.data
             const logs = parent.details.logs;
-            parent.formatLogs = logs ? logs.replace(/\n/g, '<br>') : '';
+            if (parent.status === 'PENDING' && (!logs || logs === 'null')) {
+              parent.formatLogs = 'Execution is yet to start, logs are not available.';
+            } else {
+              parent.formatLogs = logs ? logs.replace(/\n/g, '<br>') : '';
+            }
             parent.detailsLoading = false; // Stop loading
             this.changeDetectorRef.detectChanges();
 
@@ -638,6 +652,7 @@ export class DetailsExeDialogComponent {
    * @returns {void}
    */
   modulewiseExeSummary(): void {
+    this.isAnalysisLoading = true; 
     this.executionservice.modulewiseSummary(this.data.executionId).subscribe({
       next: (res) => {
         this.moduleTableData = res.data
@@ -648,6 +663,7 @@ export class DetailsExeDialogComponent {
 
         const totalData = this.moduleTableData['Total'];
         this.moduleTableTitle.push({ name: 'Total', ...totalData });
+        this.isAnalysisLoading = false;
         this.changeDetectorRef.detectChanges();
       },
       error: (err) => {

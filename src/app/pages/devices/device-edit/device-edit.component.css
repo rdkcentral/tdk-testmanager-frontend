@@ -402,8 +402,54 @@ ngx-monaco-editor {
   width: 100% !important;
 }
 
+/* 
+  Styles for the editor container within the device-create component.
+  - Sets the height of the editor to 400px.
+  - Ensures the editor takes up the full available width.
+  - Uses ::ng-deep to apply styles to child components in Angular.
+*/
 ::ng-deep .editor-container {
   height: 400px;
   width: 100%;
 }
 
+/* 
+  .editor-loader-container
+  ------------------------
+  Styles a container to overlay the entire parent element, centering its content both vertically and horizontally.
+  - Uses absolute positioning to cover the full area (top, left, right, bottom set to 0).
+  - Applies a semi-transparent white background to obscure underlying content.
+  - Utilizes flexbox for centering child elements.
+  - Sets a higher z-index to ensure it appears above other elements.
+*/
+.editor-loader-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+
+/* 
+  Styles for editor and device containers:
+  - Sets position to relative for proper positioning of child elements.
+  - Ensures a minimum height of 400px for adequate space within the containers.
+*/
+.editor-container, .device-container {
+  position: relative;
+  min-height: 400px;
+}
+
+/* 
+  .invisible class:
+  Hides the element from view but still occupies space in the layout.
+  Useful for temporarily hiding elements without affecting page structure.
+*/
+.invisible {
+  visibility: hidden;
+}

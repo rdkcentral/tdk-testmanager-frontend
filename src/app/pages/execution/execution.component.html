@@ -83,10 +83,10 @@ limitations under the License.
                                             <mat-icon class="dot-icon">more_vert</mat-icon>
                                         </button>
                                           <mat-menu #menu="matMenu" class="mat-contxtmenu">
-                                            <button mat-menu-item class="context-item" *ngIf="child.thunderEnabled === false" (click)="enableDisable(child.ip)">
+                                            <button mat-menu-item class="context-item" *ngIf="selectedDfaultCategory !== 'RDKB' && child.thunderEnabled === false" (click)="enableDisable(child.ip)">
                                               <span>Enable Thunder</span>
                                             </button>
-                                            <button mat-menu-item class="context-item" *ngIf="child.thunderEnabled === true" (click)="enableDisable(child.ip)">
+                                            <button mat-menu-item class="context-item" *ngIf="selectedDfaultCategory !== 'RDKB' && child.thunderEnabled === true" (click)="enableDisable(child.ip)">
                                               <span>Disable Thunder</span>
                                             </button>
                                             <button mat-menu-item class="context-item" (click)="copyToClipboard(child.ip)">
@@ -140,18 +140,28 @@ limitations under the License.
                     <option value="Scripts/Testsuite">Scripts/Testsuite</option>
                     <option value="Device">Device</option>
                     <option value="User">User</option>
+                    <option value="Result">Result</option>
                   </select>
                 </div>
               </div>
               <!-- Search bar section -->
-              <div class="search-bar" *ngIf="selectedCategory === 'Device' || selectedCategory === 'Scripts/Testsuite' || selectedCategory === 'ExecutionName'">
+              <div class="search-bar" *ngIf="selectedCategory === 'Device' || selectedCategory === 'Scripts/Testsuite' || selectedCategory === 'ExecutionName' || selectedCategory === 'Result'">
                 <label *ngIf="selectedCategory === 'ExecutionName'" class="search">Enter Execution Name</label>
                 <label *ngIf="selectedCategory === 'Scripts/Testsuite'" class="search">Enter Scripts/Testsuite</label>
                 <label *ngIf="selectedCategory === 'Device'" class="device-search">Enter Device Name</label>
+                <label *ngIf="selectedCategory === 'Result'" class="search">Select Result Status</label>
                 <div class="searchby">
-                  <input type="text"  #tableSearchInput class="form-control seach-input" id="filter-text-box" [(ngModel)]="searchValue"
+                  <input *ngIf="selectedCategory !== 'Result'" type="text"  #tableSearchInput class="form-control seach-input" id="filter-text-box" [(ngModel)]="searchValue"
                     placeholder="">
-                    <button class="btn btn-sm search-btn" (click)="onSearchClick()"><i class="bi bi-search icon-search"></i></button>
+                  <select *ngIf="selectedCategory === 'Result'" class="form-select" [(ngModel)]="searchValue">
+                    <option value="">Select Status</option>
+                    <option value="SUCCESS">Success</option>
+                    <option value="FAILURE">Failure</option>
+                    <option value="INPROGRESS">In Progress</option>
+                    <option value="ABORTED">Aborted</option>
+                    <option value="PAUSED">Paused</option>
+                  </select>
+                  <button class="btn btn-sm search-btn" (click)="onSearchClick()"><i class="bi bi-search icon-search"></i></button>
                 </div>
               </div>
 

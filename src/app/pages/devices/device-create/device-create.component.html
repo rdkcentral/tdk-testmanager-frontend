@@ -447,6 +447,9 @@ limitations under the License.
             </div>
           </div>
             <div class="editor-container mt-4 exist-config" *ngIf="existingConfigEditor">
+              <div class="editor-loader-container" *ngIf="isEditorLoading">
+                <app-loader></app-loader>
+              </div>
               <ngx-monaco-editor [options]="editorOptions" formControlName="editorContent" (onInit)="onEditorInit($event)">
               </ngx-monaco-editor>
               <div *ngIf="existConfigSubmitted && uploadConfigForm.controls['editorContent']?.errors" class="text-danger">
@@ -517,6 +520,9 @@ limitations under the License.
           </div>
   
             <div class="device-container mt-4 device-editor" *ngIf="deviceEditor">
+              <div class="editor-loader-container" *ngIf="isEditorLoading">
+                <app-loader></app-loader>
+              </div>
               <ngx-monaco-editor [options]="editorOptions" formControlName="editorContent" (onInit)="onEditorInit($event)">
               </ngx-monaco-editor>
               <div *ngIf="submitted && uploadDeviceConfigForm.controls['editorContent']?.errors" class="text-danger">

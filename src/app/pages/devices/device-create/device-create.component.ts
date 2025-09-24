@@ -32,11 +32,12 @@ import { DevicetypeService } from '../../../services/devicetype.service';
 import { SocService } from '../../../services/soc.service';
 import { AuthService } from '../../../auth/auth.service';
 import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
+import { LoaderComponent } from '../../../utility/component/loader/loader.component';
 
 @Component({
   selector: 'app-device-create',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule,MaterialModule,MonacoEditorModule, FormsModule],
+  imports: [CommonModule,ReactiveFormsModule,MaterialModule,MonacoEditorModule, FormsModule ,LoaderComponent],
   templateUrl: './device-create.component.html',
   styleUrl: './device-create.component.css',
 })
@@ -121,6 +122,7 @@ export class DeviceCreateComponent implements OnInit {
   editorInitialized = false;
   monacoEditorInstance: any;
   dialogOpened = false;
+  isEditorLoading: boolean = true;
 
 
   /**
@@ -1193,7 +1195,10 @@ export class DeviceCreateComponent implements OnInit {
    * @param fileName - Name of the file to open
    */
   existDeviceDialog(fileName: any): void {
-
+    this.isEditorLoading = true;
+    setTimeout(() => {
+      this.isEditorLoading = false;
+    }, 3000);
     this.showExistUploadButton = true;
     this.existingConfigEditor = true;
     this.uploadExistingConfig = false;
@@ -1244,7 +1249,10 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   openNewDeviceDialog(): void {
-
+    this.isEditorLoading = true;
+    setTimeout(() => {
+      this.isEditorLoading = false;
+    }, 3000);
     this.showUploadButton = true;
     this.deviceEditor = true;
     this.uploadConfigSec = false;

@@ -64,26 +64,18 @@ h1.view-title {
  * .module-table: Styles the module summary table.
  */
 .module-table {
-  table-layout: fixed; /* Prevents automatic resizing that can cause overlap */
   width: 100%;
-  border-collapse: collapse;
+  table-layout: fixed;
 }
-.module-table th, 
-.module-table td {
+.module-table thead, .module-table tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+.bold-table{
   padding: 6px 8px;
   text-align: center; /* Adjust as needed */
   word-wrap: break-word; /* Allows long text to wrap */
-}
-
-.module-table th:first-child, 
-.module-table td:first-child {
-  width: 200px; /* Adjust this width to fit Module Name */
-  text-align: left; /* Keep names left aligned */
-  white-space: normal; /* Allow wrapping instead of single line */
-}
-
-.method-head th {
-  background-color: #f0f0f0; /* Just for visibility */
 }
 
 /*
@@ -1338,12 +1330,95 @@ background-color: transparent;
   font-size: 0.80rem;  /* Smaller font size */
 }
 
-
-/* Fix select height */
-
 /*
  * .form-select-sm: Styles for small form select.
  */
 .form-select-sm {
   height: 32px !important;
 }
+
+/*
+ * .chart-loader-container: Styles for chart loader overlay.
+ */
+.chart-loader-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+
+/*
+ * .position-relative: Styles for relative positioning.
+ */
+.position-relative {
+  position: relative;
+}
+
+/*
+ * .invisible: Styles for invisible elements.
+ */
+.invisible {
+  visibility: hidden;
+}
+
+/*
+ * .analysis-sec: Styles for analysis section.
+ */
+.analysis-loader-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+  height: auto;
+}
+
+/*
+ *  .position-relative: Styles for relative positioning.
+ */
+.position-relative {
+  position: relative;
+}
+
+/*
+ *  .invisible: Styles for invisible elements.
+ */
+.invisible {
+  visibility: hidden;
+}
+
+/*
+ *  .anlysis-sec: Styles for analysis section.
+ */
+.anlysis-sec {
+  min-height: auto !important;
+  position: relative;
+}
+
+
+.page-corner-close-btn {
+      background: #e53935;
+      border: 1.5px solid #b71c1c;
+      border-radius: 6px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      height: 31px;
+      width: 36px;
+      font-size: 1.5rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: box-shadow 0.2s, background 0.2s;
+      margin-left: 5px;
+    }

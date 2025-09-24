@@ -62,6 +62,15 @@ export class EditTestsuiteComponent {
   selectedLeft = new Set<number>();
   selectedRight = new Set<number>();
   filteredLeftList:any;
+    // For left drag selection
+dragSelecting: boolean = false;
+dragStartIndex: number | null = null;
+dragEndIndex: number | null = null;
+
+// For right drag selection
+dragSelectingRight: boolean = false;
+dragStartIndexRight: number | null = null;
+dragEndIndexRight: number | null = null;
 
   /**
    * Constructor for EditTestsuiteComponent.
@@ -342,5 +351,90 @@ export class EditTestsuiteComponent {
     }
   }
 
+/**
+ * select the multiple scripts
+ * @param index 
+ * @param event 
+ * @returns 
+ */
+onLeftScriptMouseDown(index: number, event: MouseEvent): void {
+  if (event.button !== 0) return;
+  this.dragSelecting = true;
+  this.dragStartIndex = index;
+  this.dragEndIndex = index;
+  event.preventDefault();
+}
+
+/**
+ * Select the multiple scripts
+ * @param index 
+ */
+onLeftScriptMouseEnter(index: number): void {
+  if (this.dragSelecting && this.dragStartIndex !== null) {
+    this.dragEndIndex = index;
+  }
+}
+
+/**
+ * Select the mutiple scripts
+ */
+onLeftScriptMouseUp(): void {
+  if (this.dragSelecting && this.dragStartIndex !== null && this.dragEndIndex !== null) {
+    const start = Math.min(this.dragStartIndex, this.dragEndIndex);
+    const end = Math.max(this.dragStartIndex, this.dragEndIndex);
+    const list = this.filteredContainer1;
+    for (let i = start; i <= end; i++) {
+      const script = list[i];
+      if (script) {
+        if (this.selectedLeft.has(script.id)) {
+          this.selectedLeft.delete(script.id);
+        } else {
+          this.selectedLeft.add(script.id);
+        }
+      }
+    }
+  }
+  this.dragSelecting = false;
+  this.dragStartIndex = null;
+  this.dragEndIndex = null;
+}
+
+/* Right list drag selection */
+onRightScriptMouseDown(index: number, event: MouseEvent): void {
+  if (event.button !== 0) return;
+  this.dragSelectingRight = true;
+  this.dragStartIndexRight = index;
+  this.dragEndIndexRight = index;
+  event.preventDefault();
+}
+
+/* Right list drag selection */
+onRightScriptMouseEnter(index: number): void {
+  if (this.dragSelectingRight && this.dragStartIndexRight !== null) {
+    this.dragEndIndexRight = index;
+  }
+}
+
+/* Right list drag selection */
+onRightScriptMouseUp(): void {
+  if (this.dragSelectingRight && this.dragStartIndexRight !== null && this.dragEndIndexRight !== null) {
+    const start = Math.min(this.dragStartIndexRight, this.dragEndIndexRight);
+    const end = Math.max(this.dragStartIndexRight, this.dragEndIndexRight);
+    const list = this.container2ScriptArr;
+    for (let i = start; i <= end; i++) {
+      const script = list[i];
+      if (script) {
+        if (this.selectedRight.has(script.id)) {
+          this.selectedRight.delete(script.id);
+        } else {
+          this.selectedRight.add(script.id);
+        }
+      }
+    }
+  }
+  this.dragSelectingRight = false;
+  this.dragStartIndexRight = null;
+  this.dragEndIndexRight = null;
+}
 
 }

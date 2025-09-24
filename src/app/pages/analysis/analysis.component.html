@@ -67,12 +67,13 @@ limitations under the License.
                                     <small *ngIf="reportForm.controls['baseName']?.errors?.['required']">Give one execution name or
                                         choose.</small>
                                 </div>
+                               
                             </div>
                             <!-- Column for OR and choose button -->
                             <div class="col-md-3 text-center">
                                 <span class="ortext">OR</span><button type="button" class="create-btn" (click)="openModal()">Choose</button>
                             </div>
-</div>
+                        </div>
                         <!-- Row for comparison execution names input -->
                         <div class="mt-4 mb-3 row-align">
                             <label for="testtype" class="col-md-3 col-form-label">Comparison Execution Names <span
@@ -150,6 +151,13 @@ limitations under the License.
                                             <div *ngIf="combinedSubmitted && combinedForm.controls['deviceType']?.errors" class="text-danger">
                                                 <small *ngIf="combinedForm.controls['deviceType']?.errors?.['required']">Please select device type.</small>
                                             </div>
+                                        </div>
+                                    </div>
+                                    <!-- Row for device name input -->
+                                    <div class="mb-3 row-align">
+                                        <label for="devicename" class="col-md-4 col-form-label">Device Name</label>
+                                        <div class="col-md-8">
+                                            <input type="text" class="form-control" formControlName="deviceName" placeholder="Enter device name" />
                                         </div>
                                     </div>
                                 </div>

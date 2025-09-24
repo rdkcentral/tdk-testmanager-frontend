@@ -285,6 +285,7 @@ export class AnalysisComponent {
         fromDate: ['', Validators.required],
         toDate: ['', Validators.required],
         deviceType: ['', Validators.required],
+        deviceName: [''],
         executionType: ['', Validators.required],
         category: [{ value: this.selectedDfaultCategory, disabled: true }],
         scriptSingle: [''], // No validators
@@ -650,6 +651,7 @@ export class AnalysisComponent {
           ? this.combinedForm.get('scriptSingle')?.value
           : '',
       deviceType: this.deviceName,
+      deviceName: this.combinedForm.get('deviceName')?.value,
       category: this.selectedDfaultCategory,
     };
 
