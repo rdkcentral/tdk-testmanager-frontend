@@ -53,6 +53,10 @@ limitations under the License.
           matTooltip="Upload {{selectedCategory}} Script">
           <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
         </button>
+        <button type="button" class="download-btn" (click)="downloadAllMdZip()"
+  matTooltip="Download All Md files (zip)">
+  <i class="bi bi-file-earmark-zip download-icon"></i>
+</button>
         <button class="download-btn" (click)="createScripts()" matTooltip="Create {{selectedCategory}} Script">
           <i class="bi bi-plus-circle-fill download-icon"></i>
         </button>
@@ -65,10 +69,9 @@ limitations under the License.
           matTooltip="Upload {{selectedCategory}} testsuites">
           <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
         </button>
-        <!-- TODO : Remove this for now and decide if it is needed later
-        <button type="button" class="download-btn" matTooltip="Update Test Suite"><i
-            class="bi bi-arrow-repeat download-icon"></i> </button> -->
-
+        <button type="button" class="download-btn" matTooltip="Update Test Suite"><i class="bi bi-arrow-repeat download-icon"
+            (click)="refreshAllTestSuites()"></i>
+        </button>
         <button *ngIf="testsuitTable && categoryName !== 'Video'" class="download-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
           matTooltip="Create {{selectedCategory}} Suite">
           <i class="bi bi-plus-circle-fill download-icon"></i>
@@ -112,7 +115,7 @@ limitations under the License.
             <mat-icon class="info-icon"
               [matTooltip]="viewName === 'scripts' ? 'Search by script name here.\nFor module wise search, use column filters in the table.' : 'Search by script name here.\nFor TestSuite search, use column filters in the table.'">
               info
-            </mat-icon>
+            </mat-icon> 
           </span>
           <input type="text" class="form-control seach-input" id="filter-text-box" [(ngModel)]="globalSearchTerm"
             (input)="onSearchInput()" placeholder="Search by Script name">
@@ -143,7 +146,7 @@ limitations under the License.
                   <span class="input-group-text search-side" id="basic-addon1"><i class="bi bi-search"></i></span>
                   <input #filterInput type="text" class="form-control fiter-input" placeholder="Filter..."
                     [(ngModel)]="filterText" (keyup)="filterScript()" aria-describedby="basic-addon1">
-                </div>
+                </div> 
               </div>
             </div>
             <div class="col border-column"><span class="script-table-head">Script Count</span></div>

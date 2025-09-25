@@ -1223,3 +1223,43 @@ ag-grid-angular {
   width: 100%;
   max-height: 100%;
 }
+
+/* Style for the transparent loader dialog */
+::ng-deep .transparent-dialog {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+/* Style for the transparent loader dialog container */
+::ng-deep .transparent-dialog .mat-dialog-container {
+  background-color: transparent;
+  box-shadow: none;
+  overflow: visible !important;
+  padding: 0 !important;
+}
+
+/* Target specific Material Dialog elements */
+::ng-deep .transparent-dialog .mat-mdc-dialog-container .mdc-dialog__container {
+  overflow: visible !important;
+}
+/* Remove background and shadow from dialog surface */
+::ng-deep .transparent-dialog .mat-mdc-dialog-container .mdc-dialog__surface {
+  overflow: visible !important;
+  box-shadow: none !important;
+  background-color: transparent !important;
+}
+
+/* Remove any max-height constraints */
+::ng-deep .transparent-dialog .mat-mdc-dialog-content {
+  max-height: none !important;
+  overflow: visible !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Ensure the loader is centered */
+::ng-deep .transparent-dialog .mat-mdc-dialog-content app-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}

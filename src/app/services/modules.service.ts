@@ -173,11 +173,11 @@ export class ModulesService {
    * @param functionName The name of the function.
    * @returns Observable with the list of parameters.
    */
- findAllByFunction(functionName:any):Observable<any>{
+ findAllByFunction(functionName:any ,categoryName:any):Observable<any>{
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/parameter/findAllByFunction?functionName=${functionName}`, { headers });
+    return this.http.get(`${this.config.apiUrl}api/v1/parameter/findAllByFunction?functionName=${functionName}&category=${categoryName}`, { headers });
   }
 
   /**

@@ -357,6 +357,29 @@ export class ScriptsService {
   
   }
 
+downloadAllMdZip(category: string): Observable<any> {
+  const headers = new HttpHeaders({
+    'Authorization': this.authService.getApiToken()
+  });
+  return this.http.get(`${this.config.apiUrl}api/v1/script/downloadMarkdownByCategoryZip?category=${category}`, { headers, responseType: 'blob' });
+}
 
-
+  /**
+   * Sends a POST request to create or update the default test suites on the server.
+   *
+   * @returns An Observable emitting the server's response.
+   *
+   * @remarks
+   * The request includes an Authorization header with an API token obtained from the authentication service.
+   * The endpoint used is `${this.config.apiUrl}api/v1/script/createOrUpdateDefaultTestSuites`.
+   */
+   refreshTestSuite(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/script/createOrUpdateDefaultTestSuites`,
+      { headers }
+    );
+  }
 }

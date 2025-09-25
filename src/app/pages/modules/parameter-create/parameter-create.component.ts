@@ -97,6 +97,7 @@ export class ParameterCreateComponent {
         parameterDataType: this.parameterForm.value.parameterType,
         parameterRangeVal: this.parameterForm.value.rangeVal,
         function: this.dynamicFunctionName,
+        parameterCategory:this.configureName
       }
       
       this.moduleservice.createParameter(parameterObj).subscribe({

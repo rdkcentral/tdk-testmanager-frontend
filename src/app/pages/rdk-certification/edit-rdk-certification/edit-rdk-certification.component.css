@@ -90,3 +90,28 @@ http://www.apache.org/licenses/LICENSE-2.0
 .container.container-box {
   max-width: 95%;
 }
+
+/* Editor container positioning */
+.editor-container {
+  position: relative;
+  min-height: 60vh;
+}
+
+/* Loader container styling */
+.editor-loader-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+  z-index: 10;
+}
+
+/* Hidden element styling */
+.invisible {
+  visibility: hidden;
+}

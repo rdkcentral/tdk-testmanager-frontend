@@ -273,9 +273,9 @@ export class ExecutionComponent implements OnInit, OnDestroy {
     {
       headerName: 'Job Name',
       field: 'jobName',
-      flex: 1.7,
+      flex: 3,
       filter: 'agTextColumnFilter',
-      width: 190,
+      tooltipField: 'jobName',
       sortable: true,
       headerClass: 'header-center',
       resizable: false,
@@ -289,14 +289,12 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       },
     },
     {
-      headerName: 'Execution/Start Time',
+      headerName: 'Execution Start Time',
       field: 'executionStartTime',
       filter: 'agDateColumnFilter',
-      flex: 1.5,
-      width: 180,
-      minWidth: 180,
+      width: 120,
       sortable: true,
-      resizable: true,
+      resizable: false,
       headerClass: 'header-center',
       wrapHeaderText: true,
       autoHeaderHeight: true,
@@ -351,6 +349,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Scripts/Testsuite',
       field: 'scriptTestSuite',
       filter: 'agTextColumnFilter',
+      tooltipField: 'scriptTestSuite',
       flex: 2.5,
       sortable: true,
       resizable: false,
@@ -589,7 +588,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    */
   getAllExecutions(): void {
     this.storeSelection();
-    if (this.selectedCategory === 'ExecutionName' && this.searchValue != '') {
+  if (this.selectedCategory === 'ExecutionName' && this.searchValue != '') {
       this.executionservice
         .getAllExecutionByName(
           this.searchValue,
@@ -603,9 +602,12 @@ export class ExecutionComponent implements OnInit, OnDestroy {
             if (data === null || data === undefined) {
               this.rowData = [];
               this.totalItems = 0;
+            } else if (Array.isArray(data)) {
+              this.rowData = data;
+              this.totalItems = data.length;
             } else {
-              this.rowData = data.executions;
-              this.totalItems = data.totalItems;
+              this.rowData = data.executions || [];
+              this.totalItems = data.totalItems || this.rowData.length;
             }
             setTimeout(() => {
               this.reSoreSelection();
@@ -651,7 +653,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
             });
           },
         });
-    } else if (this.selectedCategory === 'Device' && this.searchValue != '') {
+  } else if (this.selectedCategory === 'Device' && this.searchValue != '') {
       this.executionservice
         .getAllExecutionByDevice(
           this.searchValue,
@@ -679,10 +681,44 @@ export class ExecutionComponent implements OnInit, OnDestroy {
             });
           },
         });
-    } else if (this.selectedCategory === 'User' && this.selectedOption != '') {
+  } else if (this.selectedCategory === 'User') {
+      if (this.selectedOption && this.selectedOption.trim() !== '') {
+        this.executionservice
+          .getAllExecutionByUser(
+            this.selectedOption,
+            this.selectedDfaultCategory,
+            this.currentPage,
+            this.pageSize
+          )
+          .subscribe({
+            next: (res) => {
+              let data = res.data;
+              if (data === null || data === undefined) {
+                this.rowData = [];
+                this.totalItems = 0;
+              } else {
+                this.rowData = data.executions;
+                this.totalItems = data.totalItems;
+              }
+            },
+            error: (err) => {
+              this._snakebar.open(err.message, '', {
+                duration: 2000,
+                panelClass: ['err-msg'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top',
+              });
+            },
+          });
+      } else {
+        // If no user is selected, clear the data
+        this.rowData = [];
+        this.totalItems = 0;
+      }
+    } else if (this.selectedCategory === 'Result' && this.searchValue != '') {
       this.executionservice
-        .getAllExecutionByUser(
-          this.selectedOption,
+        .getAllExecutionByStatus(
+          this.searchValue,
           this.selectedDfaultCategory,
           this.currentPage,
           this.pageSize
@@ -693,9 +729,12 @@ export class ExecutionComponent implements OnInit, OnDestroy {
             if (data === null || data === undefined) {
               this.rowData = [];
               this.totalItems = 0;
+            } else if (Array.isArray(data)) {
+              this.rowData = data;
+              this.totalItems = data.length;
             } else {
-              this.rowData = data.executions;
-              this.totalItems = data.totalItems;
+              this.rowData = data.executions || [];
+              this.totalItems = data.totalItems || this.rowData.length;
             }
           },
           error: (err) => {
@@ -1162,6 +1201,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    * Handles the search button click event and triggers search based on selected category.
    */
   onSearchClick(): void {
+    console.log('Search Clicked:', this.selectedCategory, this.searchValue);
     if (
       this.selectedCategory === 'ExecutionName' ||
       this.selectedCategory === 'Scripts/Testsuite' ||
@@ -1169,6 +1209,11 @@ export class ExecutionComponent implements OnInit, OnDestroy {
     ) {
       this.currentPage = 0;
       this.paginator.firstPage();
+      this.getAllExecutions();
+    }
+    if (this.selectedCategory === 'Result') {
+      this.currentPage = 0;
+      if (this.paginator && this.paginator.firstPage) this.paginator.firstPage();
       this.getAllExecutions();
     }
     if (this.searchValue === '') {
@@ -1195,12 +1240,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    * @param params The parameters containing executionId and other info.
    */
   openDetailsModal(params: any): void {
+    const loadingDialog = this.resultDialog.open(LoaderComponent, {
+      width: '200px',
+      height: '200px',
+      panelClass: 'transparent-dialog',
+      disableClose: true,
+    });
     localStorage.setItem('executionId', params.executionId);
     this.executionservice.resultDetails(params.executionId).subscribe({
       next: (res) => {
+        loadingDialog.close();
         this.resultDetailsData = res.data;
         this.resultDetailsData.executionId = params.executionId;
         this.resultDetailsData.category = this.selectedDfaultCategory;
+        this.resultDetailsData.executionName = params.executionName;
         if (this.resultDetailsData) {
           let resultDetailsModal = this.resultDialog.open(
             DetailsExeDialogComponent,
@@ -1218,6 +1271,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
         }
       },
       error: (err) => {
+        loadingDialog.close();
         this._snakebar.open(err.message, '', {
           duration: 2000,
           panelClass: ['err-msg'],
@@ -1267,6 +1321,14 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    */
   openModalExecute(params: any) {
     if (params.status === 'FREE') {
+      // Show loading indicator first
+      const loadingDialog = this.triggerDialog.open(LoaderComponent, {
+        width: '200px',
+        height: '200px',
+        panelClass: ['transparent-dialog', 'no-scroll-dialog'],
+        disableClose: true,
+        autoFocus: false,
+      });
       this.executionservice.getDeviceStatusByIP(params.ip).subscribe({
         next: (res) => {
           if (res.data && res.data.status === 'FREE') {
@@ -1281,12 +1343,15 @@ export class ExecutionComponent implements OnInit, OnDestroy {
                 autoFocus: false,
               }
             );
-
+            // Close loading dialog once main dialog is open
+            loadingDialog.close();
             deviceExeModal.afterClosed().subscribe(() => {
               this.getAllExecutions();
               this.getDeviceStatus();
             });
           } else {
+            // Close loading dialog if device isn't free
+            loadingDialog.close();
             this._snakebar.open(
               'The device is not available for execution',
               '',
@@ -1301,6 +1366,8 @@ export class ExecutionComponent implements OnInit, OnDestroy {
           }
         },
         error: (err) => {
+          // Close loading dialog on error
+          loadingDialog.close();
           this._snakebar.open(err.message, '', {
             duration: 2000,
             panelClass: ['err-msg'],
@@ -1333,6 +1400,17 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    * @param normalExecutionClick The data for normal execution click.
    */
   openDialog(normalExecutionClick: any) {
+    // Show loading indicator first
+    const loadingDialog = this.triggerDialog.open(LoaderComponent, {
+      width: '200px',
+      height: '200px',
+      panelClass: ['transparent-dialog', 'no-scroll-dialog'],
+      disableClose: true,
+      autoFocus: false,
+    });
+    // Short timeout to ensure loader is visible
+    setTimeout(() => {
+    // Now open the actual execution dialog
     const normalExeModal = this.triggerDialog.open(ExecuteDialogComponent, {
       width: '68%',
       height: '96vh',
@@ -1343,11 +1421,14 @@ export class ExecutionComponent implements OnInit, OnDestroy {
         normalExecutionClick,
       },
     });
+     // Close the loader once the main dialog is ready to show
+    loadingDialog.close();
     normalExeModal.afterClosed().subscribe(() => {
       setTimeout(() => {
         this.getAllExecutions();
       }, 2000);
     });
+    }, 300);
   }
 
   /**

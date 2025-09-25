@@ -290,6 +290,7 @@ export class ExecutionService {
    * @returns Observable with the executions.
    */
   getAllExecutionByUser(userName: any,category: any,page: number, size: number): Observable<any> {
+    console.log('getAllExecutionByUser called with:', userName, category, page, size);
     const headers = new HttpHeaders({
       
       'Authorization': this.authService.getApiToken()
@@ -640,5 +641,20 @@ private refreshSchedulerSubject = new Subject<void>();
    */
   getRefreshSchedulerObservable() {
     return this.refreshSchedulerSubject.asObservable();
+  }
+
+  /**
+   * Gets all executions by status with pagination.
+   * @param status The execution status to filter by (SUCCESS, FAILURE, etc).
+   * @param category The category to filter executions by.
+   * @param page The page number.
+   * @param size The page size.
+   * @returns Observable with the executions.
+   */
+  getAllExecutionByStatus(status: string, category: string, page: number, size: number): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': this.authService.getApiToken()
+    });
+    return this.http.get(`${this.config.apiUrl}execution/getAllExecutionByStatus?status=${status}&category=${category}&page=${page}&size=${size}&sortBy=createdDate&sortDir=desc`, { headers });
   }
 }

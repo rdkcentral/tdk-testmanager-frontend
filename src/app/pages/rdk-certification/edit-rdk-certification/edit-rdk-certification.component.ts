@@ -24,11 +24,12 @@ import { RdkService } from '../../../services/rdk-certification.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
+import { LoaderComponent } from '../../../utility/component/loader/loader.component';
 
 @Component({
   selector: 'app-edit-rdk-certification',
   standalone: true,
-  imports: [ReactiveFormsModule, MonacoEditorModule, CommonModule],
+  imports: [ReactiveFormsModule, MonacoEditorModule, CommonModule ,LoaderComponent],
   templateUrl: './edit-rdk-certification.component.html',
   styleUrl: './edit-rdk-certification.component.css',
 })
@@ -46,6 +47,7 @@ export class EditRdkCertificationComponent {
   editorOptions = { theme: 'vs-dark', language: 'python' };
   submitted = false;
   user: any;
+  isEditorLoading: boolean = true;
 
   /**
    * Constructor for EditRdkCertificationComponent.
@@ -80,6 +82,10 @@ export class EditRdkCertificationComponent {
       fileName: [{ value: this.user.name, disabled: true }],
       pythonEditor: ['', Validators.required],
     });
+    this.isEditorLoading = true;
+    setTimeout(() => {
+      this.isEditorLoading = false;
+    }, 3000);
     const fileName = this.certificationFormGroup.get('fileName')?.value;
     const file = encodeURIComponent(fileName);
     this.service.getFileContent(file).subscribe({
