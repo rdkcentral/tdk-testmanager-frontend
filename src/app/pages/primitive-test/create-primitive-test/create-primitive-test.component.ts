@@ -219,7 +219,7 @@ export class CreatePrimitiveTestComponent {
    */
   getFunctionSelected(event: any): void {
     this.selectedFunctionValue = event.target.value;
-    this.service.getParameterList(this.selectedFunctionValue).subscribe(res => {
+    this.service.getParameterList(this.selectedFunctionValue, this.configureName).subscribe(res => {
       this.rowData = res.data;
     })
   }

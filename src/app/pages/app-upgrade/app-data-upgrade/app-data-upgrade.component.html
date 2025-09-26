@@ -1,0 +1,104 @@
+<!--
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+-->
+
+<div class="container-fluid" style="overflow-x: hidden">
+  <div class="row mt-2 mb-4">
+    <div class="col-12">
+      <h1 class="view-title">Data Migration for TDK Service</h1>
+    </div>
+  </div>
+  
+  <div class="card mb-4">
+    <div class="card-body">
+      <div class="row mt-2 mb-3">
+        <div class="col-md-4">
+          <button
+            class="modal-btns text-center"
+            style="width: 100%;"
+            (click)="runLiquibase()"
+            [disabled]="operationInProgress"
+            matTooltip="Run liquibase data upgradation"
+          >
+            Data Upgradation
+          </button>
+        </div>
+        <div class="col-md-8 d-flex align-items-center">
+          <i class="bi bi-info-circle info-icon me-2"></i>
+          <span class="info-text">Executes liquibase scripts to upgrade the database schema and data to the latest version.</span>
+        </div>
+      </div>
+
+      <div class="row mb-2">
+        <div class="col-md-4">
+          <button
+            class="modal-btns text-center"
+            style="width: 100%;"
+            (click)="executeDataRecovery()"
+            [disabled]="operationInProgress"
+            matTooltip="Execute data recovery"
+          >
+            Data Recovery
+          </button>
+        </div>
+        <div class="col-md-8 d-flex align-items-center">
+          <i class="bi bi-info-circle info-icon me-2"></i>
+          <span class="info-text">Performs data recovery operations to restore database to the latest release data.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="logsection">
+      <span class="sub-titel" style="color: #06667d">Operation Output</span>
+      
+      <div class="execution-result">
+        <div class="logs-content">
+          <div *ngIf="operationInProgress" class="alert alert-info mt-3">
+            <i class="bi bi-hourglass-split me-2"></i>
+            Operation is in progress. Please wait.
+          </div>
+          
+          <ng-container *ngIf="outputLogs; else noLogs">
+            <div class="upgradation-logs" [innerHTML]="getFormattedLogs()"></div>
+          </ng-container>
+          
+          <ng-template #noLogs>
+            <div class="text-muted mt-3">
+              No logs available. Output will appear here during operations.
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="buttn-grp">
+      <button
+        class="modal-btns"
+        (click)="close()"
+        matTooltip="Close the dialog"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>

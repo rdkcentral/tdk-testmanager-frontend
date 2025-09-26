@@ -45,10 +45,10 @@ limitations under the License.
           ><i class="bi bi-cloud-arrow-up-fill icon-conf"></i
         ></span>
         <div class="text-group">
-          <span class="category-title3">Upgrade Service App</span>
+          <span class="category-title3">Deploy TDK Service </span>
           <i class="bi bi-arrow-right-short arrow-icon"></i>
           <div>
-            <span class="desc">Option to upgrade backend services</span>
+            <span class="desc">Option to deploy TDK backend service war</span>
           </div>
         </div>
       </div>
@@ -71,5 +71,27 @@ limitations under the License.
         </div>
       </div>
     </div>
+  </div>
+  <!-- Row for Data Migration option -->
+  <div class="row table-sec mt-3">
+    <div class="col">
+      <div
+        class="card-height-3"
+        style="cursor: pointer"
+        (click)="openDataMigrationPopup()"
+      >
+        <span class="circle">
+          <i class="bi bi-database-fill icon-conf"></i>
+        </span>
+        <div class="text-group">
+          <span class="category-title3">Data Migration for the TDK service</span>
+          <i class="bi bi-arrow-right-short arrow-icon"></i>
+          <div>
+            <span class="desc">Option to do liquibase based data upgradation</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col"></div>
   </div>
 </div>

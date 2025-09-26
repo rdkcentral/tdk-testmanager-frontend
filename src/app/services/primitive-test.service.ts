@@ -96,16 +96,16 @@ export class PrimitiveTestService {
     return this.http.get(`${this.config.apiUrl}api/v1/primitivetest/getlistbymodulename?moduleName=${moduleName}`, { headers });
   }
 
-  /**
+   /**
    * Gets the list of parameters by function name.
    * @param functionName The name of the function.
    * @returns Observable with the list of parameters.
    */
-  getParameterList(functionName: any): Observable<any> {
+  getParameterList(functionName: any, categoryName: any): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/parameter/findAllByFunction?functionName=${functionName}`, { headers});
+    return this.http.get(`${this.config.apiUrl}api/v1/parameter/findAllByFunction?functionName=${functionName}&category=${categoryName}`, { headers });
   }
 
   /**
