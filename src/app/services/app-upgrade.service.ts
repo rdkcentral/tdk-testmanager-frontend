@@ -153,4 +153,34 @@ export class AppUpgradeService {
       { headers }
     );
   }
+
+  /**
+   * Runs liquibase for data upgradation
+   * @returns Observable with liquibase response
+   */
+  runLiquibase(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/app-upgrade/runLiquibase`,
+      { headers }
+    );
+  }
+
+  /**
+   * Executes data recovery operations
+   * @returns Observable with data recovery response
+   */
+  executeDataRecovery(): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/app-upgrade/data-recovery/execute`,
+      { headers }
+    );
+  }
 }

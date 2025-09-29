@@ -31,6 +31,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { AppServiceUpgradeComponent } from '../app-upgrade/app-service-upgrade/app-service-upgrade.component';
 import { AppFrontendUpgradeComponent } from '../app-upgrade/app-frontend-upgrade/app-frontend-upgrade.component';
+import { AppDataUpgradeComponent } from '../app-upgrade/app-data-upgrade/app-data-upgrade.component';
 
 @Component({
   selector: 'app-app-upgrade',
@@ -132,6 +133,31 @@ export class AppUpgradeComponent {
   openFrontendUpgradePopup() {
     const dialogModal = this.dialogUpgradeService.open(
       AppFrontendUpgradeComponent,
+      {
+        width: '68%',
+        height: '96vh',
+        maxWidth: '100vw',
+        panelClass: 'custom-modalbox',
+        restoreFocus: false,
+      }
+    );
+    dialogModal.afterClosed().subscribe(() => {});
+  }
+
+  /**
+   * Opens a modal dialog for the data migration process using the `AppDataUpgradeComponent`.
+   * The dialog is configured with custom dimensions and styling similar to other upgrade dialogs.
+   * After the dialog is closed, an empty subscription is triggered.
+   *
+   * @remarks
+   * The dialog uses a custom panel class `custom-modalbox` and disables focus restoration.
+   * This component handles both data upgradation and data recovery operations.
+   *
+   * @returns {void}
+   */
+  openDataMigrationPopup() {
+    const dialogModal = this.dialogUpgradeService.open(
+      AppDataUpgradeComponent,
       {
         width: '68%',
         height: '96vh',

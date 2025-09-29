@@ -1267,7 +1267,8 @@ export class ScriptListComponent {
   }
 
   /**
-   * Refreshes all test suites by invoking the script service's refresh method.
+   * Refreshes all test suites with module names that should contain all the 
+   * scripts in a module by invoking the script service's refresh method.
    * 
    * - Displays a loader while the refresh operation is in progress.
    * - On success, shows a success snackbar message and reloads the test suite data.
