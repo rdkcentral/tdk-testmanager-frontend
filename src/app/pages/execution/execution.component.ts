@@ -768,7 +768,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
             }, 0);
           },
           error: (err) => {
-            this._snakebar.open(err.message, '', {
+            this._snakebar.open(err, '', {
               duration: 2000,
               panelClass: ['err-msg'],
               horizontalPosition: 'end',
@@ -1088,7 +1088,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
           }
         },
         error: (err) => {
-          this._snakebar.open(err.message, '', {
+          this._snakebar.open(err, '', {
             duration: 2000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',

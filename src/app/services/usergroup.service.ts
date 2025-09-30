@@ -98,6 +98,6 @@ export class UsergroupService {
    * @returns Observable with the application version.
    */
   appVersion(): Observable<any> {
-    return this.http.get(`${this.config.apiUrl}api/v1/users/getappversion`);
+    return this.http.get(`${this.config.apiUrl}api/v1/users/getappversion`,this.options);
   }
 }

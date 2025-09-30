@@ -126,7 +126,7 @@ export class EditScriptsComponent {
       scriptname: ['', [Validators.required, this.noSpacesValidator]],
       module: [{ value: '', disabled: true }],
       primitiveTest: [{ value: '', disabled: true }],
-      devicetype: [[], [Validators.required, this.mindeviceValidator(1)]],
+      devicetype: [[], []],
       executiontimeout: ['', [Validators.required, this.onlyNumbersValidator]],
       longdurationtest: [''],
       skipexecution: [''],

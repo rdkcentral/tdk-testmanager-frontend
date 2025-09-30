@@ -378,7 +378,7 @@ downloadAllMdZip(category: string): Observable<any> {
       Authorization: this.authService.getApiToken(),
     });
     return this.http.post(
-      `${this.config.apiUrl}api/v1/script/createOrUpdateDefaultTestSuites`,
+      `${this.config.apiUrl}api/v1/script/createOrUpdateDefaultTestSuites`, {},
       { headers }
     );
   }

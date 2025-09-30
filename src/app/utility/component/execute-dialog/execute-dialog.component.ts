@@ -268,8 +268,8 @@ export class ExecuteDialogComponent {
         date: [new Date()],
         time: [new Date()],
         scheduleType: ['OnetimeSchedule'],
-        recurrenceStartDate: [null, Validators.required],
-        recurrenceEndDate: [null, Validators.required],
+        startdate: [new Date()],
+        enddate: [new Date()],
       });
       this.isThunderEnable = this.isThunderEnable;
       this.scriptTestsuiteOptions = [];

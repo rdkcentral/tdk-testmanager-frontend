@@ -47,7 +47,7 @@ export class PackageManagerService {
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-    return this.http.post(`${this.config.apiUrl}/api/v1/packagemanager/createPackageAPI?type=${type}&device=${device}`, { headers })
+    return this.http.post(`${this.config.apiUrl}/api/v1/packagemanager/createPackageAPI?type=${type}&device=${device}`, {},{ headers })
   }
 
   /**
@@ -74,7 +74,7 @@ export class PackageManagerService {
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-    return this.http.post(`${this.config.apiUrl}/api/v1/packagemanager/installPackage?type=${type}&device=${device}&packageName=${packageName }`, { headers });
+    return this.http.post(`${this.config.apiUrl}/api/v1/packagemanager/installPackage?type=${type}&device=${device}&packageName=${packageName }`,{}, { headers });
   }
 
   /**
