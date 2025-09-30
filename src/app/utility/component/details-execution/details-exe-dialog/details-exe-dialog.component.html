@@ -454,18 +454,18 @@ limitations under the License.
                                           </ng-container>
                                         </th>
                                         <td class="details-row script-td">
-                                          <ng-container *ngIf="key === 'logs' && parent.status !== 'INPROGRESS'">
-                                            <div [innerHTML]="parent.formatLogs" class="format-text"></div>
+                                          <ng-container *ngIf="key === 'logs' && parent.status === 'PENDING'">
+                                            <div class="pending-message">
+                                              <span>Execution is yet to start, logs are not available.</span>
+                                            </div>
                                           </ng-container>
                                           <ng-container *ngIf="key === 'logs' && parent.status === 'INPROGRESS'">
-                                            <ng-container *ngIf="parent.status === 'INPROGRESS'">
-                                              <button type="button" class="download-btn log-btn" matTooltip="Live Logs" (click)="liveLogs()">
-                                                View Live Logs
-                                              </button>
-                                            </ng-container>
-                                            <ng-container *ngIf="parent.status === 'PENDING'">
-                                              <span class="text-muted">Execution is yet to start, logs are not available.</span>
-                                            </ng-container>
+                                            <button type="button" class="download-btn log-btn" matTooltip="Live Logs" (click)="liveLogs()">
+                                              View Live Logs
+                                            </button>
+                                          </ng-container>
+                                          <ng-container *ngIf="key === 'logs' && parent.status !== 'INPROGRESS' && parent.status !== 'PENDING'">
+                                            <div [innerHTML]="parent.formatLogs" class="format-text"></div>
                                           </ng-container>
                                           <ng-container *ngIf="key !== 'logs'">{{ parent.details[key] }}</ng-container>
                                         </td>

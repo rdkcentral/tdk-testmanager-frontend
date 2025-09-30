@@ -655,6 +655,6 @@ private refreshSchedulerSubject = new Subject<void>();
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-    return this.http.get(`${this.config.apiUrl}execution/getAllExecutionByStatus?status=${status}&category=${category}&page=${page}&size=${size}&sortBy=createdDate&sortDir=desc`, { headers });
+    return this.http.get(`${this.config.apiUrl}execution/getAllExecutionByStatus?status=${status}&categoryName=${category}&page=${page}&size=${size}&sortBy=createdDate&sortDir=desc`, { headers });
   }
 }

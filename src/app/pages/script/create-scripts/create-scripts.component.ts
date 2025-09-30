@@ -128,7 +128,7 @@ export class CreateScriptsComponent {
       scriptname: ['', [Validators.required, this.noSpacesValidator]],
       module: ['', Validators.required],
       primitiveTest: [{ value: this.defaultPrimitive, disabled: true }],
-      devicetype: ['', Validators.required],
+      devicetype: [''],
       executiontimeout: ['', Validators.required],
       longdurationtest: [''],
       skipexecution: [''],
