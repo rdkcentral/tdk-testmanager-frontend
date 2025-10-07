@@ -33,15 +33,15 @@ limitations under the License.
           Dropdown section for download and refresh buttons.
         -->
         <div class="download-dropdown">
-          <button type="button" class="download-btn refresh" matTooltip="Click here to update" (click)="dataUpdate()"
+          <button type="button" class="btn btn-sm top-download" matTooltip="Click here to update" (click)="dataUpdate()"
           *ngIf ="data.executionStatus === 'INPROGRESS'">
-            <i class="bi bi-arrow-clockwise download-icon"></i>
+            <i class="bi bi-arrow-clockwise extra-icon download"></i>
           </button>
           <button class="btn btn-sm top-download" matTooltip="Download Reports" (click)="showPopup()">
             <i class="bi bi-cloud-arrow-down-fill extra-icon download"></i>
           </button>
-          <button class="btn btn-sm top-download page-corner-close-btn" (click)="onClose()" matTooltip="Close">
-           <i class="bi bi-x-lg"></i>
+          <button class="btn btn-sm top-download" (click)="onClose()" matTooltip="Close">
+            <i class="bi bi-x-lg extra-icon download"></i>
           </button>
         </div>
         <div *ngIf="showPopupFlag" class="popup">
