@@ -45,7 +45,7 @@ http://www.apache.org/licenses/LICENSE-2.0
         </div>
       </div>
 
-      <div class="row mb-2">
+      <div class="row mb-3">
         <div class="col-md-4">
           <button
             class="modal-btns text-center"
@@ -60,6 +60,81 @@ http://www.apache.org/licenses/LICENSE-2.0
         <div class="col-md-8 d-flex align-items-center">
           <i class="bi bi-info-circle info-icon me-2"></i>
           <span class="info-text">Performs data recovery operations to restore database to the latest release data.</span>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <button
+            class="modal-btns text-center"
+            style="width: 100%;"
+            (click)="toggleNewChangesSection()"
+            [disabled]="operationInProgress"
+            matTooltip="Check for new changes since a specific date"
+          >
+            Check for New changes
+          </button>
+        </div>
+        <div class="col-md-8 d-flex align-items-center">
+          <i class="bi bi-info-circle info-icon me-2"></i>
+          <span class="info-text">Retrieves list of all changes made since a specified date and time.</span>
+        </div>
+      </div>
+
+      <!-- New Changes Section -->
+      <div *ngIf="showNewChangesSection" class="row mt-3 mb-3">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title">Check for New Changes</h5>
+              <div class="row">
+                <div class="col-md-6">
+                  <mat-form-field appearance="outline" class="w-100">
+                    <mat-label>Select Date and Time</mat-label>
+                    <input
+                      matInput
+                      type="datetime-local"
+                      [(ngModel)]="sinceDateTime"
+                      [disabled]="operationInProgress"
+                      matTooltip="Select date and time in your local browser time"
+                    >
+                    <mat-hint>Enter time in the browser time zone, current time is {{ getCurrentTimeString() }}</mat-hint>
+                  </mat-form-field>
+                </div>
+                <div class="col-md-6 d-flex align-items-start">
+                  <button
+                    class="modal-btns mt-2 me-2"
+                    (click)="checkForNewChanges()"
+                    [disabled]="operationInProgress || !sinceDateTime"
+                    matTooltip="Fetch changes since selected date/time"
+                  >
+                    Fetch Changes
+                  </button>
+                  <button
+                    class="modal-btns mt-2"
+                    (click)="downloadChanges()"
+                    [disabled]="operationInProgress || !sinceDateTime"
+                    matTooltip="Download changes as SQL file"
+                  >
+                    Download Changes
+                  </button>
+                </div>
+              </div>
+              
+              <!-- Changes Data Display -->
+              <div *ngIf="changesData" class="mt-3">
+                <label class="form-label">Changes Data:</label>
+                <textarea
+                  class="form-control"
+                  rows="10"
+                  [value]="changesData"
+                  readonly
+                  style="font-family: monospace; font-size: 12px;"
+                  matTooltip="Changes data from API response"
+                ></textarea>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -90,7 +165,7 @@ http://www.apache.org/licenses/LICENSE-2.0
     </div>
   </div>
 
-  <div class="row mt-4">
+  <div class="row mt-4 mb-4">
     <div class="buttn-grp">
       <button
         class="modal-btns"
