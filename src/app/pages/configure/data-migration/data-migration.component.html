@@ -1,0 +1,116 @@
+<!--
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+-->
+
+<div class="container-fluid" style="overflow-x: hidden">
+  <div class="row mt-2 mb-4">
+    <div class="col-12">
+      <h1 class="view-title">Data Migration</h1>
+    </div>
+  </div>
+  
+  <div class="card mb-4">
+    <div class="card-body">
+      <h5 class="card-title">Check for New Changes</h5>
+      <div class="row">
+        <div class="col-md-6">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Select Date and Time</mat-label>
+            <input
+              matInput
+              type="datetime-local"
+              [(ngModel)]="sinceDateTime"
+              [disabled]="operationInProgress"
+              matTooltip="Select date and time in your local browser time"
+            >
+            <mat-hint>Enter time in the browser time zone, current time is {{ getCurrentTimeString() }}</mat-hint>
+          </mat-form-field>
+        </div>
+        <div class="col-md-6 d-flex align-items-start">
+          <button
+            class="modal-btns mt-2 me-2"
+            (click)="checkForNewChanges()"
+            [disabled]="operationInProgress || !sinceDateTime"
+            matTooltip="Fetch changes since selected date/time"
+          >
+            Fetch Changes
+          </button>
+          <button
+            class="modal-btns mt-2"
+            (click)="downloadChanges()"
+            [disabled]="operationInProgress || !sinceDateTime"
+            matTooltip="Download changes as SQL file"
+          >
+            Download Changes
+          </button>
+        </div>
+      </div>
+      
+      <!-- Changes Data Display -->
+      <div *ngIf="changesData" class="mt-3">
+        <label class="form-label">Changes Data:</label>
+        <textarea
+          class="form-control"
+          rows="10"
+          [value]="changesData"
+          readonly
+          style="font-family: monospace; font-size: 12px;"
+          matTooltip="Changes data from API response"
+        ></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4">
+    <div class="logsection">
+      <span class="sub-titel" style="color: #06667d">Operation Output</span>
+      
+      <div class="execution-result">
+        <div class="logs-content">
+          <div *ngIf="operationInProgress" class="alert alert-info mt-3">
+            <i class="bi bi-hourglass-split me-2"></i>
+            Operation is in progress. Please wait.
+          </div>
+          
+          <ng-container *ngIf="outputLogs; else noLogs">
+            <div class="upgradation-logs" [innerHTML]="getFormattedLogs()"></div>
+          </ng-container>
+          
+          <ng-template #noLogs>
+            <div class="text-muted mt-3">
+              No logs available. Output will appear here during operations.
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row mt-4 mb-4">
+    <div class="buttn-grp">
+      <button
+        class="modal-btns"
+        (click)="close()"
+        matTooltip="Close the dialog"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>
