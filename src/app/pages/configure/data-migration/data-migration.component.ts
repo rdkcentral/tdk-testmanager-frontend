@@ -62,9 +62,8 @@ export class DataMigrationComponent implements OnInit {
   // Common output logs
   outputLogs: string = '';
   
-  // New changes check properties
+  // Date/time input for checking changes since a specific time
   sinceDateTime: string = '';
-  changesData: string = '';
 
   /**
    * Constructor: Initializes component and injects required services.
@@ -87,20 +86,18 @@ export class DataMigrationComponent implements OnInit {
    */
   private clearAllData(): void {
     this.outputLogs = '';
-    this.changesData = '';
   }
 
   /**
-   * Sets default date/time to current date/time
+   * Sets default date/time to current date/time in browser timezone
    */
   private setDefaultDateTime(): void {
     const now = new Date();
-    // Format date for datetime-local input (YYYY-MM-DDTHH:mm)
     const year = now.getFullYear();
-    const month = String(now.getMonth() + 1).padStart(2, '0');
-    const day = String(now.getDate()).padStart(2, '0');
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
     
     this.sinceDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
   }
@@ -126,7 +123,6 @@ export class DataMigrationComponent implements OnInit {
     }
 
     this.operationInProgress = true;
-    this.changesData = '';
     this.outputLogs = 'Checking for new changes...\n';
 
     // Convert browser time to UTC
@@ -143,11 +139,12 @@ export class DataMigrationComponent implements OnInit {
         next: (response: any) => {
           this.outputLogs += `SUCCESS: Changes retrieved successfully.\n`;
           
-          // Parse the response and extract the 'data' key value
+          // Display the response data directly in the operation output
           if (response && response.data) {
-            this.changesData = JSON.stringify(response.data, null, 2);
+            this.outputLogs += `\nFETCH RESULTS:\n`;
+            this.outputLogs += `${JSON.stringify(response.data, null, 2)}\n`;
           } else {
-            this.changesData = 'No data found in the response.';
+            this.outputLogs += `\nNo data found in the response.\n`;
           }
         },
         error: (error: any) => {
@@ -160,7 +157,6 @@ export class DataMigrationComponent implements OnInit {
           }
           
           this.outputLogs += `ERROR: ${errorMessage}\n`;
-          this.changesData = '';
         }
       });
   }
@@ -226,7 +222,7 @@ export class DataMigrationComponent implements OnInit {
   }
 
   /**
-   * Formats the output logs with colors - red for errors, green for success
+   * Formats the output logs with colors - red for errors, green for success, blue for fetch results
    */
   getFormattedLogs(): SafeHtml {
     if (!this.outputLogs) return '';
@@ -238,6 +234,11 @@ export class DataMigrationComponent implements OnInit {
           return `<div style="color: red; font-weight: bold;">${line}</div>`;
         } else if (line.startsWith('SUCCESS:')) {
           return `<div style="color: green; font-weight: bold;">${line}</div>`;
+        } else if (line.startsWith('FETCH RESULTS:')) {
+          return `<div style="color: #007bff; font-weight: bold; margin-top: 10px;">${line}</div>`;
+        } else if (line.trim().startsWith('{') || line.trim().startsWith('[') || line.trim().includes('"')) {
+          // JSON content - format with monospace and smaller font
+          return `<div style="font-family: 'Courier New', monospace; font-size: 12px; background-color: #f8f9fa; padding: 2px; margin: 1px 0;">${line}</div>`;
         }
         return `<div>${line}</div>`;
       })

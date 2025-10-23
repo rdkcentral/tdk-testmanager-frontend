@@ -31,48 +31,39 @@ http://www.apache.org/licenses/LICENSE-2.0
       <div class="row">
         <div class="col-md-6">
           <mat-form-field appearance="outline" class="w-100">
-            <mat-label>Select Date and Time</mat-label>
+            <mat-label>Since Date/Time</mat-label>
             <input
               matInput
               type="datetime-local"
               [(ngModel)]="sinceDateTime"
               [disabled]="operationInProgress"
-              matTooltip="Select date and time in your local browser time"
+              matTooltip="Select date and time to check for changes since"
             >
-            <mat-hint>Enter time in the browser time zone, current time is {{ getCurrentTimeString() }}</mat-hint>
           </mat-form-field>
+          <div class="mb-2">
+            <small class="text-muted">Enter time in the browser time zone, current time is {{ getCurrentTimeString() }}</small>
+          </div>
         </div>
         <div class="col-md-6 d-flex align-items-start">
-          <button
-            class="modal-btns mt-2 me-2"
-            (click)="checkForNewChanges()"
-            [disabled]="operationInProgress || !sinceDateTime"
-            matTooltip="Fetch changes since selected date/time"
-          >
-            Fetch Changes
-          </button>
-          <button
-            class="modal-btns mt-2"
-            (click)="downloadChanges()"
-            [disabled]="operationInProgress || !sinceDateTime"
-            matTooltip="Download changes as SQL file"
-          >
-            Download Changes
-          </button>
+          <div>
+            <button
+              class="modal-btns me-2"
+              (click)="checkForNewChanges()"
+              [disabled]="operationInProgress || !sinceDateTime"
+              matTooltip="Fetch changes since selected date/time"
+            >
+              Fetch Changes
+            </button>
+            <button
+              class="modal-btns"
+              (click)="downloadChanges()"
+              [disabled]="operationInProgress || !sinceDateTime"
+              matTooltip="Download changes as SQL file"
+            >
+              Download Changes
+            </button>
+          </div>
         </div>
-      </div>
-      
-      <!-- Changes Data Display -->
-      <div *ngIf="changesData" class="mt-3">
-        <label class="form-label">Changes Data:</label>
-        <textarea
-          class="form-control"
-          rows="10"
-          [value]="changesData"
-          readonly
-          style="font-family: monospace; font-size: 12px;"
-          matTooltip="Changes data from API response"
-        ></textarea>
       </div>
     </div>
   </div>

@@ -68,7 +68,6 @@ export class AppDataUpgradeComponent implements OnInit {
   // New changes check properties
   showNewChangesSection = false;
   sinceDateTime: string = '';
-  changesData: string = '';
 
   /**
    * Constructor: Initializes component and injects required services.
@@ -91,7 +90,6 @@ export class AppDataUpgradeComponent implements OnInit {
    */
   private clearAllData(): void {
     this.outputLogs = '';
-    this.changesData = '';
     this.showNewChangesSection = false;
   }
 
@@ -101,7 +99,6 @@ export class AppDataUpgradeComponent implements OnInit {
   runLiquibase(): void {
     this.operationInProgress = true;
     this.outputLogs = 'Starting liquibase data upgradation...\n';
-    this.changesData = ''; // Clear changes data
 
     this.appUpgradeService.runLiquibase()
       .pipe(
@@ -151,7 +148,6 @@ export class AppDataUpgradeComponent implements OnInit {
   private performDataRecovery(): void {
     this.operationInProgress = true;
     this.outputLogs = 'Starting data recovery operation...\n';
-    this.changesData = ''; // Clear changes data
 
     this.appUpgradeService.executeDataRecovery()
       .pipe(
@@ -219,7 +215,6 @@ export class AppDataUpgradeComponent implements OnInit {
     }
 
     this.operationInProgress = true;
-    this.changesData = '';
     this.outputLogs = 'Checking for new changes...\n';
 
     // Convert browser time to UTC
@@ -236,11 +231,12 @@ export class AppDataUpgradeComponent implements OnInit {
         next: (response: any) => {
           this.outputLogs += `SUCCESS: Changes retrieved successfully.\n`;
           
-          // Parse the response and extract the 'data' key value
+          // Display the response data directly in the operation output
           if (response && response.data) {
-            this.changesData = JSON.stringify(response.data, null, 2);
+            this.outputLogs += `\nFETCH RESULTS:\n`;
+            this.outputLogs += `${JSON.stringify(response.data, null, 2)}\n`;
           } else {
-            this.changesData = 'No data found in the response.';
+            this.outputLogs += `\nNo data found in the response.\n`;
           }
         },
         error: (error: any) => {
@@ -253,7 +249,6 @@ export class AppDataUpgradeComponent implements OnInit {
           }
           
           this.outputLogs += `ERROR: ${errorMessage}\n`;
-          this.changesData = '';
         }
       });
   }
@@ -319,7 +314,7 @@ export class AppDataUpgradeComponent implements OnInit {
   }
 
   /**
-   * Formats the output logs with colors - red for errors, green for success
+   * Formats the output logs with colors - red for errors, green for success, blue for fetch results
    */
   getFormattedLogs(): SafeHtml {
     if (!this.outputLogs) return '';
@@ -331,6 +326,11 @@ export class AppDataUpgradeComponent implements OnInit {
           return `<div style="color: red; font-weight: bold;">${line}</div>`;
         } else if (line.startsWith('SUCCESS:')) {
           return `<div style="color: green; font-weight: bold;">${line}</div>`;
+        } else if (line.startsWith('FETCH RESULTS:')) {
+          return `<div style="color: #007bff; font-weight: bold; margin-top: 10px;">${line}</div>`;
+        } else if (line.trim().startsWith('{') || line.trim().startsWith('[') || line.trim().includes('"')) {
+          // JSON content - format with monospace and smaller font
+          return `<div style="font-family: 'Courier New', monospace; font-size: 12px; background-color: #f8f9fa; padding: 2px; margin: 1px 0;">${line}</div>`;
         }
         return `<div>${line}</div>`;
       })
