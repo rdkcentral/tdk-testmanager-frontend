@@ -23,6 +23,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { FormsModule } from '@angular/forms';
+import { MatDialog } from '@angular/material/dialog';
+import { DataMigrationComponent } from './data-migration/data-migration.component';
 
 @Component({
   selector: 'app-configure',
@@ -44,8 +46,13 @@ export class ConfigureComponent implements OnInit {
    * Constructor for ConfigureComponent
    * @param router - Router instance
    * @param service - AuthService instance
+   * @param dialog - MatDialog instance
    */
-  constructor(private router: Router, private service: AuthService) { 
+  constructor(
+    private router: Router, 
+    private service: AuthService,
+    private dialog: MatDialog
+  ) { 
     this.loggedInUser = JSON.parse(localStorage.getItem('loggedinUser')|| '{}');
     this.defaultCategory = this.loggedInUser.userCategory;
     this.preferedCategory = localStorage.getItem('preferedCategory')|| '';
@@ -133,6 +140,22 @@ export class ConfigureComponent implements OnInit {
     if (val === 'prmitivetest') {
       this.router.navigate(['configure/list-primitivetest']);
     }
+    if (val === 'datamigration') {
+      this.openDataMigrationDialog();
+    }
+  }
+
+  /**
+   * Opens the Data Migration dialog
+   */
+  openDataMigrationDialog(): void {
+    this.dialog.open(DataMigrationComponent, {
+      width: '90%',
+      maxWidth: '1200px',
+      height: '80%',
+      disableClose: false,
+      panelClass: 'custom-dialog-container'
+    });
   }
 
 

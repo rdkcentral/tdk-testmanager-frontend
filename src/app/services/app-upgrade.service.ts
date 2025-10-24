@@ -183,4 +183,36 @@ export class AppUpgradeService {
       { headers }
     );
   }
+
+  /**
+   * Gets list of all changes since a specific date
+   * @param sinceDate UTC date string in ISO format
+   * @returns Observable with changes response
+   */
+  getListOfAllChangesSince(sinceDate: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/app-upgrade/getListOfAllChangesSince?since=${sinceDate}`,
+      { headers }
+    );
+  }
+
+  /**
+   * Downloads SQL file with changes based on time
+   * @param sinceDate UTC date string in ISO format
+   * @returns Observable with blob response for file download
+   */
+  downloadChangesBasedOnTime(sinceDate: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/app-upgrade/exportChangeBasedOnTime?since=${sinceDate}`,
+      { headers, responseType: 'blob' }
+    );
+  }
 }
