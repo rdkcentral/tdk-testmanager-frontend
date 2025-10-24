@@ -113,10 +113,28 @@ limitations under the License.
                     </div>
                 </div>
             </div>
+            <div class="row mt-4" *ngIf="privileges != 'admin'">
+            <!-- Row for data migration configuration section (non-admin only) -->
+                <div class="text-start ">
+                    <h3 class="heading commonheading">Data Migration Configuration</h3>
+                </div>
+                <div class="col" >
+                    <div class="card-height-3" (click)="navigationToUser('datamigration')">
+                        <span class="circle"><i class="bi bi-database-fill-gear icon-conf"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" (click)="navigationToUser('datamigration')">Data Migration</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Data migration related operations and configurations</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row mt-4" *ngIf="privileges == 'admin'">
             <!-- Row for common configuration section (admin only) -->
                 <div class="text-start ">
-                    <h3 class="heading commonheading">Common Configuration</h3>
+                    <h3 class="heading commonheading">Admin Configuration</h3>
                 </div>
                 <div class="col" >
                      <!-- TODO: Can be changed later -->
@@ -230,10 +248,28 @@ limitations under the License.
                     </div>
                 </div>
             </div>
+            <div class="row mt-4" *ngIf="privileges != 'admin'">
+            <!-- Row for data migration configuration section (non-admin only) -->
+                <div class="text-start ">
+                    <h3 class="heading commonheading">Data Migration Configuration</h3>
+                </div>
+                <div class="col" >
+                    <div class="card-height-3" (click)="navigationToUser('datamigration')">
+                        <span class="circle"><i class="bi bi-database-fill-gear icon-conf"></i></span>
+                        <div class="text-group">
+                            <a class="category-title3" (click)="navigationToUser('datamigration')">Data Migration</a>
+                            <i class="bi bi-arrow-right-short arrow-icon"></i>
+                            <div>
+                                <span class="desc">Data migration related operations and configurations</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="row mt-4" *ngIf="privileges == 'admin'">
             <!-- Row for common configuration section (admin only) -->
                 <div class="text-start ">
-                    <h3 class="heading commonheading">Common Configuration</h3>
+                    <h3 class="heading commonheading">Admin Configuration</h3>
                 </div>
                 <div class="col" >
                     <!-- Feature requirement as discuss with ABHIJA -->

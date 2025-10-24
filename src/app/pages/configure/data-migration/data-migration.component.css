@@ -1,0 +1,146 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/* Data Migration Component Styles */
+
+/* Container styles */
+.container {
+  padding: 20px;
+}
+
+/* Title styles */
+.view-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  font-weight: 500;
+}
+
+/* Modal button styles (primary action) */
+.modal-btns {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  padding: 7px 30px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  outline: none;
+}
+
+.modal-btns:hover:not(:disabled) {
+  background-color: #0099c7;
+}
+
+.modal-btns:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 178, 220, 0.3);
+}
+
+.modal-btns:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* Form control styles */
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #06667d;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(6, 102, 125, 0.25);
+}
+
+.form-control::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+/* Label styles */
+.form-label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+/* Button group styles */
+.buttn-grp {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+  margin-top: 24px;
+  gap: 8px;
+}
+
+/* Logs section styles */
+.logsection {
+  width: 100%;
+  padding: 0 15px;
+}
+
+.sub-titel {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.execution-result {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  padding: 15px;
+  min-height: 200px;
+}
+
+.logs-content {
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.4;
+}
+
+.upgradation-logs {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Alert styles */
+.alert {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+}
+
+.alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}

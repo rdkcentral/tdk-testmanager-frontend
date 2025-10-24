@@ -22,51 +22,47 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatDialogRef, MatDialog } from '@angular/material/dialog';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { finalize } from 'rxjs/operators';
 import { AppUpgradeService } from '../../../services/app-upgrade.service';
-import { DataRecoveryConfirmationComponent } from './data-recovery-confirmation/data-recovery-confirmation.component';
 
 /**
- * AppDataUpgradeComponent
+ * DataMigrationComponent
  * -------------------------------------------------
- * This component provides the UI and logic for data upgradation and recovery operations.
- * It handles liquibase-based data upgradation and data recovery processes with simplified UI.
+ * This component provides the UI and logic for data migration operations for non-admin users.
+ * It handles checking for new changes and downloading change data.
  *
  * Features:
- * - Simple two-button interface for Data Upgradation and Data Recovery
- * - Common output area for displaying operation results
+ * - Check for new changes since a specific date/time
+ * - Download changes as SQL file
  * - Progress tracking for operations
  * - Uses Angular Material and Bootstrap for UI
  */
 @Component({
-  selector: 'app-app-data-upgrade',
+  selector: 'app-data-migration',
   standalone: true,
   imports: [
     CommonModule,
     FormsModule,
     MatSnackBarModule,
     MatTooltipModule,
-    MatProgressBarModule,
     MatInputModule,
     MatFormFieldModule,
   ],
-  templateUrl: './app-data-upgrade.component.html',
-  styleUrl: './app-data-upgrade.component.css',
+  templateUrl: './data-migration.component.html',
+  styleUrl: './data-migration.component.css',
 })
-export class AppDataUpgradeComponent implements OnInit {
+export class DataMigrationComponent implements OnInit {
   // Operation flags
   operationInProgress = false;
   
   // Common output logs
   outputLogs: string = '';
   
-  // New changes check properties
-  showNewChangesSection = false;
+  // Date/time input for checking changes since a specific time
   sinceDateTime: string = '';
 
   /**
@@ -74,15 +70,15 @@ export class AppDataUpgradeComponent implements OnInit {
    */
   constructor(
     private snackBar: MatSnackBar,
-    private dialogRef: MatDialogRef<AppDataUpgradeComponent>,
+    private dialogRef: MatDialogRef<DataMigrationComponent>,
     private appUpgradeService: AppUpgradeService,
-    private sanitizer: DomSanitizer,
-    private dialog: MatDialog
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
     // Initialize component
     this.clearAllData();
+    this.setDefaultDateTime();
   }
 
   /**
@@ -90,108 +86,20 @@ export class AppDataUpgradeComponent implements OnInit {
    */
   private clearAllData(): void {
     this.outputLogs = '';
-    this.showNewChangesSection = false;
   }
 
   /**
-   * Runs liquibase data upgradation
+   * Sets default date/time to current date/time in browser timezone
    */
-  runLiquibase(): void {
-    this.operationInProgress = true;
-    this.outputLogs = 'Starting liquibase data upgradation...\n';
-
-    this.appUpgradeService.runLiquibase()
-      .pipe(
-        finalize(() => {
-          this.operationInProgress = false;
-        })
-      )
-      .subscribe({
-        next: (response: any) => {
-          const successMessage = response.message || response.output || 'Liquibase data upgradation completed successfully.';
-          this.outputLogs += `SUCCESS: ${successMessage}\n`;
-        },
-        error: (error: any) => {
-          // Handle both string errors from interceptor and object errors
-          let errorMessage = '';
-          if (typeof error === 'string') {
-            errorMessage = error;
-          } else {
-            errorMessage = error.message || error.error?.message || 'Liquibase data upgradation failed';
-          }
-          
-          this.outputLogs += `ERROR: ${errorMessage}\n`;
-        }
-      });
-  }
-
-  /**
-   * Shows confirmation dialog and executes data recovery if confirmed
-   */
-  executeDataRecovery(): void {
-    const confirmationDialogRef = this.dialog.open(DataRecoveryConfirmationComponent, {
-      width: '600px',
-      disableClose: true,
-      panelClass: 'custom-dialog-container'
-    });
-
-    confirmationDialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.performDataRecovery();
-      }
-    });
-  }
-
-  /**
-   * Performs the actual data recovery operation
-   */
-  private performDataRecovery(): void {
-    this.operationInProgress = true;
-    this.outputLogs = 'Starting data recovery operation...\n';
-
-    this.appUpgradeService.executeDataRecovery()
-      .pipe(
-        finalize(() => {
-          this.operationInProgress = false;
-        })
-      )
-      .subscribe({
-        next: (response: any) => {
-          const successMessage = response.message || response.output || 'Data recovery completed successfully.';
-          this.outputLogs += `SUCCESS: ${successMessage}\n`;
-        },
-        error: (error: any) => {
-          // Handle both string errors from interceptor and object errors
-          let errorMessage = '';
-          if (typeof error === 'string') {
-            errorMessage = error;
-          } else {
-            errorMessage = error.message || error.error?.message || 'Data recovery failed';
-          }
-          
-          this.outputLogs += `ERROR: ${errorMessage}\n`;
-        }
-      });
-  }
-
-  /**
-   * Shows/hides the new changes check section
-   */
-  toggleNewChangesSection(): void {
-    this.showNewChangesSection = !this.showNewChangesSection;
+  private setDefaultDateTime(): void {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
     
-    // Set default date to current date/time if showing section
-    if (this.showNewChangesSection && !this.sinceDateTime) {
-      const now = new Date();
-      // Format date for datetime-local input (YYYY-MM-DDTHH:mm)
-      const year = now.getFullYear();
-      const month = String(now.getMonth() + 1).padStart(2, '0');
-      const day = String(now.getDate()).padStart(2, '0');
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      
-      this.sinceDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
+    this.sinceDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
   }
 
   /**
