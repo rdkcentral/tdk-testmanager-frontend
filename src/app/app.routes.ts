@@ -23,6 +23,7 @@ import { ForgotPasswordComponent } from './login/forgot-password/forgot-password
 import { MainComponent } from './layout/main/main.component';
 import { ConfigureComponent } from './pages/configure/configure.component';
 import { ChangePasswordComponent } from './login/change-password/change-password.component';
+import { SystemInformationComponent } from './login/system-information/system-information.component';
 import { UserListComponent } from './pages/user-management/user-list/user-list.component';
 import { UserAddComponent } from './pages/user-management/user-add/user-add.component';
 import { UserEditComponent } from './pages/user-management/user-edit/user-edit.component';
@@ -81,6 +82,7 @@ export const routes: Routes = [
     { path: 'login', title: 'Login', component: LoginComponent },
     { path: 'forgot-password', title: 'Forgot-password', component: ForgotPasswordComponent },
     { path: 'change-password', title: 'Change-password', component: ChangePasswordComponent, canActivate: [authGuard] },
+    { path: 'system-information', title: 'TDK-version-details', component: SystemInformationComponent, canActivate: [authGuard] },
     
     {
         path: '',

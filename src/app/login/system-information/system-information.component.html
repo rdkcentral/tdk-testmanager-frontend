@@ -1,0 +1,123 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2025 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Navigation bar for the system information page -->
+<nav class="navbar navbar-expand-lg header">
+  <!-- Container for navigation bar content -->
+  <div class="container-fluid">
+    <a class="navbar-brand"></a>
+    <img src="assets/logo/TDKLogoFinal.png" alt="TDK_logo" class="logo-img img-fluid" />
+    <!-- <img src="assets/logo/rdkLogo.png" alt="TDK_logo" class="logo-img img-fluid" /> <span class="apptitle">TDK Test -->
+      <!-- Development Kit</span> -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText"
+      aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <!-- Collapsible navigation content -->
+    <div class="collapse navbar-collapse" id="navbarText">
+    </div>
+  </div>
+</nav>
+
+<!-- Main container for system information -->
+<div class="container-fluid">
+  <!-- Row for bottom border styling -->
+  <div class="row borders-btm">
+    <!-- Left column for spacing -->
+    <div class="col">
+    </div>
+    <!-- Center column for title -->
+    <div class="col">
+      <h1 class="title">TDK Version Details</h1>
+    </div>
+    <!-- Right column for spacing -->
+    <div class="col">
+    </div>
+  </div>
+  
+  <!-- Row for content -->
+  <div class="row">
+    <!-- Column for content wrapper -->
+    <div class="col">
+      <!-- Parent container for content -->
+      <div class="parent mt-3 mb-2">
+        <!-- Container for content box -->
+        <div class="container container-box" id="container-box">
+          <!-- Content container for system information -->
+          <div class="content-container system-information">
+            
+            <!-- Loading indicator -->
+            <div *ngIf="isLoading" class="loading-container">
+              <app-loader></app-loader>
+            </div>
+
+            <!-- Version information table -->
+            <div *ngIf="!isLoading" class="version-table-container">
+              <table class="table table-bordered version-table">
+                <thead>
+                  <tr>
+                    <th scope="col" class="component-header">Component</th>
+                    <th scope="col" class="version-header">Version</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="component-name">TDK Backend Service</td>
+                    <td class="version-value" [ngClass]="{'error-version': versionInfo.tdkBackendVersion.includes('Error')}">
+                      {{ versionInfo.tdkBackendVersion }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="component-name">TDK Frontend App</td>
+                    <td class="version-value" [ngClass]="{'error-version': versionInfo.tdkFrontendVersion.includes('Error')}">
+                      {{ versionInfo.tdkFrontendVersion }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="component-name">TDK Core</td>
+                    <td class="version-value" [ngClass]="{'error-version': versionInfo.tdkCoreVersion.includes('Error')}">
+                      {{ versionInfo.tdkCoreVersion }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="component-name">TDK Video</td>
+                    <td class="version-value" [ngClass]="{'error-version': versionInfo.tdkVideoVersion.includes('Error')}">
+                      {{ versionInfo.tdkVideoVersion }}
+                    </td>
+                  </tr>
+                  <tr>
+                    <td class="component-name">TDK Broadband</td>
+                    <td class="version-value" [ngClass]="{'error-version': versionInfo.tdkBroadbandVersion.includes('Error')}">
+                      {{ versionInfo.tdkBroadbandVersion }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="row mt-4">
+              <div class="action-buttons">
+                <button class="back-btn" routerLink="/configure" matTooltip="Back">Back</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<app-footer></app-footer>
