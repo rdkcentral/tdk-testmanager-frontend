@@ -326,7 +326,7 @@ export class ModulesListComponent {
    */
   dowloadAllModule(): void {
     if (this.rowData.length > 0) {
-      this.moduleservice.downloadModuleByCategory(this.selectedDeviceCategory);
+      this.moduleservice.downloadModuleByCategory(this.configureName);
     } else {
       this._snakebar.open('No data available for download', '', {
         duration: 2000,
