@@ -1,0 +1,256 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2025 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/*
+ * Header styling for the system information page.
+ */
+.header {
+  background-color: #fff;
+  background-image: linear-gradient(160deg, #ffffff 10%, #00b2dc 100%);
+  color: #000;
+  box-shadow: 0px 2px 3px rgb(1 38 69 / 33%);
+  height: 45px;
+}
+
+/*
+ * Logo image styling.
+ */
+.logo-img {
+  width: 8%;
+}
+
+/*
+ * Application title styling.
+ */
+.apptitle {
+  color: #fff;
+  font-size: 1.5rem !important;
+  font-weight: 500;
+  margin-left: 15px;
+}
+
+/*
+ * Bottom border gradient styling.
+ */
+.borders-btm {
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 15px;
+}
+
+/*
+ * Title text styling.
+ */
+.title {
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+/*
+ * Container box styling for system information.
+ */
+.container-box {
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+  margin-top: 2px;
+  min-height: 400px;
+}
+
+/*
+ * Content container styling.
+ */
+.content-container {
+  background-color: #fff;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: 20px;
+  height: 100%;
+}
+
+/*
+ * Version table container styling.
+ */
+.version-table-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+/*
+ * Version table styling.
+ */
+.version-table {
+  max-width: 600px;
+  width: 100%;
+  margin: 0 auto;
+  font-size: 0.9rem;
+  border-collapse: collapse;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/*
+ * Table header styling.
+ */
+.version-table thead th {
+  background-color: #00b2dc;
+  color: white;
+  font-weight: 600;
+  text-align: center;
+  padding: 12px;
+  border: none;
+}
+
+/*
+ * Component header styling.
+ */
+.component-header {
+  width: 60%;
+}
+
+/*
+ * Version header styling.
+ */
+.version-header {
+  width: 40%;
+}
+
+/*
+ * Table body cell styling.
+ */
+.version-table tbody td {
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  vertical-align: middle;
+}
+
+/*
+ * Component name styling.
+ */
+.component-name {
+  font-weight: 500;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+/*
+ * Version value styling.
+ */
+.version-value {
+  text-align: center;
+  font-family: 'Courier New', monospace;
+  color: #2c5aa0;
+  font-weight: 600;
+}
+
+/*
+ * Error version styling.
+ */
+.error-version {
+  color: #dc3545 !important;
+  font-style: italic;
+}
+
+/*
+ * Loading container styling.
+ */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  min-height: 200px;
+}
+
+/*
+ * Action buttons container styling.
+ */
+.action-buttons {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/*
+ * Button and back button styling.
+ */
+.back-btn {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 8px 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+/*
+ * Button hover effects.
+ */
+.back-btn:hover {
+  background-color: #0099bd;
+}
+
+/*
+ * Table row hover effect.
+ */
+.version-table tbody tr:hover {
+  background-color: #f1f8ff;
+}
+
+/*
+ * Responsive design for smaller screens.
+ */
+@media (max-width: 768px) {
+  .version-table {
+    font-size: 0.8rem;
+  }
+  
+  .component-name, .version-value {
+    padding: 8px;
+  }
+  
+  .container-box {
+    padding: 10px;
+  }
+  
+  .title {
+    font-size: 0.9rem;
+  }
+}
