@@ -69,10 +69,12 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 /* Container for monaco editor to take full width */
 .editor-container {
+  height: calc(100vh - 300px);
   width: 100%;
-  margin: 0;
-  padding: 0;
-  height: 60vh;
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
 /* Ensure monaco editor takes full width */
