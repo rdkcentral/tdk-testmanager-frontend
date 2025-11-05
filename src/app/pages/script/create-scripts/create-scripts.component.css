@@ -186,3 +186,28 @@ hr{
 .demo-stepper{
     background-color: transparent !important;
 }
+.editor-container {
+  height: calc(100vh - 300px);
+  width: 100%;
+  position: relative;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+/* Add to create-scripts.component.css */
+.test-steps-header {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    padding: 10px 0;
+    margin-bottom: 15px !important;
+    border-radius: 5px 5px 0 0;
+    margin-left: 1px;
+}
+
+.test-steps-header .form-label {
+    margin-bottom: 0;
+    color: #495057;
+    font-size: 0.9rem;
+    text-align: center;
+}

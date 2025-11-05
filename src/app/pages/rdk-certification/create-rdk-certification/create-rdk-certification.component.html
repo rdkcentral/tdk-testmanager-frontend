@@ -57,7 +57,7 @@ limitations under the License.
                             <!-- Row for monaco editor -->
                             <div class="row">
                                 <!-- Container for monaco editor -->
-                                <div style=" width: 100%;" class="editor-container">
+                                <div  class="editor-container">
                                     <ngx-monaco-editor [options]="editorOptions" formControlName="pythonEditor">
                                     </ngx-monaco-editor>
                                     <div *ngIf="submitted && certificationFormGroup.controls['pythonEditor']?.errors" class="text-danger">

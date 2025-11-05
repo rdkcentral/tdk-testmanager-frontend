@@ -157,147 +157,147 @@ http://www.apache.org/licenses/LICENSE-2.0
 }
 
 /* Delete config button style */
-.delete-config{
-    margin: 10px 0px 0px 20px;
-    padding: 5px 10px;
+.delete-config {
+  margin: 10px 0px 0px 20px;
+  padding: 5px 10px;
     border: 1px solid #00B2DC;
-    height: 35px;
+  height: 35px;
 }
 
 /* Hover style for delete config button */
-.delete-config:hover{
-    background-color: transparent;
+.delete-config:hover {
+  background-color: transparent;
 }
 
 /* Delete icon fill color */
-.delete-fill{
-    color: red;
+.delete-fill {
+  color: red;
 }
 
 /* Download icon color */
-.download-icon{
+.download-icon {
     color: #00B2DC;
 }
 
 /* Pencil icon color */
-.bi-pencil{
+.bi-pencil {
     color: #00B2DC;
 }
 
 /* Mandatory field alignment */
-.mandatory-field{
-    text-align: right;
+.mandatory-field {
+  text-align: right;
 }
 
 /* Streaming details text style */
-.streaming-details{
-    font-size: 1rem;
-    text-align: center;
+.streaming-details {
+  font-size: 1rem;
+  text-align: center;
 }
 
 
 /* Modal CSS Start */
 /* Modal dialog for config modal */
 .modal-dialog.config-modal {
-    max-width: 760px;
+  max-width: 760px;
 }
 
 /* Modal content for config modal */
 .modal-content.config-content {
-    height: 90vh;
+  height: 90vh;
 }
 
 /* Editor inside exist config modal */
-.exist-config ngx-editor{
-    height: 304px !important;
-    overflow-y: auto;
-    display: block;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 0.8rem;
+.exist-config ngx-editor {
+  height: 304px !important;
+  overflow-y: auto;
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.8rem;
 }
 
 /* Body of exist modal */
-.existModal-body{
-    height: 59%;
+.existModal-body {
+  height: 59%;
 }
 
 /* Toggle icon style */
-.toggleIcon{
+.toggleIcon {
     color: #00273F;
-    font-size: 1.4rem;
+  font-size: 1.4rem;
 }
 
 /* Toggle button style */
-.toggleBtn{
-    margin-left: 40rem;
-    padding: 0;
-    position: fixed;
+.toggleBtn {
+  margin-left: 40rem;
+  padding: 0;
+  position: fixed;
 }
 
 /* Config header style */
 .config-header {
-    display: flex;
-    color: #00273f;
-    font-size: 1rem;
-    text-align: center;
-    padding: 1px 0 10px 0;
-    border-image: linear-gradient(
-      to right,
-      rgb(0, 178, 220) 25%,
-      rgb(253, 183, 59) 25%,
-      rgb(253, 183, 59) 50%,
-      rgb(146, 200, 73) 50%,
-      rgb(146, 200, 73) 75%,
-      rgb(245, 130, 51) 75%
-    );
-    border-image-slice: 1;
-    border-image-width: 0px 0px 4px 0px;
-    margin: 5px 20px 0px 20px;
-  }
+  display: flex;
+  color: #00273f;
+  font-size: 1rem;
+  text-align: center;
+  padding: 1px 0 10px 0;
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 5px 20px 0px 20px;
+}
 
 /* Config title style */
 .config-title {
-    margin-bottom: 0px !important;
-  }
+  margin-bottom: 0px !important;
+}
 
 /* Maximized modal editor style */
 .modal-maximized ngx-editor {
-    height: 250px !important;
-    overflow-y: auto;
-    display: block;
-  }
+  height: 250px !important;
+  overflow-y: auto;
+  display: block;
+}
 
 /* Maximized modal config modal style */
 .modal-maximized .config-modal {
-    max-width: 97vw;
-  }
+  max-width: 97vw;
+}
 
 /* Maximized modal toggle icon style */
-.modal-maximized button .toggleIcon{
-    margin-left: 30rem; 
-  }
+.modal-maximized button .toggleIcon {
+  margin-left: 30rem;
+}
 
 /* Modal buttons alignment */
-.modal-btns{
-    text-align: right;
+.modal-btns {
+  text-align: right;
 }
 
 /* Device Modal CSS Start */
 /* Header for new device modal */
-.newdevice-header{
-    margin-top: 0px;
-    padding-bottom: 0px;
+.newdevice-header {
+  margin-top: 0px;
+  padding-bottom: 0px;
 }
 
 /* Editor inside device modal */
-.device-editor ngx-editor{
-    height: 304px !important;
-    overflow-y: auto;
-    display: block;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 0.8rem;
+.device-editor ngx-editor {
+  height: 304px !important;
+  overflow-y: auto;
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.8rem;
 }
 
 /* Info icon style */
@@ -308,35 +308,35 @@ http://www.apache.org/licenses/LICENSE-2.0
 }
 
 /* Upload config button alignment */
-.uploadconfig{
-    text-align: right;
-    margin-right: 10px;
+.uploadconfig {
+  text-align: right;
+  margin-right: 10px;
 }
 
 /* Upload container height */
-.upload-container{
-    height: 200px;
+.upload-container {
+  height: 200px;
 }
 
 /* Back to editor button margin */
-.backEditor{
-    margin-right: 10px;
+.backEditor {
+  margin-right: 10px;
 }
 
 /* Edit button hover style */
-.config-editbtn :hover{
-    background: none;
+.config-editbtn :hover {
+  background: none;
 }
 
 /* Toggle name color */
-.toogle-name{
+.toogle-name {
     color: #00B2DC;
 }
 
 /* Device input, edit button, and config input height and margin */
 .device-input, .config-editbtn, .config-input{
-    height: 35px;
-    margin: 10px 4px 0px 4px;
+  height: 35px;
+  margin: 10px 4px 0px 4px;
 }
 
 /* Full width dialog styles */
@@ -382,7 +382,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 /* Monaco editor container styles */
 ngx-monaco-editor {
-  height: 400px !important; 
+  height: calc(100vh - 400px) !important;
   min-height: 400px;
   display: block;
   border: 1px solid #ddd;
@@ -409,7 +409,8 @@ ngx-monaco-editor {
   - Uses ::ng-deep to apply styles to child components in Angular.
 */
 ::ng-deep .editor-container {
-  height: 400px;
+  height: calc(100vh - 350px);
+  min-height: 300px;
   width: 100%;
 }
 

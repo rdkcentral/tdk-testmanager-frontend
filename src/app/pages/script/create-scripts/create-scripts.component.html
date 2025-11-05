@@ -284,6 +284,23 @@ limitations under the License.
                             </label>
                             <!-- Column for test steps form array -->
                             <div class="col-md-10">
+
+                                <!-- Header row for test steps columns -->
+                                <div class="row mb-2 test-steps-header">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Step Name</label>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label fw-bold">Step Description</label>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold">Expected Output</label>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <label class="form-label fw-bold">Actions</label>
+                                    </div>
+                                </div>
+
                                 <div formArrayName="steps">
                                     <!-- ngFor for test steps -->
                                     <div *ngFor="let step of steps.controls; let i = index" [formGroupName]="i"
@@ -347,7 +364,7 @@ limitations under the License.
                         <!-- Row for script content editor -->
                         <div class="row">
                             <!-- Container for monaco editor -->
-                            <div style="height: 400px;">
+                            <div class="editor-container">
                                 <ngx-monaco-editor [options]="editorOptions" [(ngModel)]="sampleFile"
                                     formControlName="pythonEditor">
                                 </ngx-monaco-editor>
