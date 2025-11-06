@@ -1,0 +1,254 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/*
+ * Applies the default font family to the body and all elements except material icons
+ */
+body,
+*:not(.material-icons) {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 0.78rem;
+}
+/*
+ * Sets the font family for all heading elements inside .mat-typography
+ */
+.mat-typography h1,
+.mat-typography h2,
+.mat-typography h3,
+.mat-typography h4,
+.mat-typography h5,
+.mat-typography h6 {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+/*
+ * Styles the main container with bottom margin
+ */
+.container {
+  margin-bottom: 2rem;
+}
+/*
+ * Centers the main section
+ */
+.main-sec{
+  margin: auto;
+}
+/*
+ * Sets max height for modal content
+ */
+.exsit-modal-content {
+  max-height: 100vh;
+}
+
+/*
+ * Adds a multi-color border to the bottom of the element
+ */
+.borders-btm {
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 15px;
+  /* padding-bottom: 4px; */
+}
+/*
+ * Styles the title text
+ */
+.title {
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+/*
+ * Centers the first container
+ */
+.first-container{
+  margin: 0 auto;
+}
+/*
+ * Styles the secondary row with margins and max width
+ */
+.sec-row{
+    max-width: 100%;
+    margin: 0 15px 0 20px;
+}
+/*
+ * Styles the radio box container
+ */
+.radiobox {
+  display: flex;
+  justify-content: flex-start;
+  align-items: baseline;
+  padding: 8px 0 0 25px;
+  height: 40px;
+}
+/*
+ * Styles the row containing radio boxes
+ */
+.radiobox-row {
+  border: 1px solid #0000002e;
+  border-radius: 10px;
+  box-shadow: 1px 1px 3px 0px rgb(0 0 0 / 18%);
+}
+/*
+ * Adds left margin to the rdkgroup element
+ */
+.rdkgroup {
+  margin-left: 47px;
+}
+/*
+ * Styles the radio button border
+ */
+.rdkradio {
+  border: 2px solid #0e6f87;
+}
+/*
+ * Styles checked form check inputs
+ */
+.form-check-input:checked {
+  background-color: #0e6f87;
+  border-color: #0e6f87;
+}
+/*
+ * Styles the thunder class with border and margin
+ */
+.thunder{
+    border: 1px solid gray;
+    margin-top: 0;
+}
+/*
+ * Styles the long test row
+ */
+.longtest{
+    display: flex;
+    align-items: end;
+    justify-content: flex-start;
+}
+/*
+ * Adds left padding to label titles
+ */
+.label-title{
+  padding-left: 20px;
+}
+/*
+ * Styles the module title
+ */
+.titlemodule{
+    font-size: 0.88rem;
+    font-weight: 400;
+    padding-left: 30px;
+}
+/*
+ * Styles the select all row
+ */
+.selectall{
+  height: 35px;
+  display: flex;
+  align-items: center;
+  padding-left: 30px;
+}
+/*
+ * Styles the grid layout for names
+ */
+.name-grid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:5px;
+}
+/*
+ * Styles each name item in the grid
+ */
+.name-item{
+  padding: 5px 5px 5px 30px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+/*
+ * Adds left margin to name elements
+ */
+.name{
+  margin-left: 5px !important;
+}
+/*
+ * Styles the form row with flex and margins
+ */
+.form-row{
+  display: flex;
+  margin-left: 15px;
+  margin-right: 15px;
+  margin-top: 10px;
+}
+/*
+ * Styles the create and reset buttons
+ */
+.create-btn,
+.reset-btn {
+    background-color: #00B2DC;
+    color: #fff;
+    font-size: 0.8rem;
+    padding: 8px 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+}
+/*
+ * Adds right margin to the reset button
+ */
+.reset-btn{
+  margin-right: 12px;
+}
+/*
+ * Styles the button group
+ */
+.btn-grp{
+  padding-right: 0;
+}
+/*
+ * Styles the module section with fixed height and scroll
+ */
+.module-section{
+  display: block;
+  height: 210px;
+  overflow-y: auto;
+}
+/*
+ * Styles the error row alignment and margin
+ */
+.error-row{
+  text-align: end;
+  margin-right: 25px;
+}
+/*
+ * Removes border and shadow on focus for form controls
+ */
+::ng-deep.form-select:focus, .form-control:focus{
+  border-color: gray !important;
+  box-shadow: none !important;
+}

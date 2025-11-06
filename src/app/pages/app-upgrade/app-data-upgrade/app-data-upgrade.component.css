@@ -1,0 +1,330 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/**
+ * Styles for AppDataUpgradeComponent
+ * -------------------------------------------------
+ * This stylesheet defines the layout, form controls, button styles, 
+ * card appearance, logs display for the Data Upgrade page.
+ * 
+ * Main sections:
+ * - Container and layout styles
+ * - Form and input controls
+ * - Button and modal button styles
+ * - Card styles for data upgrade and recovery sections
+ * - Logs and execution result display
+ * - Miscellaneous utility classes
+ */
+
+/* Container styles */
+.container {
+  padding: 20px;
+}
+
+/* Title styles */
+.view-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  font-weight: 500;
+}
+
+/* Form group styles */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+/* Card styles */
+.card {
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+}
+
+.card-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  padding: 1rem;
+}
+
+.card-title {
+  color: #06667d;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+
+/* Modal button styles (primary action) */
+.modal-btns {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  padding: 7px 30px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  outline: none;
+}
+
+.modal-btns:hover:not(:disabled) {
+  background-color: #0099c7;
+}
+
+.modal-btns:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 178, 220, 0.3);
+}
+
+/* Form control styles */
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 0.375rem 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus {
+  border-color: #06667d;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(6, 102, 125, 0.25);
+}
+
+.form-control::placeholder {
+  color: #6c757d;
+  opacity: 1;
+}
+
+/* Label styles */
+.form-label {
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #495057;
+}
+
+/* Info icon styles */
+.info-icon {
+  color: #6c757d;
+  margin-left: 0.5rem;
+  cursor: help;
+}
+
+.info-icon:hover {
+  color: #06667d;
+}
+
+/* Button group styles */
+.buttn-grp {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: 10px;
+  margin-top: 24px;
+  gap: 8px;
+}
+
+
+
+
+
+.modal-btns:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* Close button styles */
+.close-btns {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.close-btns:hover:not(:disabled) {
+  background-color: #5a6268;
+}
+
+.close-btns:disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+/* Logs section styles */
+.logsection {
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.sub-titel {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+/* Execution result styles */
+.execution-result {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-top: 0.75rem;
+}
+
+.logs-content {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+/* Upgradation logs styles */
+.upgradation-logs {
+  background-color: #ffffff;
+  color: #212529;
+  padding: 1rem;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  margin: 0;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* Alert styles */
+.alert {
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.375rem;
+}
+
+.alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}
+
+.alert-secondary {
+  color: #383d41;
+  background-color: #e2e3e5;
+  border-color: #d6d8db;
+}
+
+/* Progress bar container */
+.progress-container {
+  margin-top: 1rem;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding: 1rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+  
+  .buttn-grp {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+ 
+}
+
+/* Scrollbar styles for logs */
+.logs-content::-webkit-scrollbar,
+.upgradation-logs::-webkit-scrollbar {
+  width: 8px;
+}
+
+.logs-content::-webkit-scrollbar-track,
+.upgradation-logs::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.logs-content::-webkit-scrollbar-thumb,
+.upgradation-logs::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.logs-content::-webkit-scrollbar-thumb:hover,
+.upgradation-logs::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.loading {
+  animation: pulse 2s infinite;
+}
+
+/* Text danger for validation */
+.text-danger {
+  color: #dc3545 !important;
+}
+
+.text-danger small {
+  font-size: 0.75rem;
+}
+
+/* Success and error message styles */
+.success-message {
+  color: #155724;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.error-message {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}

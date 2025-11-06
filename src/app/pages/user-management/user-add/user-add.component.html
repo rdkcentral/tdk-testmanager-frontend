@@ -1,0 +1,197 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for the user add page -->
+<div class="container-fluid">
+    <!-- Row for the page title and border -->
+    <div class="row borders-btm">
+        <!-- Empty column for spacing -->
+        <div class="col"></div>
+        <!-- Column for the page title -->
+        <div class="col">
+            <h1 class="title">Create User</h1>
+        </div>
+        <!-- Empty column for spacing -->
+        <div class="col">
+        </div>
+    </div>
+    <!-- Row for the user form -->
+    <div class="row">
+        <!-- Column for the user form -->
+        <div class="col-md-12">
+                    <form [formGroup]="userForm" (ngSubmit)="onuserSubmit()" class="userform mt-3">
+                        <!-- Row for form fields -->
+                        <div class="row">
+                            <!-- Column for left-side form fields -->
+                            <div class="col">
+                                <!-- Row for username input -->
+                                <div class="row mb-3">
+                                    <label for="username" class="col-md-3 col-form-label">User Name<span
+                                            style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="username" formControlName="username"
+                                            autocomplete="off" placeholder="Enter User Name">
+                                        <div *ngIf="userFormSubmitted && userForm.controls['username']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="userForm.controls['username']?.errors?.['required']">Please
+                                                enter user name.</small>
+                                            <small *ngIf="userForm.controls['username']?.errors?.['minlength']">User
+                                                name minimum 4 characters.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Row for user email input -->
+                                <div class="row mb-3">
+                                    <label for="useremail" class="col-md-3 col-form-label">Email<span
+                                            style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" id="useremail" class="form-control"
+                                            formControlName="useremail" autocomplete="off" placeholder="Enter Email">
+                                        <div *ngIf="userFormSubmitted && userForm.controls['useremail']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="userForm.controls['useremail']?.errors?.['required']">Please
+                                                enter email.</small>
+                                            <small *ngIf="userForm.controls['useremail']?.errors?.['pattern']">Please
+                                                enter valid email.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Row for display name input -->
+                                <div class="row mb-3">
+                                    <label for="displayname" class="col-md-3 col-form-label">Display Name<span
+                                            style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="displayname"
+                                            formControlName="displayname" autocomplete="off"
+                                            placeholder="Enter Display Name" >
+                                        <div *ngIf="userFormSubmitted && userForm.controls['displayname']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="userForm.controls['displayname']?.errors?.['required']">Please
+                                                enter display name.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Row for category select -->
+                                <div class="row mb-3">
+                                    <label for="categoryname" class="col-md-3 col-form-label">Category<span
+                                            style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="categoryname"
+                                            formControlName="categoryname">
+                                            <option value="" default>Select</option>
+                                            <option value="RDKV">Video</option>
+                                            <option value="RDKB">Broadband</option>
+                                        </select>
+                                        <div *ngIf="userFormSubmitted && userForm.controls['categoryname']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="userForm.controls['categoryname']?.errors?.['required']">Please
+                                                select category.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- 
+                                User Group Name is not planned in the current version of the application.
+                                <div class="row mb-3">
+                                    <label for="usergroupname" class="col-md-3 col-form-label">Group Name</label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example"
+                                            id="usergroupname" formControlName="usergroupname">
+                                            <option value="" default>Select</option>
+                                            @for (item of allGroupName; track $index) {
+                                            <option value="{{item.userGroupName}}">{{item.userGroupName}}</option>
+                                            }
+                                        </select>
+                                        <div *ngIf="userFormSubmitted && userForm.controls['usergroupname']?.errors"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="userForm.controls['usergroupname']?.errors?.['required']">Please
+                                                select group name.</small>
+                                        </div>
+                                    </div>
+                                </div> -->
+                            </div>
+                            <!-- Column for right-side form fields -->
+                            <div class="col">
+
+                                <!-- Row for role select -->
+                                <div class="row mb-3">
+                                    <label for="rolename" class="col-md-3 offset-1 col-form-label">Role<span
+                                            style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="rolename"
+                                            formControlName="rolename">
+                                            <option value="" default>Select</option>
+                                            @for (item of allRoles; track $index) {
+                                            <option value="{{item.userRoleName}}">{{item.userRoleName}}</option>
+                                            }
+                                        </select>
+                                        <div *ngIf="userFormSubmitted && userForm.controls['rolename']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="userForm.controls['rolename']?.errors?.['required']">Please
+                                                select role.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Row for password input -->
+                                <div class="row mb-3">
+                                    <label for="userpassword" class="col-md-3 offset-1 col-form-label">Password<span
+                                            style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="password" id="userpassword" class="form-control"
+                                            formControlName="userpassword" placeholder="Enter Password">
+                                        <div *ngIf="userFormSubmitted && userForm.controls['userpassword']?.errors"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="userForm.controls['userpassword']?.errors?.['required']">Please
+                                                enter password.</small>
+                                            <small
+                                                *ngIf="userForm.controls['userpassword']?.errors?.['minlength']">Password
+                                                minimum 6 characters.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Row for retype password input -->
+                                <div class="row mb-3">
+                                    <label for="retypepassword" class="col-md-3 offset-1 col-form-label">Retype
+                                        Password<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="password" id="retypepassword" class="form-control"
+                                            formControlName="retypepassword" placeholder="Enter Password">
+                                        <div *ngIf="userFormSubmitted && userForm.controls['retypepassword']?.errors"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="userForm.controls['retypepassword']?.errors?.['required']">Please
+                                                Retype Password.</small>
+                                            <small
+                                                *ngIf="userForm.controls['retypepassword']?.errors?.['passwordMatchValidator']">Passwords
+                                                doesn't match.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Row for form action buttons -->
+                        <div class="row">
+                            <!-- Column for form action buttons -->
+                            <div class="mt-2 text-end">
+                                <button class="reset-btn" (click)="goBack()">Back</button>
+                                <button class="reset-btn" (click)="reset()">Reset</button>
+                                <button type="submit" class="create-btn">Create</button>
+                            </div>
+                        </div>
+                    </form>
+        </div>
+    </div>
+</div>

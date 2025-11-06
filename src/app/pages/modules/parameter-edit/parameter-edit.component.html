@@ -1,0 +1,228 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for parameter update page -->
+<div class="container-fluid">
+  <!-- Row for header and controls -->
+  <div class="row borders-btm">
+    <!-- Left column -->
+    <div class="col"></div>
+    <!-- Center column for title -->
+    <div class="col">
+      <h1 class="title">Update Parameter</h1>
+    </div>
+    <!-- Right column -->
+    <div class="col"></div>
+  </div>
+  <!-- Row for form section -->
+  <div class="row">
+    <!-- Main form column -->
+    <div class="col">
+      <!-- Container box for form -->
+      <div class="container-box" id="container-box">
+        <!-- Form container for parameter update -->
+        <div class="form-container create-group">
+          <form
+            [formGroup]="updateParameterForm"
+            (ngSubmit)="updateParaFormSubmit()"
+            data-bs-spy="scroll"
+          >
+            <!-- Row for parameter name input -->
+            <div class="row mb-4">
+              <label for="paraName" class="col-md-3 col-form-label offset-1"
+                >Parameter Name<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <!-- Column for parameter name input -->
+              <div class="col-md-7">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="paraName"
+                  formControlName="parameterName"
+                  placeholder="Enter Parameter Name"
+                />
+                <!-- Error message for parameter name -->
+                <div
+                  *ngIf="
+                    paraFormSubmitted &&
+                    updateParameterForm.controls['parameterName']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="updateParameterForm.controls['parameterName']?.errors?.['required']"
+                    >Please enter parameter name.</small
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Row for parameter type input -->
+            <div class="row mb-4">
+              <label
+                for="parameterType"
+                class="col-md-3 col-form-label offset-1"
+                >Parameter Type<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+
+              <!-- Column for parameter type input -->
+              <div class="col-md-7">
+                <select
+                  class="form-select"
+                  aria-label="Default select example"
+                  formControlName="parameterType"
+                  id="parameterType"
+                >
+                  <option value="" default>Select Parameter Type</option>
+                  @for (item of parameterType; track $index) {
+                  <option value="{{ item }}">{{ item }}</option>
+                  }
+                </select>
+                <!-- Error message for parameter type -->
+                <div
+                  *ngIf="
+                    paraFormSubmitted &&
+                    updateParameterForm.controls['parameterType']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="updateParameterForm.controls['parameterType']?.errors?.['required']"
+                  >
+                    please select parameter type.
+                  </small>
+                </div>
+              </div>
+            </div>
+            <!-- Row for range value input -->
+            <div class="row mb-4">
+              <label for="rangeVal" class="col-md-3 col-form-label offset-1"
+                >Range Value<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <!-- Column for range value input -->
+              <div class="col-md-7">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="rangeVal"
+                  formControlName="rangeVal"
+                  placeholder="Enter range value"
+                />
+                <!-- Error message for range value -->
+                <div
+                  *ngIf="
+                    paraFormSubmitted &&
+                    updateParameterForm.controls['rangeVal']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="updateParameterForm.controls['rangeVal']?.errors?.['required']"
+                    >Please enter range value.</small
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Row for module input -->
+            <div class="row mb-4">
+              <label for="module" class="col-md-3 col-form-label offset-1"
+                >Module<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+
+              <!-- Column for module input -->
+              <div class="col-md-7">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="module"
+                  formControlName="module"
+                  placeholder="Enter Function Name"
+                  readonly
+                />
+                <!-- Error message for module input -->
+                <div
+                  *ngIf="
+                    paraFormSubmitted &&
+                    updateParameterForm.controls['module']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="updateParameterForm.controls['module']?.errors?.['required']"
+                    >Please enter function name.</small
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Row for function input -->
+            <div class="row mb-4">
+              <label for="function" class="col-md-3 col-form-label offset-1"
+                >Function<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+
+              <!-- Column for function input -->
+              <div class="col-md-7">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="module"
+                  formControlName="function"
+                  placeholder="Enter Function Name"
+                  readonly
+                />
+                <!-- Error message for function input -->
+                <div
+                  *ngIf="
+                    paraFormSubmitted &&
+                    updateParameterForm.controls['function']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="updateParameterForm.controls['function']?.errors?.['required']"
+                    >Please enter function name.</small
+                  >
+                </div>
+              </div>
+            </div>
+            <!-- Row for action buttons -->
+            <div class="row">
+              <!-- Container for action buttons -->
+              <div class="mt-2 createbtn">
+                <button
+                  type="button"
+                  class="back-btn create-btn"
+                  (click)="goBack()"
+                >
+                  Back
+                </button>
+                <button type="submit" class="create-btn">Update</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

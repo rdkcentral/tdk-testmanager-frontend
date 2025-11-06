@@ -1,0 +1,162 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/* Container for the main fluid layout */
+.container-fluid {
+  margin-bottom: 1rem;
+}
+
+/* Header section styling */
+.header {
+  background-color: #0e6f87;
+  color: #fff;
+  height: 60px;
+  box-shadow: 5px 5px 5px rgb(1 38 69 / 33%);
+}
+
+/* Application title styling */
+.apptitle {
+  color: #fff;
+  font-size: 1rem !important;
+  font-weight: 500;
+  margin-left: 15px;
+}
+
+/* Borders bottom style for device type list page */
+.borders-btm {
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 15px;
+}
+
+/* Title style for device type list page */
+.title {
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+/* Button group styling */
+.btns-group {
+  text-align: end;
+  margin-top: 5px;
+}
+
+/* Table section styling */
+.table-sec {
+  padding: 0 10px;
+}
+
+/* Button group flex styling */
+.btns-grp {
+  display: flex;
+  margin-left: -35px;
+}
+
+/* Group list title styling */
+.groupListTitle {
+  color: #00273f;
+  font-size: 1rem;
+  text-align: center;
+  padding: 0 0 0 0;
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+}
+
+/* Form select and control focus style override */
+::ng-deep.form-select:focus,
+.form-control:focus {
+  border-color: gray !important;
+  box-shadow: none !important;
+}
+
+/* AG Grid row styling override */
+::ng-deep .ag-theme-quartz .ag-row {
+  border-bottom: 1px solid #dee2e6 !important;
+}
+
+/* AG Grid overlay no rows center override */
+::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center{
+  display: none !important;
+}
+
+/* Create and back button styles */
+.create-btn,
+.back-btn {
+  background-color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: none;
+  box-shadow: 0px 3px 6px #0000005e;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+/* Icon size styling */
+.icon-size {
+  color: #00b2dc;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Back button margin styling */
+.back-btn {
+  margin-right: 10px;
+}
+
+/* Loader row styling */
+.loader-row{
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  right: 50%;
+}
+
+.grid-container {
+  width: 100%;
+  height: calc(100vh - 200px); /* Adjust based on viewport height */
+  min-height: 300px;
+  margin-top: 5px;
+  margin-bottom: 12px;
+}
+
+/*
+ * Allow text selection in AG Grid cells for easier copy-paste and debugging.
+ */
+::ng-deep .ag-theme-quartz .ag-cell {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  cursor: text;
+}

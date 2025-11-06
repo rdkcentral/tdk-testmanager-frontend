@@ -1,0 +1,491 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+
+/* Global font family for body and all elements except material icons */
+body,
+*:not(.material-icons) {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+/* Heading font family override */
+h1,
+h2,
+h3,
+h4,
+h6 {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+
+/* Modal content max height */
+.exsit-modal-content {
+  max-height: 100vh;
+}
+
+/* Flavor row layout */
+.falvor-row {
+  display: flex;
+  align-items: baseline;
+  margin-top: 5px;
+  padding-left: 0;
+}
+
+/* Borders bottom style for device create page */
+.borders-btm {
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0 15px;
+}
+
+/* Title style for device create page */
+.title {
+  font-size: 1rem;
+  text-align: center;
+  font-weight: 500;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+/* User form margin */
+.userform {
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+/* Create and reset button styles */
+.create-btn,
+.reset-btn {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 8px 20px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+/* Download button style */
+.download-btn {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 7px 20px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-top: 8px;
+  margin-right: 10px;
+}
+
+/* Reset button margin */
+.reset-btn {
+  margin-right: 10px;
+}
+
+/* Thunder border style */
+.thunder {
+  border: 1px solid gray;
+}
+
+/* New config file style */
+.newconfigfile {
+  font-size: 0.8rem;
+  margin-right: 10px;
+  box-shadow: 0px 3px 6px #0000005e;
+  border: 1px solid #ddd;
+}
+
+/* Config input style */
+.config-input {
+  width: 300px;
+  font-size: 0.8rem;
+}
+
+/* Read-only config input style */
+.config-input:read-only {
+  background-color: #e9ecef;
+  cursor: auto;
+  font-size: 0.8rem;
+}
+
+/* Config button group layout */
+.configbtngrp {
+  display: flex;
+}
+
+/* Inline form check style */
+.form-check-inline {
+  display: flex !important;
+}
+
+/* Checkbox input margin */
+.form-check-input[type="checkbox"] {
+  margin-top: 10px !important;
+}
+
+/* Form select and control focus style override */
+::ng-deep.form-select:focus,
+.form-control:focus {
+  border-color: gray !important;
+  box-shadow: none !important;
+}
+
+/* Check thunder layout */
+.check-thunder {
+  display: flex;
+}
+
+/* Thunder hints font size */
+.thunder-hints {
+  font-size: 11px;
+}
+
+/* Device title font size */
+.device-title {
+  font-size: 16px;
+}
+
+/* Change file name layout */
+.changefile-name {
+  margin-left: 14px;
+  display: inline-flex;
+}
+
+/* Delete config button style */
+.delete-config {
+  margin: 10px 0px 0px 20px;
+  padding: 5px 10px;
+  border: 1px solid #00b2dc;
+  height: 35px;
+}
+
+/* Delete config hover style */
+.delete-config:hover {
+  background-color: transparent;
+}
+
+/* Delete fill color */
+.delete-fill {
+  color: red;
+}
+
+/* Download icon color */
+.download-icon {
+  color: #00b2dc;
+}
+
+/* Pencil icon color */
+.bi-pencil {
+  color: #00b2dc;
+}
+
+/* Mandatory field alignment */
+.mandatory-field {
+  text-align: right;
+}
+
+/* Streaming details style */
+.streaming-details {
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* Modal dialog config modal max width */
+.modal-dialog.config-modal {
+  max-width: 760px;
+}
+
+/* Modal content config content height */
+.modal-content.config-content {
+  height: 90vh;
+}
+
+/* Exist config editor style */
+.exist-config ngx-editor {
+  height: 304px !important;
+  overflow-y: auto;
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
+
+/* Exist modal body height */
+.existModal-body {
+  height: 59%;
+}
+
+/* Toggle icon color and size */
+.toggleIcon {
+  color: #00273f;
+  font-size: 1.4rem;
+}
+
+/* Toggle button layout */
+.toggleBtn {
+  margin-left: 40rem;
+  padding: 0;
+  position: fixed;
+}
+
+/* Config header style */
+.config-header {
+  display: flex;
+  color: #00273f;
+  font-size: 1rem;
+  text-align: center;
+  padding: 1px 0 10px 0;
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 5px 20px 0px 20px;
+}
+
+/* Config title margin override */
+.config-title {
+  margin-bottom: 0px !important;
+}
+
+/* Modal maximized editor style */
+.modal-maximized ngx-editor {
+  height: 250px !important;
+  overflow-y: auto;
+  display: block;
+}
+
+/* Modal maximized config modal max width */
+.modal-maximized .config-modal {
+  max-width: 97vw;
+}
+
+/* Modal maximized toggle icon margin */
+.modal-maximized button .toggleIcon {
+  margin-left: 30rem;
+}
+
+/* Modal buttons alignment */
+.modal-btns {
+  text-align: right;
+}
+
+/* Device modal header margin */
+.newdevice-header {
+  margin-top: 0px;
+  padding-bottom: 0px;
+}
+
+/* Device editor style */
+.device-editor ngx-editor {
+  height: 304px !important;
+  overflow-y: auto;
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}
+
+/* Upload config alignment */
+.uploadconfig {
+  text-align: right;
+  margin-right: 10px;
+}
+
+/* Info icon style */
+.info-icon {
+  font-size: 20px;
+  color: #00b2dc;
+  margin-bottom: -10px;
+}
+
+/* Upload container height */
+.upload-container {
+  height: 200px;
+}
+
+/* Back editor margin */
+.backEditor {
+  margin-right: 10px;
+}
+
+/* Config edit button hover style */
+.config-editbtn :hover {
+  background: none;
+}
+
+/* Toggle name color */
+.toogle-name {
+  color: #00b2dc;
+}
+
+/* Device input, config edit button, config input style */
+.device-input,
+.config-editbtn,
+.config-input {
+  height: 35px;
+  margin: 10px 4px 0px 4px;
+}
+
+/* Button groups margin */
+.btns-grps {
+  margin-bottom: 10px;
+}
+
+/* Thunder info margin and position */
+.thunder-info {
+  margin: -18px 0 0 30px;
+  position: absolute;
+}
+
+/* Thunder port info margin and position */
+.thunderport-info {
+  margin: 0px 0 0 5px;
+  position: absolute;
+}
+
+/* Disabled form check input background */
+.form-check-input:disabled {
+  background-color: rgba(128, 128, 128, 0.897);
+}
+
+/* Device config info margin and position */
+.deviceconfig-info {
+  margin: -18px 0 0 55px;
+  position: absolute;
+}
+
+/* Full width dialog styles */
+::ng-deep .full-width-dialog {
+  max-width: 100vw !important;
+}
+
+/* Full width dialog container */
+::ng-deep .full-width-dialog .mat-mdc-dialog-container {
+  padding: 0;
+}
+
+/* Ensure dialog content takes full width */
+::ng-deep .full-width-dialog .mat-mdc-dialog-content {
+  width: 100%;
+}
+
+/* Ensure content inside the dialog takes up full width */
+::ng-deep .full-width-dialog .modal-content.config-content {
+  width: 100%;
+}
+
+
+/* Update maximized modal styles */
+.modal-maximized .config-modal {
+  max-width: 98vw !important;
+}
+
+/* Modal dialog for config modal */
+.modal-dialog.config-modal {
+  max-width: 98% !important;
+  margin: 0.75rem auto;
+}
+
+/* Modal content for config modal */
+.modal-content.config-content {
+  width: 100%;
+}
+
+/* Monaco editor container styles */
+ngx-monaco-editor {
+  height: calc(100vh - 400px) !important;
+  min-height: 400px;
+  display: block;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+/* Make sure modal content has enough height for editor */
+.existModal-body {
+  min-height: 500px;
+}
+
+/* Fix for Monaco editor in dialogs */
+::ng-deep .monaco-editor {
+  height: 100% !important;
+  min-height: 400px !important;
+  width: 100% !important;
+}
+
+/* 
+  .editor-loader-container
+  ------------------------
+  Styles a container to overlay the entire parent element, centering its content both vertically and horizontally.
+  - Uses absolute positioning to cover the full area (top, left, right, bottom set to 0).
+  - Applies a semi-transparent white background to obscure underlying content.
+  - Utilizes flexbox for centering child elements.
+  - Sets a higher z-index to ensure it appears above other elements.
+*/
+.editor-loader-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+
+/* 
+  Styles for editor and device containers:
+  - Sets position to relative for proper positioning of child elements.
+  - Ensures a minimum height of 400px for adequate space within the containers.
+*/
+.editor-container, .device-container {
+  position: relative;
+  min-height: 400px;
+}
+
+/* 
+  .invisible class:
+  Hides the element from view but still occupies space in the layout.
+  Useful for temporarily hiding elements without affecting page structure.
+*/
+.invisible {
+  visibility: hidden;
+}

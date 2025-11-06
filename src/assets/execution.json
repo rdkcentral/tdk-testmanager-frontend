@@ -1,0 +1,100 @@
+[
+    {
+      "executionName": "AMLOGIC_TDKCI",
+      "scriptsTestsuite": "Multiple Scripts",
+      "device":"AMLOGIC_TDKCI",
+      "date":"01-01-2024",
+      "results":"Success"
+      
+
+    },
+    {
+        "executionName": "RaspberryPi-4_TDKCI",
+        "scriptsTestsuite": "Multiple Scripts",
+        "device":"REALTEK_TDKCI",
+        "date":"01-01-2024",
+        "results":"abort"
+ 
+    },
+    {
+        "executionName": "REALTEK_TDKCI_RERUN_1",
+        "scriptsTestsuite": "RDKV_CERT_AVS_Network",
+        "device":"AMLOGIC_TDKCI",
+        "date":"02-01-2024",
+        "results":"Failure"
+ 
+    },
+    {
+        "executionName": "REALTEK_TDKCI-2",
+        "scriptsTestsuite": "CI_VA_Sanity_Suite",
+        "device":"REALTEK_TDKCI",
+        "date":"02-01-2024",
+        "results":"pause"
+ 
+    },
+    {
+        "executionName": "REALTEK_TDKCI",
+        "scriptsTestsuite": "RDKV_CERT_AVS_Network",
+        "device":"RaspberryPi-4_TDKC",
+        "date":"03-01-2024",
+        "results":"Inprogress"
+ 
+    },
+    {
+        "executionName": "CI_RaspberryPi-4",
+        "scriptsTestsuite": "CI_VA_Sanity_Suite",
+        "device":"RaspberryPi-4_TDKC",
+        "date":"03-01-2024",
+        "results":"abort"
+ 
+    },
+    {
+        "executionName": "CI_REALTEK_TDKCI2",
+        "scriptsTestsuite": "RDKV_CERT_AVS_Network",
+        "device":"RaspberryPi-4_TDKB",
+        "date":"04-01-2024",
+        "results":"Failure"
+ 
+    },
+    {
+        "executionName": "CI_REALTEK",
+        "scriptsTestsuite": "CI_VA_Sanity_Suite",
+        "device":"REALTEK_TDKCI",
+        "date":"04-01-2024",
+        "results":"Inprogress"
+ 
+    },
+    {
+        "executionName": "AMLOGIC_TDKCI-20",
+        "scriptsTestsuite": "CI_VA_Sanity_Suite",
+        "device":"RaspberryPi-4_TDKC",
+        "date":"05-01-2024",
+        "results":"pause"
+ 
+    },
+    {
+        "executionName": "aamp execution",
+        "scriptsTestsuite": "RDKV_CERT_AVS_Network",
+        "device":"REALTEK_TDKCI",
+        "date":"04-01-2024",
+        "results":"Failure"
+ 
+    },
+    {
+        "executionName": "bluetooth Execution",
+        "scriptsTestsuite": "CI_VA_Sanity_Suite",
+        "device":"RaspberryPi-4_TDKC",
+        "date":"04-01-2024",
+        "results":"Failure"
+ 
+    },
+    {
+        "executionName": "deepsleep Execution",
+        "scriptsTestsuite": "RDKV_CERT_AVS_Network",
+        "device":"REALTEK_TDKCI",
+        "date":"05-01-2024",
+        "results":"Success"
+ 
+    }
+   
+  ]

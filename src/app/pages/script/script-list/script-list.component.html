@@ -1,0 +1,430 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Container for the entire script list page -->
+<div class="container-fluid">
+  <!-- Row for top section with dropdowns and title -->
+  <div class="row borders-btm">
+    <!-- Left column for RDK flavor and view selection -->
+    <div class="col-md-5">
+      <!-- Row for flavor and view dropdowns -->
+      <div class="row ">
+        <!-- Row for flavor and view selectors -->
+        <div class="falvor-row">
+          <span for="falvor" class="falvor-label">RDK flavor :</span>
+          <select class="form-select rdk-dropdown" aria-label="Default select example" id="preferCategoty"
+            [(ngModel)]="selectedCategory" (change)="categoryChange($event)">
+            <option value="RDKV">Video</option>
+            <option value="RDKB">Broadband</option>
+          </select>
+          <span for="falvor" class="view-label">View :</span>
+          <select class="form-select view-dropdown" aria-label="Default select example" id="preferCategoty"
+            [(ngModel)]="viewName" (change)="viewChange(viewName)">
+            <option value="scripts">Scripts</option>
+            <option value="testsuites">TestSuites</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <!-- Center column for page title -->
+    <div class="col-md-2">
+      <h1 class="title">{{categoryName}} {{ viewName === 'testsuites' ? 'Test Suites' : ' Scripts' }}</h1>
+    </div>
+    <!-- Right column for action buttons -->
+    <div class="col-md-5">
+      <!-- Button group for script actions -->
+      <div class="btns-group" *ngIf="scriptTable">
+        <button type="button" class="download-btn" (click)="downloadTestCases()"
+          matTooltip="Download All {{selectedCategory}} test cases(zip of excel files)"><i
+            class="bi bi-cloud-arrow-down-fill download-icon"></i> </button>
+        <button type="button" class="download-btn " data-bs-toggle="modal" data-bs-target="#scriptModal"
+          matTooltip="Upload {{selectedCategory}} Script">
+          <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
+        </button>
+        <button type="button" class="download-btn" (click)="downloadAllMdZip()"
+  matTooltip="Download All Md files (zip)">
+  <i class="bi bi-file-earmark-zip download-icon"></i>
+</button>
+        <button class="download-btn" (click)="createScripts()" matTooltip="Create {{selectedCategory}} Script">
+          <i class="bi bi-plus-circle-fill download-icon"></i>
+        </button>
+      </div>
+      <!-- Button group for testsuite actions -->
+      <div *ngIf="testsuitTable" [ngClass]="testsuitTable?'testsuite-btn':'btns-group'">
+        <button type="button" class="download-btn" matTooltip="Download all suites xml in zip"
+          (click)="downloadAllSuitesZIP()"><i class="bi bi-cloud-arrow-down-fill download-icon"></i> </button>
+        <button type="button" class="download-btn" data-bs-toggle="modal" data-bs-target="#testSuiteModal"
+          matTooltip="Upload {{selectedCategory}} testsuites">
+          <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
+        </button>
+        <button type="button" class="download-btn" matTooltip="Update Test Suite"><i class="bi bi-arrow-repeat download-icon"
+            (click)="refreshAllTestSuites()"></i>
+        </button>
+        <button *ngIf="testsuitTable && categoryName !== 'Video'" class="download-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+          matTooltip="Create {{selectedCategory}} Suite">
+          <i class="bi bi-plus-circle-fill download-icon"></i>
+        </button>
+         <ul class="dropdown-menu">
+           <li><a class="dropdown-item" (click)="createScriptGroup()">TestSuite</a></li>
+           <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" (click)="customTestSuite()">Custom TestSuite</a></li>
+        </ul>
+        <button *ngIf="testsuitTable && categoryName === 'Video'" type="button" class="download-btn dropdown-toggle"
+          data-bs-toggle="dropdown" aria-expanded="false" matTooltip="Create {{selectedCategory}} Suite">
+
+          <i class="bi bi-plus-circle-fill download-icon"></i>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" (click)="createScriptVideo('RDKV_RDKSERVICE')">Thunder TestSuite</a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" (click)="createScriptVideo('RDKV')">TestSuite</a></li>
+          <li>
+            <hr class="dropdown-divider">
+          </li>
+          <li><a class="dropdown-item" (click)="customTestSuite()">Custom TestSuite</a></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+  <!-- Main section row for search and tables -->
+  <div class="row main-sec mt-1">
+    <!-- Container for search and table content -->
+    <div class="mt-1">
+      <!-- Row for search input -->
+      <div class="row">
+        <!-- Column for search input and icon -->
+        <div class="col search-header">
+          <span class="search">Search:
+            <mat-icon class="info-icon"
+              [matTooltip]="viewName === 'scripts' ? 'Search by script name here.\nFor module wise search, use column filters in the table.' : 'Search by script name here.\nFor TestSuite search, use column filters in the table.'">
+              info
+            </mat-icon> 
+          </span>
+          <input type="text" class="form-control seach-input" id="filter-text-box" [(ngModel)]="globalSearchTerm"
+            (input)="onSearchInput()" placeholder="Search by Script name">
+        </div>
+        <!-- Empty column for spacing -->
+        <div class="col"></div>
+      </div>
+      <!-- Row for script table -->
+      <div class="row" *ngIf="scriptTable">
+        <!-- Container for the script table -->
+        <div class="table-container mt-2">
+          <!-- Row for table headings -->
+          <div class="row table-heading">
+            <div class="col border-column">
+              <span class="script-table-head">Module & Scripts </span>
+
+              <button type="button" (click)="scriptSorting()" class="sort-button">
+                <i class="bi sort-icon icon-sortng"
+                  [ngClass]="sortOrder === 'asc' ? 'bi-sort-up-alt' : 'bi-sort-down-alt'  "></i>
+              </button>
+
+              <button type="button" class="sort-button filter-btn" (click)="toggleFilterInput()" #filterButton>
+                <i class="bi bi-filter icon-sortng"></i>
+              </button>
+
+              <div class="search-div" *ngIf="showFilterInput">
+                <div class="input-group search-input">
+                  <span class="input-group-text search-side" id="basic-addon1"><i class="bi bi-search"></i></span>
+                  <input #filterInput type="text" class="form-control fiter-input" placeholder="Filter..."
+                    [(ngModel)]="filterText" (keyup)="filterScript()" aria-describedby="basic-addon1">
+                </div> 
+              </div>
+            </div>
+            <div class="col border-column"><span class="script-table-head">Script Count</span></div>
+            <div class="col border-column"><span class="script-table-head">Test Group</span></div>
+            <div class="col"><span class="script-table-head">Action</span></div>
+          </div>
+          <!-- Row for table content and loader -->
+          <div class="accordion-content-area">
+            <!-- Loader row -->
+            <div class="row loader-row" *ngIf="showLoader">
+              <app-loader></app-loader>
+            </div>
+            <!-- Accordion for script modules and scripts -->
+            <div class="accordion" id="accordionExample" [class.loading]="showLoader">
+              <!-- Row for accordion items -->
+              <div class="row accord-row">
+                <!-- Accordion item for each module -->
+                <div class="accordion-item" *ngFor="let parent of paginatedScriptData">
+
+                  <h2 class="accordion-header d-flex align-items-center accord-head" (click)="togglePanel(parent)">
+                    <div class="col">
+
+                      <button class="accordion-button no-arrow collapsed flex-grow-1 accor-title" type="button">
+                        {{ parent.moduleName }}
+                        <!-- <span *ngIf="parent.scripts">
+                                      ({{ parent.scripts.length > 0 ? parent.scripts.length : '0' }})
+                                    </span> -->
+                      </button>
+                    </div>
+                    <div class="col">
+                      <button class="accordion-button no-arrow collapsed flex-grow-1 accor-title accor-count"
+                        type="button">
+                        <span *ngIf="parent.scripts">
+                          {{ parent.scripts.length > 0 ? parent.scripts.length : '0' }}
+                        </span>
+                      </button>
+                    </div>
+                    <div class="col">
+                      <button class="accordion-button no-arrow collapsed flex-grow-1 accor-testgroup" type="button">
+                        {{ parent.testGroupName }}
+                      </button>
+                    </div>
+                    <div class="col">
+                      <button class="btn btn-primary btn-sm delete-btn xlsx-btm" matTooltip="Download testcases(excel) "
+                        (click)="downloadXML(parent)">
+                        <!-- <i class="bi bi-file-earmark-excel excel-icon download-xlsx"></i> -->
+                        <img src="assets/icons/excel.png" class="excel-icon excel" />
+                      </button>
+                    </div>
+
+                    <button class="btn btn-link ms-auto"
+                      [matTooltip]="parent.expanded ? 'Hide Deatils' : 'View Details' ">
+                      <i class="bi collapse-icon" [ngClass]="parent.expanded ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                    </button>
+                  </h2>
+                  <!-- Accordion collapse for script details -->
+                  <div [class.show]="parent.expanded" class="accordion-collapse collapse">
+                    <!-- Accordion body for ag-grid table -->
+                    <div class="accordion-body">
+                      <!-- Container for ag-grid-angular -->
+                      <div class="dynamic-table-container" [class]="themeClass">
+                        <ag-grid-angular style="width: 100%; height: 100%;" [columnDefs]="columnDefs"
+                          [defaultColDef]="{sortable: true}" [rowData]="parent.scripts" [pagination]="true"
+                          [animateRows]="true" [context]="this" [gridOptions]="gridOptions"
+                          (gridReady)="onGridReady($event)"></ag-grid-angular>
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          
+        
+        <!-- Message for no scripts found -->
+        <div *ngIf="paginatedScriptData.length == 0  && !showLoader" class="noRecord">
+          <span>{{noScriptFound}}</span>
+        </div>
+        </div>
+        <!-- Paginator for scripts table -->
+        <div class="script-paginator">
+          <mat-paginator [length]="scriptFilteredData.length" [pageSize]="allPageSize" [pageSizeOptions]="[10, 15, 20, 50]"
+            (page)="onPageChangeScript($event)" class="script-pagination">
+          </mat-paginator>
+        </div>
+
+      </div>
+      </div>
+      <!-- Row for testsuite table -->
+      <div class="row" *ngIf="testsuitTable">
+        <!-- Container for the testsuite table -->
+        <div class="table-container mt-2">
+          <!-- Row for testsuite table headings -->
+          <div class="row table-heading">
+            <div class="col border-column">
+              <span class="script-table-head">Test Suites</span>
+
+              <button type="button" (click)="toggleSortSuite()" class="sort-button">
+                <i class="bi sort-icon icon-sortng"
+                  [ngClass]="sortOrder === 'asc' ? 'bi-sort-up-alt' : 'bi-sort-down-alt'  "></i>
+              </button>
+
+              <button type="button" class="sort-button filter-btn" (click)="toggleFilterInputSuite()"
+                #filterButtonSuite>
+                <i class="bi bi-filter icon-sortng"></i>
+              </button>
+              <div class="search-div" *ngIf="showFilterInputsuite">
+                <div class="input-group search-input">
+                  <span class="input-group-text search-side" id="basic-addon1"><i class="bi bi-search"></i></span>
+                  <input #filterInputSuite type="text" class="form-control" placeholder="Filter..."
+                    [(ngModel)]="filterTextSuite" (keyup)="applyFilterSuite()" aria-describedby="basic-addon1">
+                </div>
+              </div>
+            </div>
+            <div class="col border-column"><span class="script-table-head">Test Suite Count</span></div>
+            <div class="col border-column"><span class="script-table-head">Description</span></div>
+            <div class="col"><span class="script-table-head">Action</span></div>
+          </div>
+          <!-- Row for testsuite table content and loader -->
+          <div class="accordion-content-area">
+            <!-- Loader row for testsuite table -->
+            <div class="row loader-row" *ngIf="showLoader">
+              <app-loader></app-loader>
+            </div>
+            <!-- Accordion for testsuites -->
+            <div class="accordion" id="accordionExample"  [class.loading]="showLoader">
+              <!-- Row for testsuite accordion items -->
+              <div class="row accord-row">
+                <!-- Accordion item for each testsuite -->
+                <div class="accordion-item" *ngFor="let testSuite of paginatedSuiteData">
+
+                  <h2 class="accordion-header d-flex align-items-center accord-head"
+                    (click)="toggleTestSuite(testSuite)">
+                    <div class="col">
+                      <button class="accordion-button no-arrow collapsed flex-grow-1 accor-title" type="button">
+                        {{ testSuite.name }}
+
+                      </button>
+                    </div>
+                    <div class="col">
+                      <button class="accordion-button no-arrow collapsed flex-grow-1 accor-testgroup accor-count"
+                        type="button">
+                        <span *ngIf="testSuite.scripts">
+                          {{ testSuite.scripts.length > 0 ? testSuite.scripts.length : '0' }}
+                        </span>
+                      </button>
+                    </div>
+                    <div class="col">
+                      <button class="accordion-button no-arrow collapsed flex-grow-1 accor-testgroup accor-desc"
+                        type="button">
+                        {{ testSuite.description }}
+                      </button>
+                    </div>
+                    <div class="col">
+                      <button class="btn btn-primary btn-sm delete-btn xlsx-btm" matTooltip="Edit/View Suite"
+                        (click)="editTestSuite(testSuite); $event.stopPropagation()"><mat-icon
+                          class="excel-icon edit">edit</mat-icon></button>
+                      <button class="btn btn-primary btn-sm delete-btn" matTooltip="Delete Suite"><mat-icon
+                          class="delete-icon excel-icon"
+                          (click)="deleteSuite(testSuite); $event.stopPropagation()">delete_forever</mat-icon></button>
+                      <button class="btn btn-primary btn-sm delete-btn" matTooltip="Download the suite data as XML"
+                        (click)="downloadSuiteXML(testSuite); $event.stopPropagation()"><i
+                          class="bi bi-cloud-arrow-down-fill excel-icon download"></i></button>
+                      <button class="btn btn-primary btn-sm delete-btn new-excel"
+                        matTooltip="Download all testcases documentation for the suite"
+                        (click)="downloadSuiteExcel(testSuite); $event.stopPropagation()">
+                        <img src="assets/icons/excel.png" class="excel-icon excel" />
+                      </button>
+                    </div>
+
+                    <button class="btn btn-link ms-auto"
+                      [matTooltip]="testSuite.expanded ? 'Hide Deatils' : 'View Details' ">
+                      <i class="bi collapse-icon"
+                        [ngClass]="testSuite.expanded ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+                    </button>
+                  </h2>
+                  <!-- Accordion collapse for testsuite details -->
+                  <div [class.show]="testSuite.expanded" class="accordion-collapse collapse">
+                    <!-- Accordion body for testsuite ag-grid table -->
+                    <div class="accordion-body">
+                      <!-- Container for testsuite ag-grid-angular -->
+                      <div class="dynamic-table-container"
+                        [class]="themeClass">
+                        <ag-grid-angular style="width: 80%; height: 100%;" [columnDefs]="testSutiteColumn"
+                          [defaultColDef]="{sortable: true}" [rowData]="testSuite.scripts" [pagination]="true"
+                          [animateRows]="true" [gridOptions]="gridOptions"
+                          (gridReady)="onGridReady($event)"></ag-grid-angular>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Message for no testsuites found -->
+          <div *ngIf="paginatedSuiteData.length == 0" class="noRecord">
+            <span>{{noScriptFound}}</span>
+          </div>
+          </div>   
+          <!-- Paginator for testsuite table -->
+          <div class="script-paginator">
+            <mat-paginator [length]="testSuiteFilteredData.length" [pageSize]="allPageSize"
+              [pageSizeOptions]="[10, 15, 20, 50]" (page)="onPageChange($event)" class="script-pagination">
+            </mat-paginator>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- Modal Start-->
+<div class="modal fade" #scriptModal id="scriptModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="scriptModalLabel" aria-hidden="true">
+  <div class="modal-dialog custom-modal">
+    <div class="modal-content">
+      <form [formGroup]="uploadScriptForm" (ngSubmit)="uploadScriptSubmit()">
+        <div class="modal-header modaltitle">
+          <h1 class="modal-title custom-title" id="scriptModalLabel">Upload Script Zip File</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="container mt-4">
+            <div class="row mb-3">
+              <label for="uploadfile" class="col-md-4  col-form-label">Select the script Zip file<span
+                  style="color:red; margin-left: 0.75em;">*</span></label>
+              <div class="col-md-8">
+                <input class="form-control form-control-sm" id="uploadfile" type="file" formControlName="uploadZip"
+                  (change)="onFileChange($event)">
+                <div *ngIf="uploadScriptForm && uploadScriptForm.controls['uploadZip']?.errors" class="text-danger">
+                  <small *ngIf= "uploadFormSubmitted && uploadScriptForm.controls['uploadZip']?.errors?.['required']">Please select the script
+                    zip file.</small>
+                </div>
+                <small *ngIf="uploadFileError" class="errorupload">{{uploadFileError}}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="download-btn modal-btns " data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="download-btn modal-btns ">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!--TestSuite Modal Start-->
+<div class="modal fade" #testSuiteModal id="testSuiteModal" data-bs-backdrop="static" data-bs-keyboard="false"
+  tabindex="-1" aria-labelledby="testSuiteModalLabel" aria-hidden="true">
+  <div class="modal-dialog custom-modal">
+    <div class="modal-content">
+      <form [formGroup]="uploadtestSuiteForm" (ngSubmit)="testSuiteFileSubmit()">
+        <div class="modal-header modaltitle">
+          <h1 class="modal-title custom-title" id="testSuiteModalLabel">Upload TestSuite XML File</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="container mt-4">
+            <div class="row mb-3">
+              <label for="uploadfile" class="col-md-4  col-form-label">Select the testsuite xml file<span
+                  style="color:red; margin-left: 0.75em;">*</span></label>
+              <div class="col-md-8">
+                <input class="form-control form-control-sm" id="uploadfile" type="file" formControlName="uploadXML"
+                  (change)="testSuiteXMLFile($event)">
+                <div *ngIf="xmlFormSubmitted && uploadtestSuiteForm.controls['uploadXML']?.errors" class="text-danger">
+                  <small *ngIf="uploadtestSuiteForm.controls['uploadXML']?.errors?.['required']">Please select the
+                    testsuite xml file.</small>
+                </div>
+                <small *ngIf="uploadFileError" class="errorupload">{{uploadFileError}}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="download-btn modal-btns " (click)="closeSuiteModal()">Close</button>
+          <button type="submit" class="download-btn modal-btns ">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

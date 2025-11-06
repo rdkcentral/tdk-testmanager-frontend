@@ -1,0 +1,246 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<div class="container">
+  <div class="row mt-2">
+    <div class="col-md-12">
+      <h1 class="view-title">View Details</h1>
+      <div>
+        <div class="row">
+          <div class="col">
+            <div class="row mb-3">
+              <label for="stbname" class="col-md-3 col-form-label"
+                >Stb Name<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <div class="col-md-8">
+                <input
+                  type="text"
+                  class="form-control text-size"
+                  id="stbname"
+                  value="{{ data.deviceName }}"
+                  disabled
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="stbip" class="col-md-3 col-form-label"
+                >Stb IP<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <div class="col-md-8">
+                <input
+                  type="text"
+                  class="form-control text-size"
+                  id="stbip"
+                  value="{{ data.deviceIp }}"
+                  disabled
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="macaddr" class="col-md-3 col-form-label"
+                >Mac Address</label
+              >
+              <div class="col-md-8">
+                <input
+                  type="text"
+                  class="form-control text-size"
+                  id="macaddr"
+                  value="{{ data.macId }}"
+                  disabled
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="devicetype" class="col-md-3 col-form-label"
+                >Device Type<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <div class="col-md-8">
+                <select
+                  class="form-select text-size"
+                  aria-label="Default select example"
+                  id="devicetype"
+                  disabled
+                >
+                  <option value="{{ data.deviceTypeName }}">
+                    {{ data.deviceTypeName }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3" *ngIf="data.thunderEnabled === true">
+              <label for="isthunderEnabled" class="col-md-3 col-form-label"
+                >Is Thunder Enabled</label
+              >
+              <div class="col-md-8">
+                <div class="form-check form-check-inline form-check-reverse">
+                  <input
+                    class="form-check-input thunder"
+                    type="checkbox"
+                    id="isthunderEnabled"
+                    checked="{{
+                      data.thunderEnabled === true ? 'true' : 'false'
+                    }}"
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3" *ngIf="data.thunderPort !== ''">
+              <label for="thunderport" class="col-md-3 col-form-label"
+                >Thunder Port<span style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <div class="col-md-8">
+                <input
+                  type="text"
+                  class="form-control text-size"
+                  id="thunderport"
+                  value="{{ data.thunderPort ? data.thunderPort : '' }}"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+          <div class="col">
+            <div class="row mb-3">
+              <label
+                for="oem"
+                class="col-md-3 offset-1 col-form-label"
+                >OEM</label
+              >
+              <div class="col-md-8">
+                <select
+                  class="form-select text-size"
+                  aria-label="Default select example"
+                  id="oem"
+                  disabled
+                >
+                  <option value="{{ data.oemName }}">
+                    {{ data.oemName }}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="soc" class="col-md-3 offset-1 col-form-label"
+                >SoC</label
+              >
+              <div class="col-md-8">
+                <select
+                  class="form-select text-size"
+                  aria-label="Default select example"
+                  id="soc"
+                  disabled
+                >
+                  <option value="{{ data.socName }}">
+                    {{ data.socName }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <label
+                for="configuredevicePorts"
+                class="col-md-3 offset-1 col-form-label"
+                >Configure Device Ports</label
+              >
+              <div class="col-md-8">
+                <div class="form-check form-check-inline form-check-reverse">
+                  <input
+                    class="form-check-input thunder text-size"
+                    type="checkbox"
+                    checked="{{
+                      data.devicePortsConfigured === true ? 'true' : 'false'
+                    }}"
+                    id="configuredevicePorts"
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label for="agentport" class="col-md-3 offset-1 col-form-label"
+                >Agent Port</label
+              >
+              <div class="col-md-8">
+                <input
+                  type="text"
+                  class="form-control text-size"
+                  id="agentport"
+                  value="{{ data.devicePort ? data.devicePort : '' }}"
+                  disabled
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label
+                for="agentstatusport"
+                class="col-md-3 offset-1 col-form-label"
+                >Agent Status Port</label
+              >
+              <div class="col-md-8">
+                <input
+                  type="text"
+                  class="form-control text-size"
+                  id="agentstatusport"
+                  value="{{ data.statusPort ? data.statusPort : '' }}"
+                  disabled
+                />
+              </div>
+            </div>
+            <div class="row mb-3">
+              <label
+                for="agentmonitorport"
+                class="col-md-3 offset-1 col-form-label"
+                >Agent Monitor Port</label
+              >
+              <div class="col-md-8">
+                <input
+                  type="text"
+                  class="form-control text-size"
+                  id="agentmonitorport"
+                  value="{{
+                    data.agentMonitorPort ? data.agentMonitorPort : ''
+                  }}"
+                  disabled
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="mt-2 text-end mb-2">
+            <button
+              class="view-btn close"
+              (click)="onCancelDelete()"
+              *ngIf="!data.cancel"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

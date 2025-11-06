@@ -1,0 +1,92 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for module list page -->
+<div class="container-fluid">
+    <!-- Row for header and controls -->
+    <div class="row mt-2">
+        <!-- Main column for title and actions -->
+        <div class="col-md-11">
+            <h1 class="title">{{categoryName}} Module List</h1>
+            <!-- Button group for navigation and actions -->
+            <div class="btn-grp text-end">
+                <button class="back-btn" (click)="goBack()" matTooltip="Back"><i class="bi bi-arrow-return-left icon-size"></i></button>
+                <button type="button" class="create-btn dwnld-btn" (click)="dowloadAllModule()" matTooltip=" Download all the {{categoryName}} Module Details">
+                    <i class="bi bi-cloud-arrow-down-fill icon-size"></i> </button>
+                <button type="button" class="create-btn dwnld-btn" data-bs-toggle="modal" data-bs-target="#moduleListModal" matTooltip="Upload Module XML File">
+                    <i class="bi bi-cloud-arrow-up-fill icon-size"></i>
+                  </button>
+                <button class="create-btn" (click)="createModule()" matTooltip="Create {{categoryName}} Module">
+                    <i class="bi bi-plus-circle-fill icon-size"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Row for loader indicator -->
+    <div class="row loader-row" *ngIf="showLoader">
+        <app-loader></app-loader>
+    </div>
+    <!-- Row for table section -->
+    <div class="row table-sec mt-2">
+        <!-- Container for ag-grid table -->
+        <div class="grid-container" [class]="themeClass">
+            <ag-grid-angular style="width: 100%; height: 100%;" [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef" [suppressRowClickSelection]="true" [rowData]="rowData"
+                [class]="themeClass" [pagination]="true" [paginationPageSize]="paginationPageSize"
+                [paginationPageSizeSelector]="paginationPageSizeSelector" (gridReady)="onGridReady($event)"
+                [tooltipShowDelay]="tooltipShowDelay" [animateRows]="true"
+                 [context]="this" [gridOptions]="gridOptions"></ag-grid-angular>
+
+        </div>
+    </div>
+    <!-- Modal Start-->
+ <div class="modal fade" #moduleListModal id="moduleListModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="moduleListModalLabel" aria-hidden="true">
+    <!-- Modal dialog container -->
+    <div class="modal-dialog custom-modal">
+      <!-- Modal content container -->
+      <div class="modal-content">
+        <form [formGroup]="uploadXMLForm" (ngSubmit)="uploadXMLSubmit()">
+        <!-- Modal header section -->
+        <div class="modal-header modaltitle">
+          <h1 class="modal-title custom-title" id="moduleListModalLabel">Upload Module XML File</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- Modal body section -->
+        <div class="modal-body">
+            <!-- Container for upload form -->
+            <div class="container mt-4">
+                <!-- Row for file input -->
+                <div class="row mb-3"> 
+                    <label for="uploadfile" class="col-md-4  col-form-label">Select the module XML file<span style="color:red; margin-left: 0.75em;">*</span></label>
+                        <div class="col-md-8">
+                            <input class="form-control form-control-sm" id="uploadfile" type="file" formControlName="uploadXml" (change)="onFileChange($event)">
+                            <div *ngIf="uploadFormSubmitted && uploadXMLForm.controls['uploadXml']?.errors" class="text-danger">
+                                <small *ngIf="uploadXMLForm.controls['uploadXml']?.errors?.['required']">Please upload the module xml file.</small>
+                            </div>
+                            <small *ngIf="uploadFileError" class="errorupload">{{uploadFileError}}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Modal footer section -->
+        <div class="modal-footer">
+          <button type="button" class="download-btn modal-btns" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="download-btn modal-btns">Upload</button>
+        </div>
+        </form>
+      </div>
+    </div>
+</div>

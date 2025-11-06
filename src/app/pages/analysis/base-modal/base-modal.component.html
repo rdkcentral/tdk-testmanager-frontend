@@ -1,0 +1,184 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for base modal content -->
+<div class="container-fluid">
+    <!-- Row for radio box and form -->
+    <div class="radiobox-row mt-1">
+        <!-- Column for title -->
+        <div class="col-md-12">
+            <h1 class="title borders-btm">Select Base Execution for {{data.tabName}} Generation</h1>
+        </div>
+        <!-- Margin container for form and table -->
+        <div class="mt-2 main-margin">
+            <!-- Filter form for base execution selection -->
+            <form [formGroup]="filterForm" (ngSubmit)="filterDataSubmit()"> 
+                <!-- Row for filter form fields -->
+                <div class="row">
+                    <!-- Column for from date and device type -->
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <!-- Row for from date input -->
+                        <div class="mb-3 row-align">
+                            <label for="testtype" class="col-md-4 col-form-label">From <span
+                                style="color:red; margin-left: 0.75em;">*</span></label>
+                            <!-- Column for from date input field -->
+                            <div class="col-md-8">
+                                <input type="date" class="form-control" formControlName="fromDate">
+                                <div *ngIf="filterSubmitted && filterForm.controls['fromDate']?.errors" class="text-danger">
+                                    <small *ngIf="filterForm.controls['fromDate']?.errors?.['required']">Please select from date.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Row for device type select -->
+                        <div class="mt-2 mb-3 row-align">
+                            <label for="testtype" class="col-md-4 col-form-label">Device Type <span
+                                style="color:red; margin-left: 0.75em;">*</span></label>
+                            <!-- Column for device type select field -->
+                            <div class="col-md-8">
+                                <select class="form-select" aria-label="Default select example" id="selectDevicetype"
+                                    formControlName="deviceType" (change)="deviceChange($event)">
+                                    <option value="" default>Select</option>
+                                    @for (item of allDeviceType; track $index) {
+                                        <option value="{{item.deviceTypeName}}">{{item.deviceTypeName}}</option>
+                                    }
+                                </select>
+                                <div *ngIf="filterSubmitted && filterForm.controls['deviceType']?.errors" class="text-danger">
+                                    <small *ngIf="filterForm.controls['deviceType']?.errors?.['required']">Please select device type.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Row for device name input -->
+                        <div class="mb-3 row-align">
+                            <label for="devicename" class="col-md-4 col-form-label">Device Name</label>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" formControlName="deviceName" placeholder="Enter device name" />
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Column for to date and execution type -->
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <!-- Row for to date input -->
+                        <div class="mb-3 row-align">
+                            <label for="testtype" class="col-md-4 col-form-label">To <span
+                                style="color:red; margin-left: 0.75em;">*</span></label>
+                            <!-- Column for to date input field -->
+                            <div class="col-md-8">
+                                <input type="date" class="form-control" formControlName="toDate">
+                                <div *ngIf="filterSubmitted && filterForm.controls['toDate']?.errors" class="text-danger">
+                                    <small *ngIf="filterForm.controls['toDate']?.errors?.['required']">Please select to date.</small>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Row for execution type select -->
+                        <div class="mt-2 mb-3 row-align">
+                            <label for="testtype" class="col-md-4 col-form-label">Execution Type<span
+                                style="color:red; margin-left: 0.75em;">*</span></label>
+                            <!-- Column for execution type select field -->
+                            <div class="col-md-8">
+                                <select class="form-select" aria-label="Default select example" id="selectDevicetype"
+                                    formControlName="scriptType" (change)="changeExecutionType($event)">
+                                    <option value="" default>Select</option>
+                                    <option value="SINGLESCRIPT">Single Script</option>
+                                    <option value="MULTISCRIPT">Multi Script</option>
+                                    <option value="TESTSUITE">TestSuite</option>
+                                    <option value="MULTITESTSUITE">Multi Testsuite</option>
+                                </select>
+                                <div *ngIf="filterSubmitted && filterForm.controls['scriptType']?.errors" class="text-danger">
+                                    <small *ngIf="filterForm.controls['scriptType']?.errors?.['required']">Please select script type.</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Column for category, script, and testsuite -->
+                    <div class="col-lg-4 col-md-6 col-sm-12">
+                        <!-- Row for category select -->
+                        <div class="mb-3 row-align">
+                            <label for="testtype" class="col-md-4 col-form-label">Category</label>
+                            <!-- Column for category select field -->
+                            <div class="col-md-8">
+                                <select class="form-select" aria-label="Default select example" id="selectDevicetype"
+                                formControlName="category">
+                                <option value="" default>Select</option>
+                                <option value="RDKV">Video</option>
+                                <option value="RDKB">Broadband</option>
+                            </select>
+                            </div>
+                        </div>
+                        <!-- Row for script input (conditional) -->
+                        <div class="mb-3 row-align" *ngIf="showScript">
+                            <label for="testtype" class="col-md-4 col-form-label">Script</label>
+                            <!-- Column for script input field -->
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" formControlName="scriptSingle"/>
+                            </div>
+                        </div>
+                        <!-- Row for testsuite input (conditional) -->
+                        <div class="mb-3 row-align" *ngIf="testSuiteShow">
+                            <label for="testtype" class="col-md-4 col-form-label">TestSuite</label>
+                            <!-- Column for testsuite input field -->
+                            <div class="col-md-8">
+                                <input type="text" class="form-control" formControlName="testSuiteSingke"/>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Column for filter executions button -->
+                    <div class="col-12 text-end mt-3">
+                        <button type="submit" class="create-btn">Filter Executions</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <!-- Column for max days exceeded error message -->
+        <div class="col-md-12 selectedScript" *ngIf="filterSubmitted && filterForm.errors?.['maxDaysExceeded']" class="text-danger">
+            <small>Maximum number of days allowed is 30</small>
+        </div>
+        <!-- Column for selected base execution display -->
+        <div class="col-md-12 selectedScript" *ngIf="showTable">
+            <span class="selectedlabel">Selected Base Execution : <span class="selectedItem"> {{baseModalName}}</span></span>
+            <!-- <button *ngIf="baseModalName != null" type="button" class="confirm-btn" (click)="onConfirm()">Confirm</button> -->
+        </div>
+        <!-- Table details for base executions (conditional) -->
+        <div class="tableDeatils mt-2" *ngIf="showTable">
+            <!-- Container for ag-grid table -->
+            <div class="grid-container" [class]="themeClass">
+                <ag-grid-angular
+                style="width: 100%; height: 80%;"
+                [rowData]="rowData"
+                [columnDefs]="columnDefs"
+                [defaultColDef]="defaultColDef"
+                [pagination]="true"
+                [paginationPageSize]="pageSize"
+                [paginationPageSizeSelector]="pageSizeSelector"
+                [rowHeight]="35"
+                rowSelection="single"
+                (selectionChanged)="onrowSelected()"
+                (gridReady)="onGridReady($event)"
+              ></ag-grid-angular>
+            </div>
+        </div>
+        <div class="clearfix">
+        </div>
+        <!-- Row for loader spinner (conditional) -->
+        <div class="row loader-row" *ngIf="showLoader">
+            <app-loader></app-loader>
+        </div>
+        <!-- Column for confirm and close buttons -->
+        <div class="col-md-12 text-end mt-4 mb-3">
+            <button *ngIf="baseModalName != null" type="button" class="create-btn confirm-btn" (click)="onConfirm()">Confirm</button>
+            <button type="button" class="create-btn close-btn" (click)="close()" >Close</button>
+        </div>
+    </div>
+</div>

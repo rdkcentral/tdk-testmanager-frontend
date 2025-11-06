@@ -1,0 +1,190 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!-- Main container for devices page -->
+<div class="container-fluid">
+  <!-- Row for header and controls -->
+  <div class="row borders-btm">
+    <!-- Left column for flavor selection -->
+    <div class="col-md-5">
+      <!-- Row for flavor dropdown -->
+      <div class="row">
+        <!-- Flavor row -->
+        <div class="falvor-row">
+          <span for="falvor" class="falvor-label">RDK flavor :</span>
+          <select
+            class="form-select rdk-dropdown"
+            aria-label="Default select example"
+            id="preferCategoty"
+            [(ngModel)]="selectedDeviceCategory"
+            (change)="categoryChange($event)"
+          >
+            <option value="RDKV">Video</option>
+            <option value="RDKB">Broadband</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <!-- Center column for title -->
+    <div class="col-md-2">
+      <h1 class="title"> Devices</h1>
+    </div>
+    <!-- Right column for buttons -->
+    <div class="col-md-5">
+      <!-- Button group -->
+      <div class="btns-group">
+        <button
+          type="button"
+          class="download-btn"
+          (click)="downloadAllDevice()"
+          matTooltip="Download all the {{ categoryName }} Device Details"
+        >
+          <i class="bi bi-cloud-arrow-down-fill download-icon"></i>
+        </button>
+        <button
+          type="button"
+          class="download-btn"
+          matTooltip="Upload Device XML File"
+          data-bs-toggle="modal"
+          data-bs-target="#staticBackdrop"
+        >
+          <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
+        </button>
+        <button
+          class="download-btn"
+          matTooltip="Create"
+          (click)="createDevice()"
+        >
+          <i class="bi bi-plus-circle-fill download-icon"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Row for search and grid -->
+  <div class="row mt-2 seach-row">
+    <!-- Search header -->
+    <div class="col example-header">
+      <span class="search"
+        >Search:<mat-icon
+          class="info-icon"
+          matTooltip="Search by device name, device IP or boxtype"
+          >info</mat-icon
+        ></span
+      >
+      <input
+        type="text"
+        class="form-control seach-input"
+        id="filter-text-box"
+        (input)="onFilterTextBoxChanged()"
+        placeholder="Search..."
+      />
+    </div>
+    <!-- Empty column -->
+    <div class="col"></div>
+    <!-- Loader row -->
+    <div class="row loader-row" *ngIf="showLoader">
+      <app-loader></app-loader>
+    </div>
+    <!-- Grid container -->
+    <div class="grid-container" [class]="themeClass">
+      <ag-grid-angular
+        style="width: 100%; height: 100%"
+        [columnDefs]="columnDefs"
+        [defaultColDef]="defaultColDef"
+        [rowData]="rowData"
+        [pagination]="true"
+        [paginationPageSize]="paginationPageSize"
+        [paginationPageSizeSelector]="paginationPageSizeSelector"
+        (gridReady)="onGridReady($event)"
+        [animateRows]="true"
+        [context]="this"
+        [gridOptions]="gridOptions"
+        [enableCellTextSelection]="true"
+      ></ag-grid-angular>
+
+    </div>
+  </div>
+</div>
+<!-- Modal Start-->
+<div
+  class="modal fade"
+  #staticBackdrop
+  id="staticBackdrop"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="staticBackdropLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog custom-modal">
+    <div class="modal-content">
+      <form [formGroup]="uploadXMLForm" (ngSubmit)="uploadXMLSubmit()">
+        <div class="modal-header modaltitle">
+          <h1 class="modal-title custom-title" id="staticBackdropLabel">
+            Upload Device XML File
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="resetUploadForm()"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="container mt-4">
+            <div class="row mb-3">
+              <label for="uploadfile" class="col-md-4 col-form-label"
+                >Select the device XML file<span
+                  style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <div class="col-md-8">
+                <input
+                  class="form-control form-control-sm"
+                  id="uploadfile"
+                  type="file"
+                  formControlName="uploadXml"
+                  (change)="onFileChange($event)"
+                />
+                <div
+                  *ngIf="
+                    uploadFormSubmitted &&
+                    uploadXMLForm.controls['uploadXml']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="uploadXMLForm.controls['uploadXml']?.errors?.['required']"
+                    >Please upload the device xml file.</small
+                  >
+                </div>
+                <small *ngIf="uploadFileError" class="errorupload">{{
+                  uploadFileError
+                }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="modal-btns" data-bs-dismiss="modal" (click)="resetUploadForm()">
+            Close
+          </button>
+          <button type="submit" class="modal-btns">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,439 @@
+<!--
+If not stated otherwise in this file or this component's LICENSE file the
+following copyright and licenses apply:
+Copyright 2024 RDK Management
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!-- Main container for the Create Jira dialog -->
+<div class="container-fluid">
+    <!-- Header row with title -->
+    <div class="row borders-btm">
+        <div class="col"></div>
+        <div class="col">
+            <h1 class="title">Create</h1>
+        </div>
+        <div class="col">
+        </div>
+    </div>
+    <!-- Main form row -->
+    <div class="row">
+        <!-- Form column -->
+        <div class="col-md-12">
+            <!-- Jira creation form -->
+            <form [formGroup]="jiraCreateForm" (ngSubmit)="onJiraSubmit()" class="jiraCreateForm mt-3">
+                        <!-- Form section: left column -->
+                        <div class="row form-sec">
+                            <div class="col">
+                                <!-- Project Name selection -->
+                                <div class="row mb-3">
+                                    <label for="prjname" class="col-md-4 col-form-label">Project Name :<span
+                                            style="color:red; margin-left: 0.75em;">*</span></label>
+                                            <div class="col-md-8" >
+                                            <select class="form-select" aria-label="Default select example" id="projectname"
+                                            formControlName="projectname" (change)="onProjectChange($event)">
+                                            <option value="" default>Select</option>
+                                            @for (item of allProjectNames; track $index) {
+                                            <option value="{{item}}">{{item}}</option>
+                                            }
+                                        </select>
+                                        <div *ngIf="jiraSubmitted && jiraCreateForm.controls['projectname']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="jiraCreateForm.controls['projectname']?.errors?.['required']">Please
+                                                enter project name.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- TDK Version display -->
+                                <div class="row mb-3" *ngIf="showTDKVersion">
+                                    <label for="version" class="col-md-4 col-form-label">TDK Version :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control readonly-field" id="version"
+                                             [value]="versionName" readonly tabindex="-1"
+                                            >
+                                    </div>
+                                </div>
+                                <!-- Issue Summary input -->
+                                <div class="row mb-3">
+                                    <label for="summary" class="col-md-4 col-form-label">Issue Summary :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" id="summary" class="form-control"
+                                            formControlName="summary" autocomplete="off" >
+                                        <div *ngIf="jiraSubmitted && jiraCreateForm.controls['summary']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="jiraCreateForm.controls['summary']?.errors?.['required']">Please
+                                                enter summary.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                           
+                                <!-- Issue Description input -->
+                                <div class="row mb-3">
+                                    <label for="desc" class="col-md-4 col-form-label">Issue Description :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                            <textarea rows="10" class="form-control" formControlName="description"></textarea>
+                                        <div *ngIf="jiraSubmitted && jiraCreateForm.controls['description']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="jiraCreateForm.controls['description']?.errors?.['required']">Please
+                                                enter issue description.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Hardware Configuration selection -->
+                                <div class="row mb-3" *ngIf="showHardware">
+                                    <label for="hardware" class="col-md-4 col-form-label">Hardware Configuration :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                            <select class="form-select" aria-label="Default select example" id="hardware"
+                                            formControlName="hardware">
+                                            <option value="" default>Select</option>
+                                            @for (item of allHardwares; track $index) {
+                                            <option value="{{item}}">{{item}}</option>
+                                            }
+                                        </select>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['hardware']?.invalid && (jiraCreateForm.controls['hardware']?.dirty || jiraSubmitted)"    
+                                        class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['hardware']?.errors?.['required']">Please
+                                                enter hardware.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Components Impacted selection -->
+                                <div class="row mb-3" *ngIf="showCompImpacted">
+                                    <label for="impacted" class="col-md-4 col-form-label">Components Impacted :<span style="color:red; margin-left: 0.75em;">*</span>
+                                    </label>
+                                    
+                                    <div class="col-md-8">
+                                         <ng-multiselect-dropdown  id="impacted" style=" border-color: gray !important;font-size: 0.8rem;"
+                                           [placeholder]="'Select Options'" [settings]="componentsImpactedDropdownSettings"
+                                            [data]="allCompImpacted" formControlName="impacted"  
+                                            (onSelect)="onImpactedSelect($event)" (onDeSelect)="onImpactedDeSelect($event)"
+                                            (onSelectAll)="onImpactedSelectAll($event)" (onDeSelectAll)="onImpactedDeSelectAll($event)">
+                                        </ng-multiselect-dropdown>   
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['impacted']?.invalid && (jiraCreateForm.controls['impacted']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['impacted']?.errors?.['required']">Please
+                                                enter impacted.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Steps to reproduce input -->
+                                <div class="row mb-3" *ngIf="showReproduce">
+                                    <label for="reproduce" class="col-md-4 col-form-label">Steps to reproduce :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                    <textarea rows="10" class="form-control" formControlName="reproduce"></textarea>    
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['reproduce']?.invalid && (jiraCreateForm.controls['reproduce']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['reproduce']?.errors?.['required']">Please
+                                                enter reproduce.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Fixed in version selection -->
+                                <div class="row mb-3" *ngIf="showFixVersion">
+                                    <label for="fixversion" class="col-md-4 col-form-label">Fixed in version :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="fixversion"
+                                           formControlName="fixversion">
+                                           <option value="" default>Select</option>
+                                           @for (item of allFixVersion; track $index) {
+                                           <option value="{{item}}">{{item}}</option>
+                                           }
+                                       </select>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['fixversion']?.invalid && (jiraCreateForm.controls['fixversion']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['fixversion']?.errors?.['required']">Please
+                                                enter fixed version.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Attach execution logs checkbox -->
+                                <div class="row mb-3">
+                                    <label for="exelogs" class="col-md-4 col-form-label">Click to attach execution logs :</label>
+                                    <div class="col-md-8">
+                                        <input class="form-check-input" type="checkbox" id="exelogs"
+                                        formControlName="exelogs">
+                                    </div>
+                                </div>
+                                <!-- Attach device logs checkbox -->
+                                <div class="row mb-3">
+                                    <label for="devlogs" class="col-md-4 col-form-label">Click to attach device logs :</label>
+                                    <div class="col-md-8">
+                                        <input class="form-check-input" type="checkbox" id="devlogs"
+                                        formControlName="devlogs" >
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form section: right column -->
+                            <div class="col">
+
+                                <!-- Issue Type selection -->
+                                <div class="row mb-3">
+                                    <label for="issuetype" class="col-md-4 col-form-label">Issue Type :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="issuetype"
+                                            formControlName="issuetype">
+                                            <option value="BUG" default>BUG</option>
+                                        </select>
+                                        <div *ngIf="jiraSubmitted && jiraCreateForm.controls['issuetype']?.errors"
+                                            class="text-danger">
+                                            <small *ngIf="jiraCreateForm.controls['issuetype']?.errors?.['required']">Please
+                                                select issue type.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Priority selection -->
+                                <div class="row mb-3" >
+                                    <label for="priority" class="col-md-4 col-form-label">Priority :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                            <select class="form-select" aria-label="Default select example" id="priority"
+                                                formControlName="priority">
+                                                <option value="" default>Select</option>
+                                                @for (item of allPriorites; track $index) {
+                                                <option value="{{item}}">{{item}}</option>
+                                                }
+                                            </select>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['priority']?.invalid && (jiraCreateForm.controls['priority']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['priority']?.errors?.['required']">Please
+                                                select priority.
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Regression selection -->
+                                <div class="row mb-3" >
+                                    <label for="regression" class="col-md-4 col-form-label">Regression :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="regression"
+                                            formControlName="regression">
+                                            <option value="" default>Select</option>
+                                            <option value="YES" >YES</option>
+                                            <option value="NO" >NO</option>
+                                        </select>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['regression']?.invalid && (jiraCreateForm.controls['regression']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['regression']?.errors?.['required']">Please
+                                                select regression.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- RDK Version selection -->
+                                <div class="row mb-3" *ngIf="showRDKVersion">
+                                    <label for="rdkversion" class="col-md-4 col-form-label">RDK Version :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="rdkversion"
+                                           formControlName="rdkversion">
+                                           <option value="" default>Select</option>
+                                           @for (item of allRDKVersion; track $index) {
+                                           <option value="{{item}}">{{item}}</option>
+                                           }
+                                       </select>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['rdkversion']?.invalid && (jiraCreateForm.controls['rdkversion']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['rdkversion']?.errors?.['required']">Please
+                                                enter rdk version.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Label selection -->
+                                <div class="row mb-3">
+                                    <label for="label" class="col-md-4 col-form-label">Label :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                         <ng-multiselect-dropdown  id="label" style=" border-color: gray !important;font-size: 0.8rem;"
+                                           [placeholder]="'Select label(s)'" [settings]="labelDropdownSettings"
+                                            [data]="allLabels" formControlName="label"  
+                                            (onSelect)="onItemSelect($event)" (onDeSelect)="onDeSelect($event)"
+                                            (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAll($event)">
+                                        </ng-multiselect-dropdown>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['label']?.invalid && (jiraCreateForm.controls['label']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['label']?.errors?.['required']">Please
+                                                select label.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Release Version selection -->
+                                <div class="row mb-3" *ngIf="showReleaseVersion">
+                                    <label for="releaseversion" class="col-md-4 col-form-label">Release Version :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="releaseversion"
+                                            formControlName="releaseversion">
+                                            <option value="" default>Select</option>
+                                            @for (item of allReleaseVersion; track $index) {
+                                            <option value="{{item}}">{{item}}</option>
+                                            }
+                                        </select>
+
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['releaseversion']?.invalid && (jiraCreateForm.controls['releaseversion']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['releaseversion']?.errors?.['required']">Please
+                                                select release version.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Environment for test/Test setup input -->
+                                <div class="row mb-3" *ngIf="showEveSetup">
+                                    <label for="setup" class="col-md-4 col-form-label">Environment for test/Test setup :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <textarea rows="10" class="form-control" formControlName="setup" ></textarea>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['setup']?.invalid && (jiraCreateForm.controls['setup']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['setup']?.errors?.['required']">Please
+                                                enter environment for test.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Third Party Dependency selection -->
+                                <div class="row mb-3" *ngIf="showdependency">
+                                    <label for="dependency" class="col-md-4 col-form-label">Third Party Dependency :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="dependency"
+                                            formControlName="dependency">
+                                            <option value="YES" default>YES</option>
+                                            <option value="NO" >NO</option>
+                                        </select>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['dependency']?.invalid && (jiraCreateForm.controls['dependency']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['dependency']?.errors?.['required']">Please
+                                                select third Party dependency.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Severities selection -->
+                                <div class="row mb-3" *ngIf="showSeverites">
+                                    <label for="severities" class="col-md-4 col-form-label">Severities :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <select class="form-select" aria-label="Default select example" id="severities"
+                                             formControlName="severities">
+                                             <option value="" default>Select</option>
+                                             @for (item of allServerities; track $index) {
+                                             <option value="{{item}}">{{item}}</option>
+                                             }
+                                         </select>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['severities']?.invalid && (jiraCreateForm.controls['severities']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['severities']?.errors?.['required']">Please
+                                                select severities.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Impacted Platforms selection -->
+                                <div class="row mb-3" *ngIf="showPlatform">
+                                    <label for="platforms" class="col-md-4 col-form-label">Impacted Platforms :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                         <ng-multiselect-dropdown  id="platforms" style=" border-color: gray !important;font-size: 0.8rem;"
+                                           [placeholder]="'Select Options'" [settings]="impactedPlatformsDropdownSettings"
+                                            [data]="allImpPlatforms" formControlName="platforms"  
+                                            (onSelect)="onPlatformSelect($event)" (onDeSelect)="onPlatformDeSelect($event)"
+                                            (onSelectAll)="onPlatformSelectAll($event)" (onDeSelectAll)="onPlatformDeSelectAll($event)">
+                                        </ng-multiselect-dropdown>
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['platforms']?.invalid && (jiraCreateForm.controls['platforms']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['platforms']?.errors?.['required']">Please
+                                                impacted platforms.</small>
+                                    
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Reproducibility input -->
+                                <div class="row mb-3" *ngIf="showReproducibitity">
+                                    <label for="reproducibitity" class="col-md-4 col-form-label">Reproducibility(%) :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="reproducibitity"
+                                            formControlName="reproducibitity" autocomplete="off"
+                                             >
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['reproducibitity']?.invalid && (jiraCreateForm.controls['reproducibitity']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['reproducibitity']?.errors?.['required']">Please
+                                                enter reproducibitity.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- User input -->
+                                <div class="row mb-3">
+                                    <label for="user" class="col-md-4 col-form-label">User :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="text" class="form-control" id="user"
+                                            formControlName="user" autocomplete="off"
+                                             >
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['user']?.invalid && (jiraCreateForm.controls['user']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['user']?.errors?.['required']">Please
+                                                enter user name.</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Password input -->
+                                <div class="row mb-3">
+                                    <label for="password" class="col-md-4 col-form-label">Password :<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                    <div class="col-md-8">
+                                        <input type="password" class="form-control" id="password"
+                                            formControlName="password" autocomplete="off"
+                                           >
+                                        <div 
+                                        *ngIf="jiraCreateForm.controls['password']?.invalid && (jiraCreateForm.controls['password']?.dirty || jiraSubmitted)"
+                                            class="text-danger">
+                                            <small
+                                                *ngIf="jiraCreateForm.controls['password']?.errors?.['required']">Please
+                                                enter password.</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                       
+                    <!-- Action buttons row -->
+                    <div class="row">
+                    <div class="mt-2 text-end">
+                        <button type="button" class="close-btn" (click)="close()">Close</button>
+                        <button type="submit" class="create-btn" >Create</button>
+                    </div>
+                </div>
+            </div>
+            </form>
+        </div>
+    </div>
+</div>
