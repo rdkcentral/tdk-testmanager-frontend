@@ -18,7 +18,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { CommonModule } from '@angular/common';
-import { Component ,HostListener} from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
@@ -27,7 +27,7 @@ import {
   GridReadyEvent,
   IMultiFilterParams,
   RowSelectedEvent,
-  SelectionChangedEvent
+  SelectionChangedEvent,
 } from 'ag-grid-community';
 import { Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
@@ -138,8 +138,22 @@ export class FunctionListComponent {
     } else {
       this.categoryName = 'Video';
     }
+    // Get saved state FIRST before loading data
+    const savedState = this.moduleservice.getPaginationState('functions');
+
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.paginationPageSize = savedState.pageSize;
+      this.paginationPageSizeSelector = [
+        savedState.pageSize,
+        savedState.pageSize * 2,
+        savedState.pageSize * 5,
+      ];
+    } else {
+      // Fresh navigation - use screen size
+      this.adjustPaginationToScreenSize();
+    }
     this.functionListByModule();
-    this.adjustPaginationToScreenSize();
   }
 
   /**
@@ -155,6 +169,13 @@ export class FunctionListComponent {
    */
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
+
+    // Don't override if we're restoring from saved state
+    const savedState = this.moduleservice.getPaginationState('functions');
+    if (savedState && savedState.pageSize && !this.gridApi) {
+      // If we have saved state and grid is not ready yet, don't recalculate
+      return;
+    }
 
     if (height > 1200) {
       this.paginationPageSize = 25;
@@ -188,6 +209,24 @@ export class FunctionListComponent {
     this.showLoader = true;
     this.moduleservice.functionList(this.dynamicModuleName).subscribe((res) => {
       this.rowData = res.data;
+      // After data is loaded, restore pagination state if available
+        setTimeout(() => {
+          const savedState = this.moduleservice.getPaginationState("functions");
+          if (savedState && this.gridApi) {
+           // Set the page size first
+            this.gridApi.setGridOption(
+              'paginationPageSize',
+              savedState.pageSize
+            );
+
+            // Then navigate to the saved page
+            setTimeout(() => {
+              this.gridApi.paginationGoToPage(savedState.currentPage);
+              // Clear the restoration flag after successful restoration
+              this.moduleservice.clearRestorationFlag("functions");
+            }, 100);
+          }
+        }, 100);
       if (
         this.rowData == null ||
         this.rowData == undefined ||
@@ -204,7 +243,11 @@ export class FunctionListComponent {
    */
   onGridReady(params: GridReadyEvent<any>) {
     this.gridApi = params.api;
-    this.adjustPaginationToScreenSize();
+    // Only apply screen-based sizing if no saved state exists
+    const savedState = this.moduleservice.getPaginationState("functions");
+    if (!savedState) {
+      this.adjustPaginationToScreenSize();
+    }
   }
 
   /**
@@ -239,6 +282,15 @@ export class FunctionListComponent {
    * No return value.
    */
   goTocreateFunctionPage(): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.moduleservice.savePaginationState(
+        'functions',
+        currentPage,
+        pageSize
+      );
+    }
     this.router.navigate(['/configure/function-create']);
   }
 
@@ -248,6 +300,15 @@ export class FunctionListComponent {
    * No return value.
    */
   userEdit(functions: any): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.moduleservice.savePaginationState(
+        'functions',
+        currentPage,
+        pageSize
+      );
+    }
     localStorage.setItem('functions', JSON.stringify(functions));
     this.router.navigate(['configure/function-edit']);
   }
@@ -266,12 +327,16 @@ export class FunctionListComponent {
               (row: any) => row.id !== data.id
             );
             this.rowData = [...this.rowData];
+            // Reset pagination state after successful deletion
+            this.moduleservice.resetPaginationState('functions');
             this._snakebar.open(res.message, '', {
               duration: 1000,
               panelClass: ['success-msg'],
               horizontalPosition: 'end',
               verticalPosition: 'top',
             });
+            // Reset pagination state after successful creation
+            this.moduleservice.resetPaginationState('functions');
           },
           error: (err) => {
             this._snakebar.open(err.message, '', {
@@ -292,6 +357,15 @@ export class FunctionListComponent {
    * No return value.
    */
   createParameter(data: any): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.moduleservice.savePaginationState(
+        'functions',
+        currentPage,
+        pageSize
+      );
+    }
     localStorage.setItem('function', JSON.stringify(data));
     this.router.navigate(['/configure/parameter-list']);
   }
@@ -302,6 +376,7 @@ export class FunctionListComponent {
    * No return value.
    */
   goBack(): void {
+    this.moduleservice.resetPaginationState('functions');
     this.router.navigate(['/configure/modules-list']);
   }
 }

@@ -112,6 +112,7 @@ export class EditDeviceTypeComponent {
               this.router.navigate(["configure/list-devicetype"]);
             }, 1000);
           }
+           this.service.resetPaginationState();
         },
         error: (err) => {
           console.log(err);

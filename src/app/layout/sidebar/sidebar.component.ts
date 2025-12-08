@@ -68,7 +68,7 @@ export class SidebarComponent implements OnInit {
           event.url === '/cofigure/edit-streamdetails' || event.url === '/cofigure/edit-streamdetails' ||
           event.url === '/configure/streamingtemplates-list' || event.url === '/configure/streamingtemplates-create' || event.url === '/configure/streamingtemplates-edit' ||
           event.url === '/devices/device-edit' || event.url === '/configure/modules-list' || event.url === '/configure/parameter-list' || event.url === '/configure/function-list'||
-          event.url === '/configure/modules-create' || event.url === '/configure/function-create' || event.url === '/configure/parmeter-create' || event.url === '/configure/scripttag-list' || 
+          event.url === '/configure/modules-create' || event.url === '/configure/function-create' || event.url === '/configure/parameter-create' || event.url === '/configure/scripttag-list' || 
           event.url === '/configure/scripttag-create' || event.url === '/configure/scripttag-edit' || event.url === '/configure/list-rdkversions' ||
           event.url === '/configure/create-rdkversions' || event.url === '/configure/edit-rdkversions' || event.url === '/configure/list-primitivetest' || event.url === '/configure/create-primitivetest' || event.url === '/configure/edit-primitivetest' || 
           event.url === '/configure/modules-edit' || event.url === '/configure/parameter-edit' || event.url === '/configure/function-edit' || event.url ==='/script' || event.url ==='/script/create-scripts' || event.url === '/execution' ||

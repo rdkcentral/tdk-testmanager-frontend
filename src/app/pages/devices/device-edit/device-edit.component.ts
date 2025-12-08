@@ -811,6 +811,7 @@ export class DeviceEditComponent {
             panelClass: ['success-msg'],
             verticalPosition: 'top',
           });
+          this.service.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(['/devices']);
             localStorage.removeItem('streamData');
@@ -861,6 +862,7 @@ export class DeviceEditComponent {
             panelClass: ['success-msg'],
             verticalPosition: 'top',
           });
+          this.service.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(['/devices']);
           }, 1000);
