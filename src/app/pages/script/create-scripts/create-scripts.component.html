@@ -31,354 +31,360 @@ limitations under the License.
         </div>
     </div>
     <!-- Main content row for stepper and forms -->
-    <div class="row mt-1">
-        <!-- Main column for stepper and forms -->
-        <div class="col-md-12">
-            <!-- Stepper for script creation steps -->
-            <mat-horizontal-stepper class="demo-stepper" [linear]="isLinear" #stepper>
-                <mat-step [stepControl]="firstFormGroup">
-                    <form [formGroup]="firstFormGroup">
-                        <ng-template matStepLabel>Script Details</ng-template>
-                        <!-- Row for script details form fields -->
-                        <div class="row mt-2 row-align">
-                            <!-- Left column for script details -->
-                            <div class="col">
-                                <!-- Row for script name input -->
-                                <div class="row mb-3">
-                                    <label for="scriptname" class="col-md-3 col-form-label">Script Name<span
-                                            style="color:red; margin-left: 0.75em;">*</span></label>
-                                    <!-- Column for script name input field -->
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control" id="scriptname" autocomplete="off"
-                                            placeholder="Enter script name" formControlName="scriptname"
-                                            (input)="onScritName($event)">
-                                    </div>
-                                </div>
-                                <!-- Row for module selection -->
-                                <div class="row mb-3">
-                                    <label for="module" class="col-md-3 col-form-label">
-                                        Module<span style="color:red; margin-left: 0.75em;">*</span>
-                                    </label>
-                                    <!-- Column for module select field -->
-                                    <div class="col-md-9">
-                                        <select class="form-select" aria-label="Default select example" id="module"
-                                            formControlName="module" (change)="getSelectedModule($event)">
-                                            <option value="" default>Select</option>
-                                            <option *ngFor="let item of allModules" [value]="item.moduleName">
-                                                {{ item.moduleName }}
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
 
-                                <!-- Row for primitive test selection -->
-                                <div class="row mb-3">
-                                    <label for="primitivetest" class="col-md-3 col-form-label">Primitive Test</label>
-                                    <!-- Column for primitive test select field -->
-                                    <div class="col-md-9">
-                                        <select class="form-select" aria-label="Default select example"
-                                            id="primitiveTest" formControlName="primitiveTest"
-                                            (change)="onChangePrimitive($event)">
-                                            <!-- <option value="" default>Select</option> -->
-                                            <option *ngFor="let item of allPrimitiveTest"
-                                                [value]="item.primitiveTestName">
-                                                {{ item.primitiveTestName }}
-                                            </option>
-                                        </select>
-                                    </div>
+    <!-- Main column for stepper and forms -->
+    <div class="responsive-form-container">
+        <!-- Stepper for script creation steps -->
+        <mat-horizontal-stepper class="demo-stepper" [linear]="isLinear" #stepper>
+            <mat-step [stepControl]="firstFormGroup">
+                <form [formGroup]="firstFormGroup">
+                    <ng-template matStepLabel>Script Details</ng-template>
+                    <!-- Row for script details form fields -->
+                    <!-- Fix for the Script Details section alignment -->
+                    <div class="row mt-2 row-align">
+                        <!-- Left column for script details -->
+                        <div class="col">
+                            <!-- Row for script name input -->
+                            <div class="row mb-3">
+                                <label for="scriptname" class="col-md-3 col-form-label">Script Name<span
+                                        style="color:red; margin-left: 0.75em;">*</span></label>
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="scriptname" autocomplete="off"
+                                        placeholder="Enter script name" formControlName="scriptname"
+                                        (input)="onScritName($event)">
                                 </div>
-                                <!-- Row for long duration and skip execution checkboxes -->
-                                <div class="row mb-3">
-                                    <label for="longtest" class="col-md-3 col-form-label">Long duration test</label>
-                                    <!-- Column for long duration test checkbox -->
-                                    <div class="col-md-9 check-thunder">
-                                        <div class="form-check form-check-inline form-check-reverse longtest">
-                                            <input class="form-check-input thunder" type="checkbox" id="longtest"
-                                                formControlName="longdurationtest" (change)="longDuration($event)">
+                            </div>
+
+                            <!-- Row for module selection -->
+                            <div class="row mb-3">
+                                <label for="module" class="col-md-3 col-form-label">
+                                    Module<span style="color:red; margin-left: 0.75em;">*</span>
+                                </label>
+                                <div class="col-md-9">
+                                    <select class="form-select" aria-label="Default select example" id="module"
+                                        formControlName="module" (change)="getSelectedModule($event)">
+                                        <option value="" default>Select</option>
+                                        <option *ngFor="let item of allModules" [value]="item.moduleName">
+                                            {{ item.moduleName }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Row for primitive test selection -->
+                            <div class="row mb-3">
+                                <label for="primitivetest" class="col-md-3 col-form-label">Primitive Test</label>
+                                <div class="col-md-9">
+                                    <select class="form-select" aria-label="Default select example" id="primitiveTest"
+                                        formControlName="primitiveTest" (change)="onChangePrimitive($event)">
+                                        <option *ngFor="let item of allPrimitiveTest" [value]="item.primitiveTestName">
+                                            {{ item.primitiveTestName }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Row for checkboxes - Fixed alignment -->
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <label for="longtest" class="col-md-6 col-form-label">Long duration test</label>
+                                        <div class="col-md-6 check-thunder">
+                                            <div class="form-check form-check-inline form-check-reverse longtest">
+                                                <input class="form-check-input thunder" type="checkbox" id="longtest"
+                                                    formControlName="longdurationtest" (change)="longDuration($event)">
+                                            </div>
                                         </div>
                                     </div>
-                                    <label for="skipexecution" class="col-md-3 col-form-label">Skip
-                                        Execution</label>
-                                    <!-- Column for skip execution checkbox -->
-                                    <div class="col-md-9 check-thunder">
-                                        <div class="form-check form-check-inline form-check-reverse longtest">
-                                            <input class="form-check-input thunder" type="checkbox" id="skipexecution"
-                                                formControlName="skipexecution" (change)="skipExecution($event)">
-                                        </div>
-                                    </div>
-
                                 </div>
-                            </div>
-                            <!-- Right column for device type, timeout, and synopsis -->
-                            <div class="col">
-                                <!-- Row for device type selection -->
-                                <div class="row mb-3">
-                                    <label for="devicetype" class="col-md-3 col-form-label">Device Type<span
-                                            style="color:red; margin-left: 0.75em;">*</span></label>
-                                    <!-- Column for device type multiselect -->
-                                    <div class="col-md-9">
-                                        <ng-multiselect-dropdown #multiSelect id="subBoxtypelist"
-                                            [placeholder]="'Select an option'" [settings]="deviceTypeSettings"
-                                            [data]="allDeviceType" formControlName="devicetype"
-                                            (onSelect)="onItemSelect($event)" (onDeSelect)="onDeSelect($event)"
-                                            (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAll($event)">
-                                        </ng-multiselect-dropdown>
-                                    </div>
-                                </div>
-
-                                <!-- Row for execution timeout input -->
-                                <div class="row mb-3">
-                                    <label for="executiontimeout" class="col-md-3 col-form-label">Execution
-                                        TimeOut(minutes)<span style="color:red; margin-left: 0.75em;">*</span></label>
-                                    <!-- Column for execution timeout input field -->
-                                    <div class="col-md-9">
-                                        <input inputmode="numeric" oninput="this.value = this.value.replace(/\D+/g, '')"
-                                            class="form-control" id="executiontimeout" autocomplete="off"
-                                            placeholder="Enter execution timeout (min)"
-                                            formControlName="executiontimeout">
-                                    </div>
-                                </div>
-
-                                <!-- Row for synopsis input -->
-                                <div class="row mb-3">
-                                    <label for="synopsis" class="col-md-3 col-form-label">Synopsis<span
-                                            style="color:red; margin-left: 0.75em;">*</span></label>
-                                    <!-- Column for synopsis textarea -->
-                                    <div class="col-md-9">
-                                        <textarea class="form-control" id="synopsis" rows="3" formControlName="synopsis"
-                                            placeholder="Enter Synopsis" (input)="onInput($event)"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Action buttons for first step -->
-                        <div class="text-end">
-                            <button mat-button matStepperPrevious class="reset-btn" (click)="goBack()">Back</button>
-                            <button mat-button matStepperNext class="reset-btn next-btn"
-                                [disabled]="!firstFormGroup.valid">Next</button>
-                        </div>
-                    </form>
-                </mat-step>
-                <mat-step [stepControl]="secondFormGroup" label="Test Case Details">
-                    <form [formGroup]="secondFormGroup">
-                        <!-- Row for test case details form fields -->
-                        <div class="row mt-2">
-                            <!-- Left column for test case details -->
-                            <div class="col-md-6">
-                                <!-- Row for test case ID input -->
-                                <div class="row mb-3">
-                                    <label for="testId" class="col-md-3 col-form-label">Test Case ID<span
-                                            style="color:red; margin-left: 0.75em;">*</span></label>
-                                    <!-- Column for test case ID input field -->
-                                    <div class="col-md-9">
-                                        <input type="text" class="form-control" id="testId" autocomplete="off"
-                                            placeholder="Enter test case ID" formControlName="testcaseID"
-                                            (input)="onTestcaseID($event)">
-                                    </div>
-                                </div>
-
-                                <!-- Row for test objective input -->
-                                <div class="row mb-3">
-                                    <label for="testobjective" class="col-md-3 col-form-label">Test Objective<span
-                                            style="color:red; margin-left: 0.75em;">*</span></label>
-                                    <!-- Column for test objective textarea -->
-                                    <div class="col-md-9">
-                                        <textarea class="form-control" id="testobjective" rows="3"
-                                            placeholder="Enter test objective" formControlName="testObjective"
-                                            (input)="onTestObjective($event)"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-
-
-                            <!-- Right column for priority and release version -->
-                            <div class="col-md-6">
-                                <!-- Row for priority selection -->
-                                <div class="row mb-3">
-                                    <label for="priority" class="col-md-3 col-form-label">Priority<span
-                                            style="color:red; margin-left: 0.75em;">*</span></label>
-                                    <!-- Column for priority select field -->
-                                    <div class="col-md-8">
-                                        <select class="form-select" aria-label="Default select example" id="priority"
-                                            formControlName="priority" (change)="changePriority($event)">
-                                            <option value="" default>Select</option>
-                                            <option value="High">High</option>
-                                            <option value="Medium">Medium</option>
-                                            <option value="Low">Low</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <!-- Row for release version input -->
-                                <div class="row mb-3">
-                                    <label for="releaseVersion" class="col-md-3 col-form-label"> Release
-                                        Version</label>
-                                    <!-- Column for release version textarea -->
-                                    <div class="col-md-8">
-                                        <textarea class="form-control" id="releaseVersion" rows="3"
-                                            placeholder="Enter Release version"
-                                            formControlName="releaseVersion"></textarea>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Horizontal rule for section separation -->
-                        <hr class="my-4" style="border-top: 2px solid #e0e0e0;">
-
-
-                        <!-- Row for preconditions form array -->
-                        <div class="row mb-3" style="justify-content: left;">
-                            <label class="col-md-2 col-form-label" style="flex: 0 0 12.5%; max-width: 12.5%;">Pre
-                                Conditions
-                                <span style="color:red; margin-left: 0.75em;">*</span>
-                            </label>
-                            <!-- Column for preconditions form array -->
-                            <div class="col-md-10">
-                                <div formArrayName="preconditions">
-                                    <!-- ngFor for precondition steps -->
-                                    <div *ngFor="let step of preconditions.controls; let i = index" [formGroupName]="i"
-                                        class="row mb-2 align-items-center" style="justify-content: left;">
-
-                                        <!-- Column for precondition textarea -->
-                                        <div class="col-md-11">
-                                            <textarea class="form-control" id="precondition{{i}}" rows="1"
-                                                style="min-height: 2rem;" formControlName="precondition"
-                                                placeholder="Pre Condition"></textarea>
-                                        </div>
-                                        <!-- Column for precondition add/remove buttons -->
-                                        <div class="col-md-1 d-flex align-items-center ">
-
-                                            <button type="button" *ngIf="i === preconditions.length - 1"
-                                                class="btn btn-outline-secondary btn-sm me-2"
-                                                style="border-color: grey; color: grey; background-color: white;"
-                                                matTooltip="Add Precondition" (click)="addPrecondition()">
-                                                <i class="bi bi-plus-circle" style="color: grey;"></i>
-                                            </button>
-
-                                            <button type="button" *ngIf="i !== 0"
-                                                class="btn btn-outline-secondary btn-sm me-2"
-                                                style="border-color: grey; color: grey; background-color: white;"
-                                                matTooltip="Remove Precondition" (click)="removePrecondition(i)">
-                                                <i class="bi bi-dash-circle" style="color: grey; "></i>
-                                            </button>
-
-
-
-
-
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <label for="skipexecution" class="col-md-6 col-form-label">Skip
+                                            Execution</label>
+                                        <div class="col-md-6 check-thunder">
+                                            <div class="form-check form-check-inline form-check-reverse longtest">
+                                                <input class="form-check-input thunder" type="checkbox"
+                                                    id="skipexecution" formControlName="skipexecution"
+                                                    (change)="skipExecution($event)">
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
+                        <!-- Right column for device type, timeout, and synopsis -->
+                        <div class="col">
+                            <!-- Row for device type selection -->
+                            <div class="row mb-3">
+                                <label for="devicetype" class="col-md-3 col-form-label">Device Type<span
+                                        style="color:red; margin-left: 0.75em;">*</span></label>
+                                <div class="col-md-9">
+                                    <ng-multiselect-dropdown #multiSelect id="subBoxtypelist"
+                                        [placeholder]="'Select an option'" [settings]="deviceTypeSettings"
+                                        [data]="allDeviceType" formControlName="devicetype"
+                                        (onSelect)="onItemSelect($event)" (onDeSelect)="onDeSelect($event)"
+                                        (onSelectAll)="onSelectAll($event)" (onDeSelectAll)="onDeSelectAll($event)">
+                                    </ng-multiselect-dropdown>
+                                </div>
+                            </div>
+
+                            <!-- Row for execution timeout input -->
+                            <div class="row mb-3">
+                                <label for="executiontimeout" class="col-md-3 col-form-label">Execution
+                                    TimeOut(minutes)<span style="color:red; margin-left: 0.75em;">*</span></label>
+                                <div class="col-md-9">
+                                    <input inputmode="numeric" oninput="this.value = this.value.replace(/\D+/g, '')"
+                                        class="form-control" id="executiontimeout" autocomplete="off"
+                                        placeholder="Enter execution timeout (min)" formControlName="executiontimeout">
+                                </div>
+                            </div>
+
+                            <!-- Row for synopsis input -->
+                            <div class="row mb-3">
+                                <label for="synopsis" class="col-md-3 col-form-label">Synopsis<span
+                                        style="color:red; margin-left: 0.75em;">*</span></label>
+                                <div class="col-md-9">
+                                    <textarea class="form-control" id="synopsis" rows="3" formControlName="synopsis"
+                                        placeholder="Enter Synopsis" (input)="onInput($event)"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Empty div to balance the height with left column -->
+                            <div class="row mb-3" style="visibility: hidden;">
+                                <div class="col-md-12">
+                                    <div style="height: 38px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Action buttons for first step -->
+                    <div class="text-end">
+                        <button mat-button matStepperPrevious class="reset-btn" (click)="goBack()">Back</button>
+                        <button mat-button matStepperNext class="reset-btn next-btn"
+                            [disabled]="!firstFormGroup.valid">Next</button>
+                    </div>
+                </form>
+            </mat-step>
+            <mat-step [stepControl]="secondFormGroup" label="Test Case Details">
+                <form [formGroup]="secondFormGroup">
+                    <!-- Row for test case details form fields -->
+                    <div class="row mt-2">
+                        <!-- Left column for test case details -->
+                        <div class="col-md-6">
+                            <!-- Row for test case ID input -->
+                            <div class="row mb-3">
+                                <label for="testId" class="col-md-3 col-form-label">Test Case ID<span
+                                        style="color:red; margin-left: 0.75em;">*</span></label>
+                                <!-- Column for test case ID input field -->
+                                <div class="col-md-9">
+                                    <input type="text" class="form-control" id="testId" autocomplete="off"
+                                        placeholder="Enter test case ID" formControlName="testcaseID"
+                                        (input)="onTestcaseID($event)">
+                                </div>
+                            </div>
+
+                            <!-- Row for test objective input -->
+                            <div class="row mb-3">
+                                <label for="testobjective" class="col-md-3 col-form-label">Test Objective<span
+                                        style="color:red; margin-left: 0.75em;">*</span></label>
+                                <!-- Column for test objective textarea -->
+                                <div class="col-md-9">
+                                    <textarea class="form-control" id="testobjective" rows="3"
+                                        placeholder="Enter test objective" formControlName="testObjective"
+                                        (input)="onTestObjective($event)"></textarea>
+                                </div>
+                            </div>
+                        </div>
 
 
-                        <!-- Horizontal rule for section separation -->
-                        <hr class="my-4" style="border-top: 2px solid #e0e0e0;">
+                        <!-- Right column for priority and release version -->
+                        <div class="col-md-6">
+                            <!-- Row for priority selection -->
+                            <div class="row mb-3">
+                                <label for="priority" class="col-md-3 col-form-label">Priority<span
+                                        style="color:red; margin-left: 0.75em;">*</span></label>
+                                <!-- Column for priority select field -->
+                                <div class="col-md-8">
+                                    <select class="form-select" aria-label="Default select example" id="priority"
+                                        formControlName="priority" (change)="changePriority($event)">
+                                        <option value="" default>Select</option>
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <!-- Row for release version input -->
+                            <div class="row mb-3">
+                                <label for="releaseVersion" class="col-md-3 col-form-label"> Release
+                                    Version</label>
+                                <!-- Column for release version textarea -->
+                                <div class="col-md-8">
+                                    <textarea class="form-control" id="releaseVersion" rows="3"
+                                        placeholder="Enter Release version" formControlName="releaseVersion"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Horizontal rule for section separation -->
+                    <hr class="my-4" style="border-top: 2px solid #e0e0e0;">
 
-                        <!-- Row for test steps form array -->
-                        <div class="row mb-3" style="justify-content: left;">
-                            <label class="col-md-2 col-form-label" style="flex: 0 0 12.5%; max-width: 12.5%;">
-                                Test Steps
-                                <span style="color:red; margin-left: 0.75em;">*</span>
-                            </label>
-                            <!-- Column for test steps form array -->
-                            <div class="col-md-10">
 
-                                <!-- Header row for test steps columns -->
-                                <div class="row mb-2 test-steps-header">
+                    <!-- Row for preconditions form array -->
+                    <div class="row mb-3" style="justify-content: left;">
+                        <label class="col-md-2 col-form-label" style="flex: 0 0 12.5%; max-width: 12.5%;">Pre
+                            Conditions
+                            <span style="color:red; margin-left: 0.75em;">*</span>
+                        </label>
+                        <!-- Column for preconditions form array -->
+                        <div class="col-md-10">
+                            <div formArrayName="preconditions">
+                                <!-- ngFor for precondition steps -->
+                                <div *ngFor="let step of preconditions.controls; let i = index" [formGroupName]="i"
+                                    class="row mb-2 align-items-center" style="justify-content: left;">
+
+                                    <!-- Column for precondition textarea -->
+                                    <div class="col-md-11">
+                                        <textarea class="form-control" id="precondition{{i}}" rows="1"
+                                            style="min-height: 2rem;" formControlName="precondition"
+                                            placeholder="Pre Condition"></textarea>
+                                    </div>
+                                    <!-- Column for precondition add/remove buttons -->
+                                    <div class="col-md-1 d-flex align-items-center ">
+
+                                        <button type="button" *ngIf="i === preconditions.length - 1"
+                                            class="btn btn-outline-secondary btn-sm me-2"
+                                            style="border-color: grey; color: grey; background-color: white;"
+                                            matTooltip="Add Precondition" (click)="addPrecondition()">
+                                            <i class="bi bi-plus-circle" style="color: grey;"></i>
+                                        </button>
+
+                                        <button type="button" *ngIf="i !== 0"
+                                            class="btn btn-outline-secondary btn-sm me-2"
+                                            style="border-color: grey; color: grey; background-color: white;"
+                                            matTooltip="Remove Precondition" (click)="removePrecondition(i)">
+                                            <i class="bi bi-dash-circle" style="color: grey; "></i>
+                                        </button>
+
+
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- Horizontal rule for section separation -->
+                    <hr class="my-4" style="border-top: 2px solid #e0e0e0;">
+
+                    <!-- Row for test steps form array -->
+                    <div class="row mb-3" style="justify-content: left;">
+                        <label class="col-md-2 col-form-label" style="flex: 0 0 12.5%; max-width: 12.5%;">
+                            Test Steps
+                            <span style="color:red; margin-left: 0.75em;">*</span>
+                        </label>
+                        <!-- Column for test steps form array -->
+                        <div class="col-md-10">
+
+                            <!-- Header row for test steps columns -->
+                            <div class="row mb-2 test-steps-header">
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Step Name</label>
+                                </div>
+                                <div class="col-md-5">
+                                    <label class="form-label fw-bold">Step Description</label>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label fw-bold">Expected Output</label>
+                                </div>
+                                <div class="col-md-1">
+                                    <label class="form-label fw-bold">Actions</label>
+                                </div>
+                            </div>
+
+                            <div formArrayName="steps">
+                                <!-- ngFor for test steps -->
+                                <div *ngFor="let step of steps.controls; let i = index" [formGroupName]="i"
+                                    class="row mb-2 align-items-center" style="justify-content: left;">
+
+                                    <!-- Column for step name textarea -->
                                     <div class="col-md-3">
-                                        <label class="form-label fw-bold">Step Name</label>
+                                        <textarea class="form-control" id="stepName{{i}}" rows="1"
+                                            style="min-height: 5rem;" formControlName="stepName"
+                                            placeholder="Step Name"></textarea>
                                     </div>
+                                    <!-- Column for step description textarea -->
                                     <div class="col-md-5">
-                                        <label class="form-label fw-bold">Step Description</label>
+                                        <textarea class="form-control" id="stepDescription{{i}}" rows="1"
+                                            style="min-height: 5rem;" formControlName="stepDescription"
+                                            placeholder="Step Description"></textarea>
                                     </div>
+                                    <!-- Column for expected result textarea -->
                                     <div class="col-md-3">
-                                        <label class="form-label fw-bold">Expected Output</label>
+                                        <textarea class="form-control" id="expectedResult{{i}}" rows="1"
+                                            style="min-height: 5rem;" formControlName="expectedResult"
+                                            placeholder="Expected Result"></textarea>
                                     </div>
-                                    <div class="col-md-1">
-                                        <label class="form-label fw-bold">Actions</label>
-                                    </div>
-                                </div>
+                                    <!-- Column for test step add/remove buttons -->
+                                    <div class="col-md-1 d-flex align-items-center ">
+                                        <button type="button" *ngIf="i === steps.length - 1"
+                                            class="btn btn-outline-secondary btn-sm me-2"
+                                            style="border-color: grey; color: grey; background-color: white;"
+                                            (click)="addStep()" matTooltip="Add Step">
+                                            <i class="bi bi-plus-circle" style="color: grey;"></i>
+                                        </button>
 
-                                <div formArrayName="steps">
-                                    <!-- ngFor for test steps -->
-                                    <div *ngFor="let step of steps.controls; let i = index" [formGroupName]="i"
-                                        class="row mb-2 align-items-center" style="justify-content: left;">
+                                        <button type="button" *ngIf="i !== 0"
+                                            class="btn btn-outline-secondary btn-sm me-2"
+                                            style="border-color: grey; color: grey; background-color: white;"
+                                            (click)="removeStep(i)" matTooltip="Remove Step">
+                                            <i class="bi bi-dash-circle" style="color: grey;"></i>
+                                        </button>
 
-                                        <!-- Column for step name textarea -->
-                                        <div class="col-md-3">
-                                            <textarea class="form-control" id="stepName{{i}}" rows="1"
-                                                style="min-height: 5rem;" formControlName="stepName"
-                                                placeholder="Step Name"></textarea>
-                                        </div>
-                                        <!-- Column for step description textarea -->
-                                        <div class="col-md-5">
-                                            <textarea class="form-control" id="stepDescription{{i}}" rows="1"
-                                                style="min-height: 5rem;" formControlName="stepDescription"
-                                                placeholder="Step Description"></textarea>
-                                        </div>
-                                        <!-- Column for expected result textarea -->
-                                        <div class="col-md-3">
-                                            <textarea class="form-control" id="expectedResult{{i}}" rows="1"
-                                                style="min-height: 5rem;" formControlName="expectedResult"
-                                                placeholder="Expected Result"></textarea>
-                                        </div>
-                                        <!-- Column for test step add/remove buttons -->
-                                        <div class="col-md-1 d-flex align-items-center ">
-                                            <button type="button" *ngIf="i === steps.length - 1"
-                                                class="btn btn-outline-secondary btn-sm me-2"
-                                                style="border-color: grey; color: grey; background-color: white;"
-                                                (click)="addStep()" matTooltip="Add Step">
-                                                <i class="bi bi-plus-circle" style="color: grey;"></i>
-                                            </button>
-
-                                            <button type="button" *ngIf="i !== 0"
-                                                class="btn btn-outline-secondary btn-sm me-2"
-                                                style="border-color: grey; color: grey; background-color: white;"
-                                                (click)="removeStep(i)" matTooltip="Remove Step">
-                                                <i class="bi bi-dash-circle" style="color: grey;"></i>
-                                            </button>
-
-                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
 
 
 
 
-                        <!-- Action buttons for second step -->
-                        <div class="text-end">
-                            <button mat-button matStepperPrevious class="reset-btn">Back</button>
-                            <button mat-button matStepperNext class="reset-btn next-btn" type="submit"
-                                [disabled]="!secondFormGroup.valid">Next</button>
+                    <!-- Action buttons for second step -->
+                    <div class="text-end">
+                        <button mat-button matStepperPrevious class="reset-btn">Back</button>
+                        <button mat-button matStepperNext class="reset-btn next-btn" type="submit"
+                            [disabled]="!secondFormGroup.valid">Next</button>
+                    </div>
+                </form>
+            </mat-step>
+            <mat-step [stepControl]="thirdFormGroup" label="Script">
+                <form [formGroup]="thirdFormGroup">
+                    <label for="scriptcontent" class="col-md-3 col-form-label ">Script Content</label>
+                    <!-- Row for script content editor -->
+                    <div class="row">
+                        <!-- Container for monaco editor -->
+                        <div class="editor-container">
+                            <ngx-monaco-editor [options]="editorOptions" [(ngModel)]="sampleFile"
+                                formControlName="pythonEditor">
+                            </ngx-monaco-editor>
                         </div>
-                    </form>
-                </mat-step>
-                <mat-step [stepControl]="thirdFormGroup" label="Script">
-                    <form [formGroup]="thirdFormGroup">
-                        <label for="scriptcontent" class="col-md-3 col-form-label ">Script Content</label>
-                        <!-- Row for script content editor -->
-                        <div class="row">
-                            <!-- Container for monaco editor -->
-                            <div class="editor-container">
-                                <ngx-monaco-editor [options]="editorOptions" [(ngModel)]="sampleFile"
-                                    formControlName="pythonEditor">
-                                </ngx-monaco-editor>
-                            </div>
-                        </div>
-                        <!-- Action buttons for third step -->
-                        <div class="mt-2 text-end">
-                            <button mat-button matStepperPrevious class="reset-btn">Back</button>
-                            <button mat-button type="submit" (click)="onSubmit()" class="reset-btn">Submit</button>
-                        </div>
-                    </form>
+                    </div>
+                    <!-- Action buttons for third step -->
+                    <div class="mt-2 text-end">
+                        <button mat-button matStepperPrevious class="reset-btn">Back</button>
+                        <button mat-button type="submit" (click)="onSubmit()" class="reset-btn">Submit</button>
+                    </div>
+                </form>
 
-                </mat-step>
-            </mat-horizontal-stepper>
-        </div>
+            </mat-step>
+        </mat-horizontal-stepper>
     </div>
+
 </div>

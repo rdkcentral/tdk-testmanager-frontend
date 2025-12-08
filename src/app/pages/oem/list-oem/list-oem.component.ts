@@ -119,6 +119,25 @@ export class ListOemComponent {
       .getOemByList(this.authservice.selectedConfigVal)
       .subscribe((res) => {
         this.rowData = res.data;
+        
+        // After data is loaded, restore pagination state if available
+        setTimeout(() => {
+          const savedState = this.service.getPaginationState();
+          if (savedState && this.gridApi) {
+           // Set the page size first
+            this.gridApi.setGridOption(
+              'paginationPageSize',
+              savedState.pageSize
+            );
+
+            // Then navigate to the saved page
+            setTimeout(() => {
+              this.gridApi.paginationGoToPage(savedState.currentPage);
+              // Clear the restoration flag after successful restoration
+              this.service.clearRestorationFlag();
+            }, 100);
+          }
+        }, 100);
         if (
           this.rowData == null ||
           this.rowData == undefined ||
@@ -134,6 +153,21 @@ export class ListOemComponent {
     } else {
       this.categoryName = 'Video';
     }
+
+     // Get saved state FIRST before loading data
+  const savedState = this.service.getPaginationState();
+ 
+  
+  if (savedState && savedState.pageSize) {
+    // Restore pagination settings BEFORE loading data
+    this.paginationPageSize = savedState.pageSize;
+    this.paginationPageSizeSelector = [
+      savedState.pageSize,
+      savedState.pageSize * 2,
+      savedState.pageSize * 5,
+    ];
+  
+  }
     this.adjustPaginationToScreenSize();
   }
 
@@ -150,6 +184,11 @@ export class ListOemComponent {
    */
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
+    const savedState = this.service.getPaginationState();
+  if (savedState && savedState.pageSize && !this.gridApi) {
+    // If we have saved state and grid is not ready yet, don't recalculate
+    return;
+  }
 
     if (height > 1200) {
       this.paginationPageSize = 25;
@@ -181,7 +220,13 @@ export class ListOemComponent {
    */
   onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
-    this.adjustPaginationToScreenSize();
+    // Only apply screen-based sizing if no saved state exists
+    const savedState = this.service.getPaginationState();
+    if (!savedState) {
+      this.adjustPaginationToScreenSize();
+    }
+    
+    
   }
 
   /**
@@ -246,6 +291,11 @@ export class ListOemComponent {
    * @param user The user/OEM to edit.
    */
   userEdit(user: any): void {
+     if (this.gridApi) {
+    const currentPage = this.gridApi.paginationGetCurrentPage();
+    const pageSize = this.gridApi.paginationGetPageSize();
+    this.service.savePaginationState(currentPage, pageSize);
+  }
     localStorage.setItem('user', JSON.stringify(user));
     this.service.currentUrl = user.userGroupId;
     this.router.navigate(['configure/oem-edit']);
@@ -256,6 +306,11 @@ export class ListOemComponent {
    * No parameters.
    */
   createOem(): void {
+     if (this.gridApi) {
+    const currentPage = this.gridApi.paginationGetCurrentPage();
+    const pageSize = this.gridApi.paginationGetPageSize();
+    this.service.savePaginationState(currentPage, pageSize);
+  }
     this.router.navigate(['/configure/create-oem']);
   }
 

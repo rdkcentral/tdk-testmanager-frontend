@@ -513,6 +513,7 @@ export class CreateScriptsComponent {
           panelClass: ['success-msg'],
           verticalPosition: 'top'
         })
+        this.scriptservice.resetPaginationState();
         setTimeout(() => {
           this.router.navigate(["/script"]);
         }, 1000);

@@ -114,6 +114,8 @@ export class ModulesCreateComponent {
             panelClass: ['success-msg'],
             verticalPosition: 'top'
             })
+            // Reset pagination state after successful creation
+            this.moduleservice.resetPaginationState('modules');
             setTimeout(() => {
               this.createModuleForm.reset();
               this.router.navigate(["configure/modules-list"]);

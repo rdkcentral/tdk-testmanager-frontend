@@ -107,6 +107,7 @@ export class ParameterEditComponent {
             panelClass: ['success-msg'],
             verticalPosition: 'top'
           })
+          this.moduleservice.resetPaginationState('parameters');
           setTimeout(() => {
             this.updateParameterForm.reset();
             this.router.navigate(["/configure/parameter-list"]);

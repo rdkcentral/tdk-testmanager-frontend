@@ -17,10 +17,21 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Component, ElementRef, Renderer2, ViewChild, HostListener} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Renderer2,
+  ViewChild,
+  HostListener,
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
   ColDef,
@@ -163,6 +174,18 @@ export class ListRdkCertificationComponent {
       }),
     });
     this.getAllCerificate();
+    // Get saved state FIRST before loading data
+    const savedState = this.service.getPaginationState();
+
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.paginationPageSize = savedState.pageSize;
+      this.paginationPageSizeSelector = [
+        savedState.pageSize,
+        savedState.pageSize * 2,
+        savedState.pageSize * 5,
+      ];
+    }
     this.adjustPaginationToScreenSize();
   }
 
@@ -180,6 +203,11 @@ export class ListRdkCertificationComponent {
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
 
+    const savedState = this.service.getPaginationState();
+    if (savedState && savedState.pageSize && !this.gridApi) {
+      // If we have saved state and grid is not ready yet, don't recalculate
+      return;
+    }
     if (height > 1200) {
       this.paginationPageSize = 25;
     } else if (height > 900) {
@@ -219,6 +247,23 @@ export class ListRdkCertificationComponent {
       ) {
         this.rowData = certificationNames.map((name: any) => ({ name }));
       }
+      setTimeout(() => {
+          const savedState = this.service.getPaginationState();
+          if (savedState && this.gridApi) {
+           // Set the page size first
+            this.gridApi.setGridOption(
+              'paginationPageSize',
+              savedState.pageSize
+            );
+
+            // Then navigate to the saved page
+            setTimeout(() => {
+              this.gridApi.paginationGoToPage(savedState.currentPage);
+              // Clear the restoration flag after successful restoration
+              this.service.clearRestorationFlag();
+            }, 100);
+          }
+        }, 100);
       if (
         this.rowData == null ||
         this.rowData == undefined ||
@@ -235,7 +280,11 @@ export class ListRdkCertificationComponent {
    */
   onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
-    this.adjustPaginationToScreenSize();
+   // Only apply screen-based sizing if no saved state exists
+    const savedState = this.service.getPaginationState();
+    if (!savedState) {
+      this.adjustPaginationToScreenSize();
+    }
   }
 
   /**
@@ -245,6 +294,11 @@ export class ListRdkCertificationComponent {
    * @returns void
    */
   userEdit(user: any): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     localStorage.setItem('user', JSON.stringify(user));
     this.router.navigate(['configure/edit-rdk-certifications']);
   }
@@ -255,6 +309,11 @@ export class ListRdkCertificationComponent {
    * It uses the Angular Router to navigate to the specified route.
    */
   createRdkCertification(): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['configure/create-rdk-certifications']);
   }
 

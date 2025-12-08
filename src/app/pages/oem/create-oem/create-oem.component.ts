@@ -96,6 +96,7 @@ export class CreateOemComponent implements OnInit{
             panelClass: ['success-msg'],
             verticalPosition: 'top'
           })
+           this.service.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(["configure/list-oem"]);
           }, 1000);

@@ -17,7 +17,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Component, OnInit ,HostListener} from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -27,7 +27,7 @@ import {
   GridReadyEvent,
   IMultiFilterParams,
   RowSelectedEvent,
-  SelectionChangedEvent
+  SelectionChangedEvent,
 } from 'ag-grid-community';
 import { Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
@@ -125,10 +125,37 @@ export class ListSocComponent {
     } else {
       this.categoryName = 'Video';
     }
+    // Get saved state FIRST before loading data
+    const savedState = this.service.getPaginationState();
+
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.paginationPageSize = savedState.pageSize;
+      this.paginationPageSizeSelector = [
+        savedState.pageSize,
+        savedState.pageSize * 2,
+        savedState.pageSize * 5,
+      ];
+    }
+
     this.authservice.currentRoute = this.router.url.split('?')[0];
     this.showLoader = true;
     this.service.getSoc(this.authservice.selectedConfigVal).subscribe((res) => {
       this.rowData = res.data;
+      setTimeout(() => {
+        const savedState = this.service.getPaginationState();
+        if (savedState && this.gridApi) {
+          // Set the page size first
+          this.gridApi.setGridOption('paginationPageSize', savedState.pageSize);
+
+          // Then navigate to the saved page
+          setTimeout(() => {
+            this.gridApi.paginationGoToPage(savedState.currentPage);
+            // Clear the restoration flag after successful restoration
+            this.service.clearRestorationFlag();
+          }, 100);
+        }
+      }, 100);
       if (
         this.rowData == null ||
         this.rowData == undefined ||
@@ -153,6 +180,12 @@ export class ListSocComponent {
    */
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
+    // Don't override if we're restoring from saved state
+    const savedState = this.service.getPaginationState();
+    if (savedState && savedState.pageSize && !this.gridApi) {
+      // If we have saved state and grid is not ready yet, don't recalculate
+      return;
+    }
 
     if (height > 1200) {
       this.paginationPageSize = 25;
@@ -184,6 +217,12 @@ export class ListSocComponent {
   onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
     this.adjustPaginationToScreenSize();
+
+    // Only apply screen-based sizing if no saved state exists
+    const savedState = this.service.getPaginationState();
+    if (!savedState) {
+      this.adjustPaginationToScreenSize();
+    }
   }
 
   /**
@@ -248,6 +287,11 @@ export class ListSocComponent {
    * @param user The user to edit.
    */
   userEdit(user: any): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     localStorage.setItem('user', JSON.stringify(user));
     this.router.navigate(['configure/edit-soc']);
   }
@@ -256,6 +300,11 @@ export class ListSocComponent {
    * Creates a SOC.
    */
   createSoc(): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['configure/create-soc']);
   }
 

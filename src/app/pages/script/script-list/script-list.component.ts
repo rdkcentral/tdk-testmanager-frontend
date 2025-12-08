@@ -18,8 +18,26 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { CommonModule } from '@angular/common';
-import { ApplicationRef, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, NgZone, Output, Renderer2, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ApplicationRef,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  NgZone,
+  Output,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MaterialModule } from '../../../material/material.module';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../auth/auth.service';
@@ -225,6 +243,17 @@ export class ScriptListComponent {
     let localViewName = localStorage.getItem('viewName') || 'scripts';
     localStorage.setItem('category', this.selectedCategory);
     this.setCategoryName(this.selectedCategory);
+
+    // Get saved pagination state FIRST before loading data
+    const savedState = this.scriptservice.getPaginationState();
+
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.allPageSize = savedState.pageSize;
+      this.scriptPageSize = savedState.pageSize;
+      this.testsuitePageSize = savedState.pageSize;
+    }
+
     this.viewChange(localViewName);
     this.onResize(null);
     this.uploadScriptForm = new FormGroup({
@@ -237,8 +266,17 @@ export class ScriptListComponent {
     });
   }
 
+  ngAfterViewInit(): void {}
+
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
+    // Check if we have saved state and paginator isn't ready yet
+    const savedState = this.scriptservice.getPaginationState();
+    if (savedState && savedState.pageSize && !this.paginator) {
+      // If we have saved state and paginator is not ready yet, don't recalculate
+      return;
+    }
+
     // Adjust page size based on screen height
     const height = window.innerHeight;
     // Handle 4K and other very high resolution displays
@@ -300,6 +338,9 @@ export class ScriptListComponent {
           this.filterScript();
           this.scriptSorting();
           this.showLoader = false;
+
+          // AFTER data is loaded, filtered, and sorted, restore pagination
+          this.restorePaginationIfNeeded();
         } else {
           this.cdRef.detectChanges();
           this.scriptDataArr = [];
@@ -311,8 +352,59 @@ export class ScriptListComponent {
         if (errmsg && errmsg.includes('No script found for category')) {
           this.noScriptFound = 'No Rows To Show';
         }
+        this.showLoader = false;
       },
     });
+  }
+
+  /**
+   * Restores pagination state after data is loaded and filtered
+   */
+  private restorePaginationIfNeeded(): void {
+    const savedState = this.scriptservice.getPaginationState();
+
+    if (savedState && this.paginator) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        if (savedState.pageSize) {
+          this.paginator.pageSize = savedState.pageSize;
+          this.allPageSize = savedState.pageSize;
+        }
+
+        if (savedState.currentPage > 0) {
+          const dataLength =
+            this.viewName === 'testsuites'
+              ? this.testSuiteFilteredData.length
+              : this.scriptFilteredData.length;
+
+          const maxPage = Math.ceil(dataLength / this.paginator.pageSize) - 1;
+
+          if (savedState.currentPage <= maxPage) {
+            this.paginator.pageIndex = savedState.currentPage;
+            this.currentPage = savedState.currentPage;
+
+            // Trigger pagination update to show correct data
+            if (this.viewName === 'testsuites') {
+              this.paginateSuiteData();
+            } else {
+              this.scriptDataPagination();
+            }
+          } else {
+            this.paginator.pageIndex = maxPage >= 0 ? maxPage : 0;
+            this.currentPage = this.paginator.pageIndex;
+
+            if (this.viewName === 'testsuites') {
+              this.paginateSuiteData();
+            } else {
+              this.scriptDataPagination();
+            }
+          }
+        }
+
+        // Clear the restoration flag
+        this.scriptservice.clearRestorationFlag();
+      }, 100);
+    }
   }
 
   /**
@@ -439,9 +531,13 @@ export class ScriptListComponent {
           this.applyFilterSuite();
           this.toggleSortSuite();
           this.showLoader = false;
+
+          // AFTER data is loaded, filtered, and sorted, restore pagination
+          this.restorePaginationIfNeeded();
         } else {
           this.cdRef.detectChanges();
           this.testSuiteDataArr = [];
+          this.showLoader = false;
         }
       },
       error: (err) => {
@@ -452,6 +548,7 @@ export class ScriptListComponent {
         if (errmsg.message === " Test suite - 'RDKV' doesnt exist") {
           this.noScriptFound = 'No Rows To Show';
         }
+        this.showLoader = false;
       },
     });
   }
@@ -851,6 +948,12 @@ export class ScriptListComponent {
    * This method is triggered to initiate the creation of new scripts.
    */
   createScripts(): void {
+    // Save pagination state before navigation
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['script/create-scripts']);
   }
   /**
@@ -858,6 +961,11 @@ export class ScriptListComponent {
    * This method is used to initiate the creation of a new script group.
    */
   createScriptGroup(): void {
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['script/create-script-group']);
   }
   /**
@@ -866,6 +974,11 @@ export class ScriptListComponent {
    * @param value - The category of the video to be used for script creation.
    */
   createScriptVideo(value: string) {
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     let onlyVideoCategory = value;
     this.authservice.videoCategoryOnly = onlyVideoCategory;
     this.router.navigate(['script/create-script-group']);
@@ -875,6 +988,11 @@ export class ScriptListComponent {
    * This method uses the Angular Router to navigate to the 'script/custom-testsuite' route.
    */
   customTestSuite() {
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['script/custom-testsuite'], {
       state: { category: this.selectedCategory },
     });
@@ -889,6 +1007,13 @@ export class ScriptListComponent {
    * @param editData - The data containing the ID of the script to be edited.
    */
   editScript(editData: any): void {
+    // Save pagination state before navigation
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
+
     this.scriptservice.scriptFindbyId(editData.id).subscribe({
       next: (res) => {
         this.scriptDetails = res.data;
@@ -1194,6 +1319,11 @@ export class ScriptListComponent {
    * @param testSuiteData - The data of the test suite to be edited.
    */
   editTestSuite(testSuiteData: any) {
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['script/edit-testsuite'], {
       state: { testSuiteData },
     });
@@ -1267,9 +1397,9 @@ export class ScriptListComponent {
   }
 
   /**
-   * Refreshes all test suites with module names that should contain all the 
+   * Refreshes all test suites with module names that should contain all the
    * scripts in a module by invoking the script service's refresh method.
-   * 
+   *
    * - Displays a loader while the refresh operation is in progress.
    * - On success, shows a success snackbar message and reloads the test suite data.
    * - On error, logs the error, displays an error snackbar message, and hides the loader.

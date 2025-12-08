@@ -22,12 +22,18 @@ import { AuthService } from '../auth/auth.service';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, map, Observable, of } from 'rxjs';
 import { saveAs } from 'file-saver';
-
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class RdkService {
+  private paginationState = {
+    currentPage: 0,
+    pageSize: 10,
+  };
+  private shouldRestorePagination = false; // Add this flag
 
   /**
    * Constructor for RdkService.
@@ -35,9 +41,70 @@ export class RdkService {
    * @param authService AuthService for authentication and API token
    * @param config Application configuration injected as APP_CONFIG
    */
-  constructor(private http: HttpClient, private authService: AuthService,
-    @Inject('APP_CONFIG') private config: any
-  ) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    @Inject('APP_CONFIG') private config: any,
+    private router: Router
+  ) {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        // If the new URL is not an OEM-related page, reset the pagination
+        if (
+          !event.url.includes('/configure/list-rdk-certifications') &&
+          !event.url.includes('/configure/create-rdk-certifications') &&
+          !event.url.includes('/configure/edit-rdk-certifications')
+        ) {
+          this.resetPaginationState();
+        }
+      });
+  }
+
+  /**
+   * Saves the current pagination state (page number and page size) and sets a flag
+   * to indicate that pagination should be restored later.
+   *
+   * @param currentPage - The current page number to save
+   * @param pageSize - The number of items per page to save
+   * @returns void
+   */
+  savePaginationState(currentPage: number, pageSize: number): void {
+    this.paginationState = { currentPage, pageSize };
+    this.shouldRestorePagination = true; // Set flag when saving
+  }
+
+  /**
+   * Retrieves the current pagination state if restoration is enabled.
+   *
+   * @returns An object containing the current page number and page size if pagination
+   *          should be restored, otherwise returns null.
+   */
+  getPaginationState(): { currentPage: number; pageSize: number } | null {
+    // Only return state if we should restore
+    if (this.shouldRestorePagination) {
+      return this.paginationState;
+    }
+    return null;
+  }
+
+  /**
+   * Resets the pagination state to its default values and clears the restoration flag.
+   * Sets the current page to 0, page size to 10, and disables pagination restoration.
+   */
+  resetPaginationState(): void {
+    this.paginationState = { currentPage: 0, pageSize: 10 };
+    this.shouldRestorePagination = false; // Clear flag
+  }
+
+  /**
+   * Clears the restoration flag by setting shouldRestorePagination to false.
+   * This method is typically called when pagination state should no longer be restored,
+   * such as after a successful restoration or when starting a fresh pagination session.
+   */
+  clearRestorationFlag(): void {
+    this.shouldRestorePagination = false;
+  }
 
   /**
    * Uploads a config file for RDK certification.
@@ -46,11 +113,15 @@ export class RdkService {
    */
   uploadConfigFile(file: File): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
     const formData: FormData = new FormData();
     formData.append('pythonFile', file, file.name);
-    return this.http.post(`${this.config.apiUrl}api/v1/rdkcertification/create`, formData, { headers });
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/rdkcertification/create`,
+      formData,
+      { headers }
+    );
   }
 
   /**
@@ -59,10 +130,12 @@ export class RdkService {
    */
   getallRdkCertifications(): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/rdkcertification/getall`, { headers});
-
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/rdkcertification/getall`,
+      { headers }
+    );
   }
 
   /**
@@ -72,26 +145,32 @@ export class RdkService {
    */
   downloadConfig(name: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/rdkcertification/download?fileName=${name}`, { headers, responseType: 'blob', observe: 'response' }).pipe(
-      map((response: HttpResponse<Blob>) => {
-        const contentDisposition = response.headers.get('content-disposition');
-        let filename = 'script.py';
-        if (contentDisposition) {
-          const matches = /filename="([^"]*)"/.exec(contentDisposition);
-          if (matches && matches[1]) {
-            filename = matches[1];
+    return this.http
+      .get(
+        `${this.config.apiUrl}api/v1/rdkcertification/download?fileName=${name}`,
+        { headers, responseType: 'blob', observe: 'response' }
+      )
+      .pipe(
+        map((response: HttpResponse<Blob>) => {
+          const contentDisposition = response.headers.get(
+            'content-disposition'
+          );
+          let filename = 'script.py';
+          if (contentDisposition) {
+            const matches = /filename="([^"]*)"/.exec(contentDisposition);
+            if (matches && matches[1]) {
+              filename = matches[1];
+            }
           }
-        }
-        const status = {
-          ...response.body,
-          statusCode: response.status
-        }
-        return { filename, content: response.body, status }
-      })
-    )
-
+          const status = {
+            ...response.body,
+            statusCode: response.status,
+          };
+          return { filename, content: response.body, status };
+        })
+      );
   }
 
   /**
@@ -101,9 +180,12 @@ export class RdkService {
    */
   scriptTemplate(name: string) {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/script/getScriptTemplate?primitiveTestName=${name}`, { headers, responseType: 'text' })
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/script/getScriptTemplate?primitiveTestName=${name}`,
+      { headers, responseType: 'text' }
+    );
   }
 
   /**
@@ -115,9 +197,13 @@ export class RdkService {
     const formData = new FormData();
     formData.append('pythonFile', scriptFile);
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.post(`${this.config.apiUrl}api/v1/rdkcertification/create`, formData, { headers});
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/rdkcertification/create`,
+      formData,
+      { headers }
+    );
   }
 
   /**
@@ -129,9 +215,13 @@ export class RdkService {
     const formData = new FormData();
     formData.append('pythonFile', scriptFile);
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.post(`${this.config.apiUrl}api/v1/rdkcertification/update`, formData, { headers });
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/rdkcertification/update`,
+      formData,
+      { headers }
+    );
   }
 
   /**
@@ -141,18 +231,22 @@ export class RdkService {
    */
   getFileContent(fileName: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/rdkcertification/getconfigfilecontent?fileName=${fileName}`, { headers, responseType: 'blob', observe: 'response' }).pipe(
-      map((response: HttpResponse<Blob>) => {
-        const status = {
-          ...response.body,
-          statusCode: response.status
-        }
-        return { content: response.body, status }
-      })
-    )
-
+    return this.http
+      .get(
+        `${this.config.apiUrl}api/v1/rdkcertification/getconfigfilecontent?fileName=${fileName}`,
+        { headers, responseType: 'blob', observe: 'response' }
+      )
+      .pipe(
+        map((response: HttpResponse<Blob>) => {
+          const status = {
+            ...response.body,
+            statusCode: response.status,
+          };
+          return { content: response.body, status };
+        })
+      );
   }
 
   /**
@@ -160,10 +254,13 @@ export class RdkService {
    * @param name The name of the file to delete.
    * @returns Observable with the deletion result.
    */
-  deleteRdkCertification(name: any): Observable<any>{
+  deleteRdkCertification(name: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.delete(`${this.config.apiUrl}api/v1/rdkcertification/delete?fileName=${name}`, { headers });
+    return this.http.delete(
+      `${this.config.apiUrl}api/v1/rdkcertification/delete?fileName=${name}`,
+      { headers }
+    );
   }
 }

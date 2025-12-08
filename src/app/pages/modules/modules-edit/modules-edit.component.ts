@@ -178,6 +178,8 @@ export class ModulesEditComponent {
           panelClass: ['success-msg'],
           verticalPosition: 'top'
           })
+          // Reset pagination state after successful creation
+          this.moduleservice.resetPaginationState('modules');
           setTimeout(() => {
             this.router.navigate(["configure/modules-list"]);
           }, 1000);

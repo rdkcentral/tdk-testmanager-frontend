@@ -107,6 +107,7 @@ export class ParameterCreateComponent {
           panelClass: ['success-msg'],
           verticalPosition: 'top'
           })
+          this.moduleservice.resetPaginationState('parameters');
           setTimeout(() => {
             this.router.navigate(["/configure/parameter-list"]);
           }, 2000);

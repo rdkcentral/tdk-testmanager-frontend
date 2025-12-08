@@ -18,8 +18,19 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Renderer2, ViewChild ,HostListener} from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Component,
+  ElementRef,
+  Renderer2,
+  ViewChild,
+  HostListener,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
   ColDef,
@@ -27,7 +38,7 @@ import {
   GridReadyEvent,
   IMultiFilterParams,
   RowSelectedEvent,
-  SelectionChangedEvent
+  SelectionChangedEvent,
 } from 'ag-grid-community';
 import { Router } from '@angular/router';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -165,11 +176,30 @@ export class ModulesListComponent {
     } else {
       this.categoryName = 'Video';
     }
+
+    // Get saved state FIRST before loading data
+    const savedState = this.moduleservice.getPaginationState('modules');
+   
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.paginationPageSize = savedState.pageSize;
+      this.paginationPageSizeSelector = [
+        savedState.pageSize,
+        savedState.pageSize * 2,
+        savedState.pageSize * 5,
+      ];
+    } else {
+      // Fresh navigation - use screen size
+      this.adjustPaginationToScreenSize();
+      
+    }
+
+    // Load data AFTER pagination settings are restored
     this.findallbyCategory();
+
     this.uploadXMLForm = this.fb.group({
       uploadXml: [null, Validators.required],
     });
-    this.adjustPaginationToScreenSize();
   }
 
   /**
@@ -185,6 +215,13 @@ export class ModulesListComponent {
    */
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
+
+    // Don't override if we're restoring from saved state
+    const savedState = this.moduleservice.getPaginationState('modules');
+    if (savedState && savedState.pageSize && !this.gridApi) {
+      // If we have saved state and grid is not ready yet, don't recalculate
+      return;
+    }
 
     if (height > 1200) {
       this.paginationPageSize = 25;
@@ -205,7 +242,6 @@ export class ModulesListComponent {
 
     // Apply changes to grid if it's already initialized
     if (this.gridApi) {
-      // Use the correct method to update pagination page size
       this.gridApi.setGridOption('paginationPageSize', this.paginationPageSize);
     }
   }
@@ -220,6 +256,25 @@ export class ModulesListComponent {
       .findallbyCategory(this.configureName)
       .subscribe((res) => {
         this.rowData = res.data;
+
+        // After data is loaded, restore pagination state if available
+        setTimeout(() => {
+          const savedState = this.moduleservice.getPaginationState("modules");
+          if (savedState && this.gridApi) {
+           // Set the page size first
+            this.gridApi.setGridOption(
+              'paginationPageSize',
+              savedState.pageSize
+            );
+
+            // Then navigate to the saved page
+            setTimeout(() => {
+              this.gridApi.paginationGoToPage(savedState.currentPage);
+              // Clear the restoration flag after successful restoration
+              this.moduleservice.clearRestorationFlag("modules");
+            }, 100);
+          }
+        }, 100);
         if (
           this.rowData == null ||
           this.rowData == undefined ||
@@ -235,9 +290,18 @@ export class ModulesListComponent {
    * Event handler for when the grid is ready.
    * @param params The grid ready event parameters.
    */
+  /**
+   * Event handler for when the grid is ready.
+   * @param params The grid ready event parameters.
+   */
   onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
-    this.adjustPaginationToScreenSize();
+
+    // Only apply screen-based sizing if no saved state exists
+    const savedState = this.moduleservice.getPaginationState("modules");
+    if (!savedState) {
+      this.adjustPaginationToScreenSize();
+    }
   }
 
   /**
@@ -272,7 +336,12 @@ export class ModulesListComponent {
    * No return value.
    */
   createModule(): void {
-    this.router.navigate(['/configure/modules-create']);
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.moduleservice.savePaginationState('modules', currentPage, pageSize);
+      this.router.navigate(['/configure/modules-create']);
+    }
   }
 
   /**
@@ -281,6 +350,11 @@ export class ModulesListComponent {
    * No return value.
    */
   userEdit(modules: any): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.moduleservice.savePaginationState('modules', currentPage, pageSize);
+    }
     localStorage.setItem('modules', JSON.stringify(modules));
     this.router.navigate(['configure/modules-edit']);
   }
@@ -425,6 +499,11 @@ export class ModulesListComponent {
    * No return value.
    */
   createFunction(data: any): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.moduleservice.savePaginationState('modules', currentPage, pageSize);
+    }
     localStorage.setItem('modules', JSON.stringify(data));
     this.router.navigate(['/configure/function-list']);
   }
@@ -456,6 +535,7 @@ export class ModulesListComponent {
    * No return value.
    */
   goBack(): void {
+    this.moduleservice.resetPaginationState('modules');
     this.authservice.selectedConfigVal = 'RDKV';
     this.authservice.showSelectedCategory = 'Video';
     this.router.navigate(['/configure']);

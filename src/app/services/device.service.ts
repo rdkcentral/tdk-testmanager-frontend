@@ -17,23 +17,28 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Injectable , Inject} from '@angular/core';
+import { Injectable, Inject } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
 import { BehaviorSubject, map, Observable, of } from 'rxjs';
 import { saveAs } from 'file-saver';
-
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class DeviceService {
-
   deviceCategory!: string;
   fileName!: string;
   private storageKey = 'streamData';
   typeOfboxtypeDropdown!: string;
   showSelectedCategory: string = 'Video';
+  private paginationState = {
+    currentPage: 0,
+    pageSize: 10,
+  };
+  private shouldRestorePagination = false; // Add this flag
 
   /**
    * Constructor for DeviceService.
@@ -41,10 +46,71 @@ export class DeviceService {
    * @param authService AuthService for authentication and API token
    * @param config Application configuration injected as APP_CONFIG
    */
-  constructor(private http: HttpClient, private authService: AuthService,
-    @Inject('APP_CONFIG') private config: any
-  ) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    @Inject('APP_CONFIG') private config: any,
+    private router: Router
+  ) {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        // If the new URL is not an OEM-related page, reset the pagination
+        if (
+          !event.url.includes('/devices') &&
+          !event.url.includes('/devices/device-edit') &&
+          !event.url.includes('/devices/device-create')
+        ) {
+          this.resetPaginationState();
+        }
+      });
+  }
 
+  /**
+   * Saves the current pagination state including page number and page size.
+   * Sets a flag to indicate that pagination should be restored on next load.
+   *
+   * @param currentPage - The current page number to save
+   * @param pageSize - The number of items per page to save
+   */
+  savePaginationState(currentPage: number, pageSize: number): void {
+    this.paginationState = { currentPage, pageSize };
+    this.shouldRestorePagination = true; // Set flag when saving
+  }
+
+  /**
+   * Retrieves the current pagination state if restoration is enabled.
+   *
+   * @returns An object containing the current page number and page size if pagination
+   *          should be restored, otherwise returns null.
+   */
+  getPaginationState(): { currentPage: number; pageSize: number } | null {
+    // Only return state if we should restore
+    if (this.shouldRestorePagination) {
+      return this.paginationState;
+    }
+    return null;
+  }
+
+  /**
+   * Resets the pagination state to its default values and clears the restoration flag.
+   *
+   * Sets the current page to 0, page size to 10, and disables pagination restoration.
+   * This method is typically called when starting a fresh pagination cycle or
+   * when clearing previous pagination settings.
+   */
+  resetPaginationState(): void {
+    this.paginationState = { currentPage: 0, pageSize: 10 };
+    this.shouldRestorePagination = false; // Clear flag
+  }
+
+  /**
+   * Clears the restoration flag by setting shouldRestorePagination to false.
+   * This prevents pagination state from being restored on subsequent operations.
+   */
+  clearRestorationFlag(): void {
+    this.shouldRestorePagination = false;
+  }
   /**
    * Checks if the given boxtype is a gateway.
    * @param boxtype The boxtype to check.
@@ -52,10 +118,12 @@ export class DeviceService {
    */
   isBoxtypeGateway(boxtype: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/boxtype/istheboxtypegateway?boxType=${boxtype}`, { headers, responseType: 'text' });
-
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/boxtype/istheboxtypegateway?boxType=${boxtype}`,
+      { headers, responseType: 'text' }
+    );
   }
 
   /**
@@ -65,10 +133,12 @@ export class DeviceService {
    */
   findallbyCategory(category: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/device/findAllByCategory?category=${category}`, { headers });
-
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/device/findAllByCategory?category=${category}`,
+      { headers }
+    );
   }
 
   /**
@@ -78,9 +148,11 @@ export class DeviceService {
    */
   createDevice(data: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.post(`${this.config.apiUrl}api/v1/device/create`, data, { headers })
+    return this.http.post(`${this.config.apiUrl}api/v1/device/create`, data, {
+      headers,
+    });
   }
 
   /**
@@ -90,9 +162,12 @@ export class DeviceService {
    */
   getlistofGatewayDevices(category: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/device/getlistofgatewaydevices?category=${category}`, { headers, responseType: 'text' });
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/device/getlistofgatewaydevices?category=${category}`,
+      { headers, responseType: 'text' }
+    );
   }
 
   /**
@@ -102,9 +177,11 @@ export class DeviceService {
    */
   updateDevice(data: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.put(`${this.config.apiUrl}api/v1/device/update`, data, { headers })
+    return this.http.put(`${this.config.apiUrl}api/v1/device/update`, data, {
+      headers,
+    });
   }
 
   /**
@@ -114,9 +191,12 @@ export class DeviceService {
    */
   deleteDevice(id: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.delete(`${this.config.apiUrl}api/v1/device/delete?id=${id}`, { headers });
+    return this.http.delete(
+      `${this.config.apiUrl}api/v1/device/delete?id=${id}`,
+      { headers }
+    );
   }
 
   /**
@@ -126,9 +206,12 @@ export class DeviceService {
    */
   downloadDevice(name: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/device/downloadXML?deviceName=${name}`, { headers, responseType: 'blob' })
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/device/downloadXML?deviceName=${name}`,
+      { headers, responseType: 'blob' }
+    );
   }
 
   /**
@@ -138,12 +221,16 @@ export class DeviceService {
    */
   uploadXMLFile(file: File): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
     const formData: FormData = new FormData();
     formData.append('file', file, file.name);
 
-    return this.http.post(`${this.config.apiUrl}api/v1/device/uploadxml`, formData, { headers});
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/device/uploadxml`,
+      formData,
+      { headers }
+    );
   }
 
   /**
@@ -153,27 +240,38 @@ export class DeviceService {
    * @param isThunder Whether thunder is enabled.
    * @returns Observable with the config file blob and status.
    */
-  downloadDeviceConfigFile(deviceTypeName: string, deviceType: string, isThunder: boolean): Observable<any> {
+  downloadDeviceConfigFile(
+    deviceTypeName: string,
+    deviceType: string,
+    isThunder: boolean
+  ): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/device/downloadDeviceConfigFile?deviceTypeName=${deviceTypeName}&deviceType=${deviceType}&isThunderEnabled=${isThunder}`, { headers, responseType: 'blob', observe: 'response' }).pipe(
-      map((response: HttpResponse<Blob>) => {
-        const contentDisposition = response.headers.get('content-disposition');
-        let filename = 'device.config';
-        if (contentDisposition) {
-          const matches = /filename="([^"]*)"/.exec(contentDisposition);
-          if (matches && matches[1]) {
-            filename = matches[1];
+    return this.http
+      .get(
+        `${this.config.apiUrl}api/v1/device/downloadDeviceConfigFile?deviceTypeName=${deviceTypeName}&deviceType=${deviceType}&isThunderEnabled=${isThunder}`,
+        { headers, responseType: 'blob', observe: 'response' }
+      )
+      .pipe(
+        map((response: HttpResponse<Blob>) => {
+          const contentDisposition = response.headers.get(
+            'content-disposition'
+          );
+          let filename = 'device.config';
+          if (contentDisposition) {
+            const matches = /filename="([^"]*)"/.exec(contentDisposition);
+            if (matches && matches[1]) {
+              filename = matches[1];
+            }
           }
-        }
-        const status = {
-          ...response.body,
-          statusCode: response.status
-        }
-        return { filename, content: response.body, status }
-      })
-    )
+          const status = {
+            ...response.body,
+            statusCode: response.status,
+          };
+          return { filename, content: response.body, status };
+        })
+      );
   }
 
   /**
@@ -182,11 +280,16 @@ export class DeviceService {
    */
   downloadDeviceByCategory(category: string): void {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    this.http.get(`${this.config.apiUrl}api/v1/device/downloadDevicesByCategory?category=${category}`, { headers, responseType: 'blob' }).subscribe(blob => {
-      saveAs(blob, `device_${category}.zip`);
-    });
+    this.http
+      .get(
+        `${this.config.apiUrl}api/v1/device/downloadDevicesByCategory?category=${category}`,
+        { headers, responseType: 'blob' }
+      )
+      .subscribe((blob) => {
+        saveAs(blob, `device_${category}.zip`);
+      });
   }
 
   /**
@@ -195,13 +298,17 @@ export class DeviceService {
    * @param isThunder Whether thunder is enabled.
    * @returns Observable with the upload result.
    */
-  uploadConfigFile(file: File,isThunder:boolean): Observable<any> {
+  uploadConfigFile(file: File, isThunder: boolean): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
     const formData: FormData = new FormData();
     formData.append('uploadFile', file, file.name);
-    return this.http.post(`${this.config.apiUrl}api/v1/device/uploadDeviceConfigFile?isThunderEnabled=${isThunder}`, formData, { headers });
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/device/uploadDeviceConfigFile?isThunderEnabled=${isThunder}`,
+      formData,
+      { headers }
+    );
   }
 
   /**
@@ -210,11 +317,13 @@ export class DeviceService {
    * @param isThunder Whether thunder is enabled.
    * @returns Observable with the deletion result as text.
    */
-  deleteDeviceConfigFile(deviceConfigFileName: any ,isThunder:boolean) {
+  deleteDeviceConfigFile(deviceConfigFileName: any, isThunder: boolean) {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.delete(`${this.config.apiUrl}api/v1/device/deleteDeviceConfigFile?deviceConfigFileName=${deviceConfigFileName}&isThunderEnabled=${isThunder}`, { headers, responseType: 'text' });
+    return this.http.delete(
+      `${this.config.apiUrl}api/v1/device/deleteDeviceConfigFile?deviceConfigFileName=${deviceConfigFileName}&isThunderEnabled=${isThunder}`,
+      { headers, responseType: 'text' }
+    );
   }
-
 }
