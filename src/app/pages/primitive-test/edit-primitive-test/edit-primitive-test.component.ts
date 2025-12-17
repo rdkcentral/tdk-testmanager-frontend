@@ -228,6 +228,7 @@ export class EditPrimitiveTestComponent {
             panelClass: ['success-msg'],
             verticalPosition: 'top'
           })
+          this.service.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(["configure/list-primitivetest"]);
           }, 1000);

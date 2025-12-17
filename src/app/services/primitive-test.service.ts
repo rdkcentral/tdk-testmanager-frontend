@@ -21,15 +21,21 @@ import { Inject, inject, Injectable } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs/operators';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class PrimitiveTestService {
-
   currentUrl: any;
   allPassedData: BehaviorSubject<any> = new BehaviorSubject<any>([]);
-  private dropdownValueSubject = new BehaviorSubject<any>(null); 
+  private dropdownValueSubject = new BehaviorSubject<any>(null);
+  private paginationState = {
+    currentPage: 0,
+    pageSize: 10,
+  };
+  private shouldRestorePagination = false; // Add this flag
 
   /**
    * Constructor for PrimitiveTestService.
@@ -37,14 +43,81 @@ export class PrimitiveTestService {
    * @param authService AuthService for authentication and API token
    * @param config Application configuration injected as APP_CONFIG
    */
-  constructor(private http: HttpClient, private authService: AuthService,
-    @Inject('APP_CONFIG') private config: any
-  ) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    @Inject('APP_CONFIG') private config: any,
+    private router: Router
+  ) {
+    this.router.events
+      .pipe(filter((event) => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        // If the new URL is not an OEM-related page, reset the pagination
+        if (
+          !event.url.includes('/configure/list-primitivetest') &&
+          !event.url.includes('/configure/create-primitivetest') &&
+          !event.url.includes('/configure/edit-primitivetest')
+        ) {
+          this.resetPaginationState();
+        }
+      });
+  }
 
+  /**
+   * Saves the current pagination state including page number and page size.
+   * Sets a flag to indicate that pagination should be restored when needed.
+   *
+   * @param currentPage - The current page number to save
+   * @param pageSize - The number of items per page to save
+   * @returns void
+   */
+  savePaginationState(currentPage: number, pageSize: number): void {
+    this.paginationState = { currentPage, pageSize };
+    this.shouldRestorePagination = true; // Set flag when saving
+  }
+
+  /**
+   * Retrieves the current pagination state if restoration is enabled.
+   *
+   * @returns The current pagination state containing page number and size if restoration
+   * is enabled, otherwise null
+   */
+  getPaginationState(): { currentPage: number; pageSize: number } | null {
+    // Only return state if we should restore
+    if (this.shouldRestorePagination) {
+      return this.paginationState;
+    }
+    return null;
+  }
+
+  /**
+   * Resets the pagination state to its initial values and clears the restoration flag.
+   *
+   * This method sets the current page to 0, page size to 10, and disables pagination restoration.
+   * Typically called when starting a new search or clearing filters.
+   */
+  resetPaginationState(): void {
+    this.paginationState = { currentPage: 0, pageSize: 10 };
+    this.shouldRestorePagination = false; // Clear flag
+  }
+
+  /**
+   * Clears the restoration flag by setting shouldRestorePagination to false.
+   * This method is typically called when pagination state should not be restored,
+   * such as after a successful restoration or when starting fresh pagination.
+   */
+  clearRestorationFlag(): void {
+    this.shouldRestorePagination = false;
+  }
   /**
    * Options for HTTP requests with authorization header.
    */
-  private options = { headers: new HttpHeaders().set('Authorization', this.authService.getApiToken()) };
+  private options = {
+    headers: new HttpHeaders().set(
+      'Authorization',
+      this.authService.getApiToken()
+    ),
+  };
 
   /**
    * Gets the list of modules by category.
@@ -53,10 +126,12 @@ export class PrimitiveTestService {
    */
   getlistofModules(category: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/module/findAllModuleNamesByCategory?category=${category}`, { headers});
-
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/module/findAllModuleNamesByCategory?category=${category}`,
+      { headers }
+    );
   }
 
   /**
@@ -66,10 +141,12 @@ export class PrimitiveTestService {
    */
   getlistofFunction(moduleName: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/function/getlistoffunctionbymodulename?moduleName=${moduleName}`, { headers});
-
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/function/getlistoffunctionbymodulename?moduleName=${moduleName}`,
+      { headers }
+    );
   }
 
   /**
@@ -79,9 +156,13 @@ export class PrimitiveTestService {
    */
   createPrimitiveTest(data: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.post(`${this.config.apiUrl}api/v1/primitivetest/create`, data, { headers })
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/primitivetest/create`,
+      data,
+      { headers }
+    );
   }
 
   /**
@@ -91,21 +172,27 @@ export class PrimitiveTestService {
    */
   getParameterNames(moduleName: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/primitivetest/getlistbymodulename?moduleName=${moduleName}`, { headers });
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/primitivetest/getlistbymodulename?moduleName=${moduleName}`,
+      { headers }
+    );
   }
 
-   /**
+  /**
    * Gets the list of parameters by function name.
    * @param functionName The name of the function.
    * @returns Observable with the list of parameters.
    */
   getParameterList(functionName: any, categoryName: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/parameter/findAllByFunction?functionName=${functionName}&category=${categoryName}`, { headers });
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/parameter/findAllByFunction?functionName=${functionName}&category=${categoryName}`,
+      { headers }
+    );
   }
 
   /**
@@ -115,9 +202,12 @@ export class PrimitiveTestService {
    */
   getParameterListUpdate(id: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.get(`${this.config.apiUrl}api/v1/primitivetest/findbyid?id=${id}`, { headers });
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/primitivetest/findbyid?id=${id}`,
+      { headers }
+    );
   }
 
   /**
@@ -127,9 +217,13 @@ export class PrimitiveTestService {
    */
   updatePrimitiveTest(data: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.put(`${this.config.apiUrl}api/v1/primitivetest/update`, data, { headers, observe: 'response'})
+    return this.http.put(
+      `${this.config.apiUrl}api/v1/primitivetest/update`,
+      data,
+      { headers, observe: 'response' }
+    );
   }
 
   /**
@@ -139,11 +233,14 @@ export class PrimitiveTestService {
    */
   deletePrimitiveTest(id: number): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.delete(`${this.config.apiUrl}api/v1/primitivetest/delete?id=${id}`, { headers});
+    return this.http.delete(
+      `${this.config.apiUrl}api/v1/primitivetest/delete?id=${id}`,
+      { headers }
+    );
   }
- 
+
   /**
    * Observable for dropdown value changes.
    */

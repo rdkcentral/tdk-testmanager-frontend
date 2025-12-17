@@ -109,6 +109,7 @@ export class CreateRdkCertificationComponent {
             panelClass: ['success-msg'],
             verticalPosition: 'top'
           });
+          this.service.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(["configure/list-rdk-certifications"]);
           }, 1000);

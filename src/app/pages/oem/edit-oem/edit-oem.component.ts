@@ -102,10 +102,12 @@ export class EditOemComponent implements OnInit{
             panelClass: ['success-msg'],
             verticalPosition: 'top'
           })
+           this.oemService.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(["configure/list-oem"]);
           }, 1000);
         },
+       
         error: (err) => {
           this._snakebar.open(err.message, '', {
             duration: 3000,

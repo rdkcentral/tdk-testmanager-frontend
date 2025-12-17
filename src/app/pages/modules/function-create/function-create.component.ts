@@ -96,6 +96,8 @@ export class FunctionCreateComponent {
           panelClass: ['success-msg'],
           verticalPosition: 'top'
           })
+          // Reset pagination state after successful creation
+          this.moduleservice.resetPaginationState('functions');
           setTimeout(() => {
             this.functionForm.reset();
             this.router.navigate(["/configure/function-list"]);

@@ -19,16 +19,33 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef,Renderer2, ViewChild, HostListener} from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  Renderer2,
+  ViewChild,
+  HostListener,
+} from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef,GridApi,GridReadyEvent,IMultiFilterParams } from 'ag-grid-community';
+import {
+  ColDef,
+  GridApi,
+  GridReadyEvent,
+  IMultiFilterParams,
+} from 'ag-grid-community';
 import '../../../../node_modules/ag-grid-community/styles/ag-grid.css';
 import '../../../../node_modules/ag-grid-community/styles/ag-theme-quartz.css';
 import { ButtonComponent } from '../../utility/component/ag-grid-buttons/button/button.component';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DeviceService } from '../../services/device.service';
-import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MaterialModule } from '../../material/material.module';
 import { MatDialog } from '@angular/material/dialog';
 import { AuthService } from '../../auth/auth.service';
@@ -166,6 +183,22 @@ export class DevicesComponent {
     } else {
       this.categoryName = 'Video';
     }
+
+    // Get saved state FIRST before any other pagination logic
+    const savedState = this.service.getPaginationState();
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.paginationPageSize = savedState.pageSize;
+      this.paginationPageSizeSelector = [
+        savedState.pageSize,
+        savedState.pageSize * 2,
+        savedState.pageSize * 5,
+      ];
+    } else {
+      // Only apply screen-based sizing if no saved state exists
+      this.adjustPaginationToScreenSize();
+    }
+
     if (deviceCategory === null) {
       this.configureName = this.selectedDeviceCategory;
       this.findallbyCategory();
@@ -174,14 +207,14 @@ export class DevicesComponent {
       this.selectedDeviceCategory = deviceCategory;
       this.findallbyCategory();
     }
+
     this.uploadXMLForm = this.fb.group({
       uploadXml: [null, Validators.required],
     });
+
     //Resets the view for scripts when moving to other tabs
     localStorage.setItem('viewName', 'scripts');
-    this.adjustPaginationToScreenSize();
   }
-
   /**
    * Listens for window resize events to adjust the grid
    */
@@ -195,7 +228,11 @@ export class DevicesComponent {
    */
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
-
+    const savedState = this.service.getPaginationState();
+    if (savedState && savedState.pageSize && !this.gridApi) {
+      // If we have saved state and grid is not ready yet, don't recalculate
+      return;
+    }
     if (height > 1200) {
       this.paginationPageSize = 25;
     } else if (height > 900) {
@@ -231,6 +268,26 @@ export class DevicesComponent {
         this.rowData = [];
         let data = res.data;
         this.rowData = data;
+
+        // After data is loaded, restore pagination state if available
+        setTimeout(() => {
+          const savedState = this.service.getPaginationState();
+          if (savedState && this.gridApi) {
+           // Set the page size first
+            this.gridApi.setGridOption(
+              'paginationPageSize',
+              savedState.pageSize
+            );
+
+            // Then navigate to the saved page
+            setTimeout(() => {
+              this.gridApi.paginationGoToPage(savedState.currentPage);
+              // Clear the restoration flag after successful restoration
+              this.service.clearRestorationFlag();
+            }, 100);
+          }
+        }, 100);
+
         if (
           this.rowData == null ||
           this.rowData == undefined ||
@@ -257,6 +314,8 @@ export class DevicesComponent {
    * @param event - The event object containing the checked value.
    */
   categoryChange(event: any) {
+    this.service.resetPaginationState();
+
     let val = event.target.value;
     if (val === 'RDKB') {
       this.categoryName = 'Broadband';
@@ -279,9 +338,13 @@ export class DevicesComponent {
    * Event handler for when the grid is ready.
    * @param params - The GridReadyEvent object containing the grid API.
    */
-  onGridReady(params: GridReadyEvent<any>) {
+  onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
-    this.adjustPaginationToScreenSize();
+    // Only apply screen-based sizing if no saved state exists
+    const savedState = this.service.getPaginationState();
+    if (!savedState) {
+      this.adjustPaginationToScreenSize();
+    }
   }
 
   /**
@@ -301,6 +364,11 @@ export class DevicesComponent {
    * @returns The edited user object.
    */
   userEdit(user: any): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     localStorage.setItem('user', JSON.stringify(user));
     this.router.navigate(['/devices/device-edit']);
   }
@@ -345,6 +413,11 @@ export class DevicesComponent {
    * No parameters.
    */
   createDevice() {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['/devices/device-create']);
   }
 
