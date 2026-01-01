@@ -170,6 +170,7 @@ export class ScriptListComponent {
         onEditClick: this.editScript.bind(this),
         onDeleteClick: this.deleteScript.bind(this),
         onDownloadZip: this.downloadScriptZip.bind(this),
+        onDownloadTar: this.downloadScriptTar.bind(this),
         onDownloadMd: this.downloadMdFile.bind(this),
         selectedRowCount: () => this.selectedRowCount,
       }),
@@ -811,13 +812,13 @@ export class ScriptListComponent {
     this.uploadFileName = event.target.files[0].name;
     const file: File = event.target.files[0];
     if (file) {
-      if (file.name.endsWith('.zip')) {
+      if (file.name.endsWith('.zip') || file.name.endsWith('.tar.gz')) {
         this.uploadScriptForm.patchValue({ file: file });
         this.uploadFileName = file;
         this.uploadFileError = null;
       } else {
         this.uploadScriptForm.patchValue({ file: null });
-        this.uploadFileError = 'Please upload a valid zip file.';
+        this.uploadFileError = 'Please upload a valid .zip or .tar.gz file.';
       }
     }
   }
@@ -843,6 +844,7 @@ export class ScriptListComponent {
     } else {
       if (this.uploadFileName) {
         this.uploadFileError = null;
+        this.showLoader = true;
         this.scriptservice.uploadZipFile(this.uploadFileName).subscribe({
           next: (res) => {
             this._snakebar.open(res.message, '', {
@@ -852,7 +854,7 @@ export class ScriptListComponent {
               verticalPosition: 'top',
             });
             this.close();
-            this.ngOnInit();
+            this.findallScriptsByCategory(this.selectedCategory);
           },
           error: (err) => {
             this._snakebar.open(err.message, '', {
@@ -1092,6 +1094,29 @@ export class ScriptListComponent {
       window.URL.revokeObjectURL(url);
     });
   }
+
+  /**
+   * Downloads a script as a TAR.GZ file.
+   *  
+   * This method calls the `downloadSriptTar` service method with the provided script name,
+   * subscribes to the resulting blob, and creates a downloadable TAR.GZ file.
+   * The file is named using the script name with a `.tar.gz` extension.
+   * * @param downloadData - An object containing the name of the script to be downloaded.
+   **/
+   
+  downloadScriptTar(downloadData: any) {
+  this.scriptservice.downloadSriptTar(downloadData.name).subscribe((blob) => {
+    const tarGzBlob = new Blob([blob], { type: 'application/gzip' });
+    const url = window.URL.createObjectURL(tarGzBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${downloadData.name}.tar.gz`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  });
+}
 
   /**
    * Downloads a Markdown file for the specified script.

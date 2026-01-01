@@ -535,4 +535,21 @@ export class ScriptsService {
       { headers }
     );
   }
+
+  /**
+   * Downloads a script tar.gz file from the API.
+   * 
+   * @param name - The name of the script to download
+   * @returns Observable that emits the downloaded tar.gz file as a blob
+   * 
+   */
+  downloadSriptTar(name: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/script/downloadScriptDataTarGz?scriptName=${name}`,
+      { headers, responseType: 'blob' }
+    );
+  }
 }
