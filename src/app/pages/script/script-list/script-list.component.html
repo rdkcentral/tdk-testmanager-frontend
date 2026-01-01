@@ -371,14 +371,14 @@ limitations under the License.
         <div class="modal-body">
           <div class="container mt-4">
             <div class="row mb-3">
-              <label for="uploadfile" class="col-md-4  col-form-label">Select the script Zip file<span
+              <label for="uploadfile" class="col-md-4  col-form-label">Select the script .zip/.tar.gz file<span
                   style="color:red; margin-left: 0.75em;">*</span></label>
               <div class="col-md-8">
                 <input class="form-control form-control-sm" id="uploadfile" type="file" formControlName="uploadZip"
-                  (change)="onFileChange($event)">
+                  accept=".zip,.tar.gz" (change)="onFileChange($event)">
                 <div *ngIf="uploadScriptForm && uploadScriptForm.controls['uploadZip']?.errors" class="text-danger">
-                  <small *ngIf= "uploadFormSubmitted && uploadScriptForm.controls['uploadZip']?.errors?.['required']">Please select the script
-                    zip file.</small>
+                  <small *ngIf="uploadFormSubmitted && uploadScriptForm.controls['uploadZip']?.errors?.['required']">Please select
+                    the script .zip or .tar.gz file.</small>
                 </div>
                 <small *ngIf="uploadFileError" class="errorupload">{{uploadFileError}}</small>
               </div>
