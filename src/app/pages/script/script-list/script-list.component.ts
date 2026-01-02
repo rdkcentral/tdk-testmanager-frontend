@@ -1540,7 +1540,17 @@ export class ScriptListComponent {
       }
     }
   }
-
+  
+  /**
+   * Handles the submission of a custom test suite file upload form.
+   * 
+   * Validates the form, uploads the selected file, and handles the response.
+   * Shows loading indicators during upload and displays success/error messages
+   * via snackbar notifications. Resets the form and closes the modal after
+   * completion regardless of success or failure.
+   * 
+   * @returns {void} No return value
+   */
   customTestSuiteFileSubmit() {
     this.customFormSubmitted = true;
     if (this.uploadCustomTestSuiteForm.invalid) {
