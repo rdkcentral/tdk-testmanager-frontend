@@ -96,6 +96,8 @@ export class ScriptListComponent {
   @ViewChild('filterButtonSuite') filterButtonSuite!: ElementRef;
   @ViewChild('scriptModal', { static: false }) scriptModal?: ElementRef;
   @ViewChild('testSuiteModal', { static: false }) testSuiteModal?: ElementRef;
+  @ViewChild('customTestSuiteModal', { static: false })
+  customTestSuiteModal?: ElementRef;
   categories = ['Video', 'Broadband', 'Camera'];
   selectedCategory!: string;
   categoryName!: string;
@@ -140,6 +142,11 @@ export class ScriptListComponent {
   userCategory!: string;
   showLoader = false;
   debounceTimer: any = null;
+  uploadCustomTestSuiteForm!: FormGroup;
+  customFormSubmitted = false;
+  customUploadFileName!: File | null;
+  customUploadFileError: string | null = null;
+  showCustomUploadLoader = false;
 
   public columnDefs: ColDef[] = [
     {
@@ -264,6 +271,9 @@ export class ScriptListComponent {
     });
     this.uploadtestSuiteForm = this.fb.group({
       uploadXML: [null, Validators.required],
+    });
+    this.uploadCustomTestSuiteForm = this.fb.group({
+      uploadCustomFile: [null, Validators.required],
     });
   }
 
@@ -1097,26 +1107,26 @@ export class ScriptListComponent {
 
   /**
    * Downloads a script as a TAR.GZ file.
-   *  
+   *
    * This method calls the `downloadSriptTar` service method with the provided script name,
    * subscribes to the resulting blob, and creates a downloadable TAR.GZ file.
    * The file is named using the script name with a `.tar.gz` extension.
    * * @param downloadData - An object containing the name of the script to be downloaded.
    **/
-   
+
   downloadScriptTar(downloadData: any) {
-  this.scriptservice.downloadSriptTar(downloadData.name).subscribe((blob) => {
-    const tarGzBlob = new Blob([blob], { type: 'application/gzip' });
-    const url = window.URL.createObjectURL(tarGzBlob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${downloadData.name}.tar.gz`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-  });
-}
+    this.scriptservice.downloadSriptTar(downloadData.name).subscribe((blob) => {
+      const tarGzBlob = new Blob([blob], { type: 'application/gzip' });
+      const url = window.URL.createObjectURL(tarGzBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${downloadData.name}.tar.gz`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
+  }
 
   /**
    * Downloads a Markdown file for the specified script.
@@ -1465,5 +1475,127 @@ export class ScriptListComponent {
         this.showLoader = false;
       },
     });
+  }
+
+  /**
+   * Downloads custom test suite in the specified format (ZIP or TAR.GZ).
+   * @param format - The format of the file to download ('zip' or 'tar.gz')
+   */
+  downloadCustomTestSuite(format: string) {
+    const fileExtension = format === 'zip' ? '.zip' : '.tar.gz';
+    const mimeType = format === 'zip' ? 'application/zip' : 'application/gzip';
+
+    this.scriptservice
+      .downloadCustomTestSuite(this.selectedCategory, format)
+      .subscribe({
+        next: (blob) => {
+          const downloadBlob = new Blob([blob], { type: mimeType });
+          const url = window.URL.createObjectURL(downloadBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `CustomTestSuite_${this.selectedCategory}${fileExtension}`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        },
+        error: async (err) => {
+          let errorMessage = `Failed to download custom test suite ${format.toUpperCase()} file`;
+
+          if (err instanceof Blob) {
+            const text = await err.text();
+            const errorObj = JSON.parse(text);
+            errorMessage = errorObj.message || errorMessage;
+          } else if (err.message) {
+            errorMessage = err.message;
+          } else if (err.message) {
+            errorMessage = err.message;
+          }
+
+          this._snakebar.open(errorMessage, '', {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        },
+      });
+  }
+
+  /**
+   * Handles file change event for custom test suite upload.
+   * @param event - The file input change event.
+   */
+  onCustomTestSuiteFileChange(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      if (file.name.endsWith('.zip') || file.name.endsWith('.tar.gz')) {
+        this.uploadCustomTestSuiteForm.patchValue({ file: file });
+        this.customUploadFileName = file;
+        this.customUploadFileError = null;
+      } else {
+        this.uploadCustomTestSuiteForm.patchValue({ file: null });
+        this.customUploadFileError =
+          'Please upload a valid .zip or .tar.gz file.';
+      }
+    }
+  }
+
+  customTestSuiteFileSubmit() {
+    this.customFormSubmitted = true;
+    if (this.uploadCustomTestSuiteForm.invalid) {
+      return;
+    } else {
+      if (this.customUploadFileName) {
+        this.customUploadFileError = null;
+        this.showCustomUploadLoader = true;
+        this.scriptservice
+          .uploadCustomTestSuite(this.customUploadFileName)
+          .subscribe({
+            next: (res) => {
+              this.showCustomUploadLoader = false;
+              this._snakebar.open(res.message, '', {
+                duration: 3000,
+                panelClass: ['success-msg'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top',
+              });
+              this.uploadCustomTestSuiteForm.reset();
+              this.closeCustomSuiteModal();
+              this.allTestSuilteListByCategory();
+              this.showLoader = false;
+            },
+            error: (err) => {
+              this.showCustomUploadLoader = false;
+              this._snakebar.open(
+                err.message || 'Failed to upload custom test suite',
+                '',
+                {
+                  duration: 2000,
+                  panelClass: ['err-msg'],
+                  horizontalPosition: 'end',
+                  verticalPosition: 'top',
+                }
+              );
+              this.showLoader = false;
+              this.uploadCustomTestSuiteForm.reset();
+              this.closeCustomSuiteModal();
+            },
+          });
+      }
+    }
+  }
+  /**
+   * Closes the custom test suite upload modal.
+   */
+  closeCustomSuiteModal() {
+    this.uploadCustomTestSuiteForm.reset();
+    this.customFormSubmitted = false;
+    this.customUploadFileError = null;
+    this.showCustomUploadLoader = false;
+    (this.customTestSuiteModal?.nativeElement as HTMLElement).style.display =
+      'none';
+    this.renderer.removeStyle(document.body, 'overflow');
+    this.renderer.removeStyle(document.body, 'padding-right');
   }
 }

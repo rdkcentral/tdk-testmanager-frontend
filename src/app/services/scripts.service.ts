@@ -552,4 +552,45 @@ export class ScriptsService {
       { headers, responseType: 'blob' }
     );
   }
+  
+  /**
+   * Downloads a custom test suite in the specified format.
+   * @param category - The category of the custom test suite to download
+   * @param format - The format in which to download the test suite (e.g., 'xml', 'xlsx')
+   * @returns Observable that emits the downloaded test suite file as a blob
+   * */
+  downloadCustomTestSuite(category: string, format: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/testsuite/downloadCustomTestSuiteXml`,
+      {
+        params: {
+          category: category,
+          format: format,
+        },
+        headers: headers,
+        responseType: 'blob' as 'json',
+      }
+    );
+  }
+
+  /**
+   * Uploads a custom test suite archive file to the server.
+   * * @param file - The archive file to upload
+   * * @returns Observable that emits the server's response
+   * */
+  uploadCustomTestSuite(file: File): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    const formData = new FormData();
+    formData.append('archiveFile', file);
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/testsuite/uploadAllTestSuitesArchive`,
+      formData,
+      { headers }
+    );
+  }
 }

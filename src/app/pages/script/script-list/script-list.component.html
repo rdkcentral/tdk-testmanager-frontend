@@ -72,6 +72,33 @@ limitations under the License.
         <button type="button" class="download-btn" matTooltip="Update Test Suite"><i class="bi bi-arrow-repeat download-icon"
             (click)="refreshAllTestSuites()"></i>
         </button>
+        <!-- Custom Test Suite Upload Button -->
+        <button
+          type="button"
+          class="download-btn"
+          data-bs-toggle="modal"
+          data-bs-target="#customTestSuiteModal"
+          matTooltip="Upload Custom Test Suite (ZIP or TAR.GZ)"
+        >
+          <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
+        </button>
+        <!-- Custom Test Suite Download Button with Dropdown -->
+        <button
+          type="button"
+          class="download-btn dropdown-toggle"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+          matTooltip="Download Custom Test Suite"
+        >
+          <i class="bi bi-cloud-arrow-down-fill download-icon"></i>
+        </button>
+        <ul class="dropdown-menu">
+          <li><a class="dropdown-item" (click)="downloadCustomTestSuite('zip')">Download as ZIP</a></li>
+          <li>
+            <hr class="dropdown-divider" />
+          </li>
+          <li><a class="dropdown-item"(click)="downloadCustomTestSuite('tar.gz')">Download as TAR.GZ</a></li>
+        </ul>
         <button *ngIf="testsuitTable && categoryName !== 'Video'" class="download-btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
           matTooltip="Create {{selectedCategory}} Suite">
           <i class="bi bi-plus-circle-fill download-icon"></i>
@@ -428,3 +455,93 @@ limitations under the License.
     </div>
   </div>
 </div>
+
+<!--Custom TestSuite Upload Modal Start-->
+<div
+  class="modal fade"
+  #customTestSuiteModal
+  id="customTestSuiteModal"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="customTestSuiteModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog custom-modal">
+    <div class="modal-content">
+      <form
+        [formGroup]="uploadCustomTestSuiteForm"
+        (ngSubmit)="customTestSuiteFileSubmit()"
+      >
+        <div class="modal-header modaltitle">
+          <h1 class="modal-title custom-title" id="customTestSuiteModalLabel">
+            Upload Custom Test Suite File
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          
+          <div class="container mt-4">
+            <div class="row mb-3">
+              <label for="uploadCustomFile" class="col-md-4 col-form-label"
+                >Select ZIP or TAR.GZ file<span
+                  style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <div class="col-md-8">
+                <input
+                  class="form-control form-control-sm"
+                  id="uploadCustomFile"
+                  type="file"
+                  formControlName="uploadCustomFile"
+                  accept=".zip,.tar.gz"
+                  (change)="onCustomTestSuiteFileChange($event)"
+                />
+                <div
+                  *ngIf="
+                    customFormSubmitted &&
+                    uploadCustomTestSuiteForm.controls['uploadCustomFile']
+                      ?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="uploadCustomTestSuiteForm.controls['uploadCustomFile']?.errors?.['required']"
+                    >Please select a ZIP or TAR.GZ file.</small
+                  >
+                </div>
+                <small *ngIf="customUploadFileError" class="errorupload">{{
+                  customUploadFileError
+                }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="showCustomUploadLoader">
+            <app-loader></app-loader>
+          </div>
+        <div class="modal-footer">
+          
+          <button
+            type="button"
+            class="download-btn modal-btns"
+            (click)="closeCustomSuiteModal()"
+          >
+            Close
+          </button>
+          <button type="submit" class="download-btn modal-btns">Upload</button>
+          <!-- Loader row -->
+          
+        </div>
+        
+      </form>
+    </div>
+  </div>
+</div>
+<!--Custom TestSuite Upload Modal End-->
