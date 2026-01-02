@@ -46,6 +46,7 @@ import { MatPaginator } from '@angular/material/paginator';
 import { ScheduleButtonComponent } from '../../utility/component/execution-button/schedule-button.component';
 import { TdkInstallComponent } from '../../utility/component/tdk-install/tdk-install.component';
 import { LoaderComponent } from '../../utility/component/loader/loader.component';
+import { DeleteConfirmationDialogComponent } from '../../utility/component/delete-confirmation-dialog/delete-confirmation-dialog.component';
 
 @Component({
   selector: 'app-execution',
@@ -1436,7 +1437,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    */
   deleteSelectedRows(): void {
     const selectedRows = this.gridApi.getSelectedRows();
-    let executionArr = [];
+    let executionArr: any[] = [];
     for (let i = 0; i < selectedRows.length; i++) {
       const element = selectedRows[i].executionId;
       executionArr.push(element);
@@ -1449,28 +1450,36 @@ export class ExecutionComponent implements OnInit, OnDestroy {
         verticalPosition: 'top',
       });
     } else {
-      if (confirm('Are you sure to delete ?')) {
-        this.executionservice.deleteExecutions(executionArr).subscribe({
-          next: (res) => {
-            this._snakebar.open(res.message, '', {
-              duration: 3000,
-              panelClass: ['success-msg'],
-              horizontalPosition: 'end',
-              verticalPosition: 'top',
-            });
-            this.getAllExecutions();
-          },
-          error: (err) => {
-            let errmsg = err.message;
-            this._snakebar.open(errmsg, '', {
-              duration: 2000,
-              panelClass: ['err-msg'],
-              horizontalPosition: 'end',
-              verticalPosition: 'top',
-            });
-          },
-        });
-      }
+      const deleteDialog = this.deleteDateDialog.open(DeleteConfirmationDialogComponent, {
+        width: '500px',
+        panelClass: 'custom-modalbox',
+        data: {},
+      });
+
+      deleteDialog.afterClosed().subscribe((result) => {
+        if (result && result.confirmed) {
+          this.executionservice.deleteExecutions(executionArr, result.isDataDeletionNeeded).subscribe({
+            next: (res) => {
+              this._snakebar.open(res.message, '', {
+                duration: 3000,
+                panelClass: ['success-msg'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top',
+              });
+              this.getAllExecutions();
+            },
+            error: (err) => {
+              let errmsg = err.message;
+              this._snakebar.open(errmsg, '', {
+                duration: 2000,
+                panelClass: ['err-msg'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top',
+              });
+            },
+          });
+        }
+      });
     }
   }
 
@@ -1480,7 +1489,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
   deleteDateModal(): void {
     const deletedateModal = this.deleteDateDialog.open(DateDialogComponent, {
       width: '50%',
-      height: '70vh',
+      height: '50vh',
       maxWidth: '100vw',
       panelClass: 'custom-modalbox',
       data: {},
