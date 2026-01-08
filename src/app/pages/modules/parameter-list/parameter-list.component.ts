@@ -18,7 +18,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { CommonModule } from '@angular/common';
-import { Component ,HostListener} from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
@@ -27,7 +27,7 @@ import {
   GridReadyEvent,
   IMultiFilterParams,
   RowSelectedEvent,
-  SelectionChangedEvent
+  SelectionChangedEvent,
 } from 'ag-grid-community';
 import { Router } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
@@ -39,7 +39,6 @@ import { ModulesService } from '../../../services/modules.service';
 import { MatDialog } from '@angular/material/dialog';
 import { MaterialModule } from '../../../material/material.module';
 import { LoaderComponent } from '../../../utility/component/loader/loader.component';
-
 
 @Component({
   selector: 'app-parameter-list',
@@ -146,8 +145,23 @@ export class ParameterListComponent {
     } else {
       this.categoryName = 'Video';
     }
+    // Get saved state FIRST before loading data
+    const savedState = this.moduleservice.getPaginationState('parameters');
+
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.paginationPageSize = savedState.pageSize;
+      this.paginationPageSizeSelector = [
+        savedState.pageSize,
+        savedState.pageSize * 2,
+        savedState.pageSize * 5,
+      ];
+    } else {
+      // Fresh navigation - use screen size
+      this.adjustPaginationToScreenSize();
+    }
+
     this.parameterByFunction();
-    this.adjustPaginationToScreenSize();
   }
 
   /**
@@ -164,6 +178,11 @@ export class ParameterListComponent {
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
 
+    const savedState = this.moduleservice.getPaginationState('parameters');
+    if (savedState && savedState.pageSize && !this.gridApi) {
+      // If we have saved state and grid is not ready yet, don't recalculate
+      return;
+    }
     if (height > 1200) {
       this.paginationPageSize = 25;
     } else if (height > 900) {
@@ -194,27 +213,47 @@ export class ParameterListComponent {
    */
   parameterByFunction(): void {
     this.showLoader = true;
-    this.moduleservice.findAllByFunction(this.dynamicFunctionName,this.configureName).subscribe({
-      next: (data) => {
-        this.rowData = data.data;
-        if (
-          this.rowData == null ||
-          this.rowData == undefined ||
-          this.rowData.length > 0
-        ) {
+    this.moduleservice
+      .findAllByFunction(this.dynamicFunctionName, this.configureName)
+      .subscribe({
+        next: (data) => {
+          this.rowData = data.data;
+          // After data is loaded, restore pagination state if available
+        setTimeout(() => {
+          const savedState = this.moduleservice.getPaginationState("parameters");
+          if (savedState && this.gridApi) {
+           // Set the page size first
+            this.gridApi.setGridOption(
+              'paginationPageSize',
+              savedState.pageSize
+            );
+
+            // Then navigate to the saved page
+            setTimeout(() => {
+              this.gridApi.paginationGoToPage(savedState.currentPage);
+              // Clear the restoration flag after successful restoration
+              this.moduleservice.clearRestorationFlag("parameters");
+            }, 100);
+          }
+        }, 100);
+          if (
+            this.rowData == null ||
+            this.rowData == undefined ||
+            this.rowData.length > 0
+          ) {
+            this.showLoader = false;
+          }
+        },
+        error: (err) => {
           this.showLoader = false;
-        }
-      },
-      error: (err) => {
-        this.showLoader = false;
-        this._snakebar.open(err, '', {
-          duration: 2000,
-          panelClass: ['err-msg'],
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-        });
-      },
-    });
+          this._snakebar.open(err, '', {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        },
+      });
   }
 
   /**
@@ -223,7 +262,11 @@ export class ParameterListComponent {
    */
   onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
-    this.adjustPaginationToScreenSize();
+    // Only apply screen-based sizing if no saved state exists
+    const savedState = this.moduleservice.getPaginationState("parameters");
+    if (!savedState) {
+      this.adjustPaginationToScreenSize();
+    }
   }
 
   /**
@@ -257,7 +300,16 @@ export class ParameterListComponent {
    * No parameters.
    */
   createParameterName(): void {
-    this.router.navigate(['/configure/parmeter-create']);
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.moduleservice.savePaginationState(
+        'parameters',
+        currentPage,
+        pageSize
+      );
+    }
+    this.router.navigate(['/configure/parameter-create']);
   }
 
   /**
@@ -265,6 +317,15 @@ export class ParameterListComponent {
    * @param parameter The parameter to edit.
    */
   userEdit(parameter: any): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.moduleservice.savePaginationState(
+        'parameters',
+        currentPage,
+        pageSize
+      );
+    }
     localStorage.setItem('parameters', JSON.stringify(parameter));
     this.router.navigate(['configure/parameter-edit']);
   }
@@ -288,6 +349,7 @@ export class ParameterListComponent {
               horizontalPosition: 'end',
               verticalPosition: 'top',
             });
+            this.moduleservice.resetPaginationState('parameters');
           },
           error: (err) => {
             this._snakebar.open(err.message, '', {
@@ -307,6 +369,7 @@ export class ParameterListComponent {
    * No parameters.
    */
   goBack(): void {
+    this.moduleservice.resetPaginationState('parameters');
     this.router.navigate(['/configure/function-list']);
   }
 }

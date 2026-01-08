@@ -18,8 +18,26 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { CommonModule } from '@angular/common';
-import { ApplicationRef, ChangeDetectorRef, Component, ElementRef, EventEmitter, HostListener, NgZone, Output, Renderer2, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  ApplicationRef,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  EventEmitter,
+  HostListener,
+  NgZone,
+  Output,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MaterialModule } from '../../../material/material.module';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../auth/auth.service';
@@ -78,6 +96,8 @@ export class ScriptListComponent {
   @ViewChild('filterButtonSuite') filterButtonSuite!: ElementRef;
   @ViewChild('scriptModal', { static: false }) scriptModal?: ElementRef;
   @ViewChild('testSuiteModal', { static: false }) testSuiteModal?: ElementRef;
+  @ViewChild('customTestSuiteModal', { static: false })
+  customTestSuiteModal?: ElementRef;
   categories = ['Video', 'Broadband', 'Camera'];
   selectedCategory!: string;
   categoryName!: string;
@@ -122,6 +142,11 @@ export class ScriptListComponent {
   userCategory!: string;
   showLoader = false;
   debounceTimer: any = null;
+  uploadCustomTestSuiteForm!: FormGroup;
+  customFormSubmitted = false;
+  customUploadFileName!: File | null;
+  customUploadFileError: string | null = null;
+  showCustomUploadLoader = false;
 
   public columnDefs: ColDef[] = [
     {
@@ -152,6 +177,7 @@ export class ScriptListComponent {
         onEditClick: this.editScript.bind(this),
         onDeleteClick: this.deleteScript.bind(this),
         onDownloadZip: this.downloadScriptZip.bind(this),
+        onDownloadTar: this.downloadScriptTar.bind(this),
         onDownloadMd: this.downloadMdFile.bind(this),
         selectedRowCount: () => this.selectedRowCount,
       }),
@@ -225,6 +251,17 @@ export class ScriptListComponent {
     let localViewName = localStorage.getItem('viewName') || 'scripts';
     localStorage.setItem('category', this.selectedCategory);
     this.setCategoryName(this.selectedCategory);
+
+    // Get saved pagination state FIRST before loading data
+    const savedState = this.scriptservice.getPaginationState();
+
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.allPageSize = savedState.pageSize;
+      this.scriptPageSize = savedState.pageSize;
+      this.testsuitePageSize = savedState.pageSize;
+    }
+
     this.viewChange(localViewName);
     this.onResize(null);
     this.uploadScriptForm = new FormGroup({
@@ -235,10 +272,22 @@ export class ScriptListComponent {
     this.uploadtestSuiteForm = this.fb.group({
       uploadXML: [null, Validators.required],
     });
+    this.uploadCustomTestSuiteForm = this.fb.group({
+      uploadCustomFile: [null, Validators.required],
+    });
   }
+
+  ngAfterViewInit(): void {}
 
   @HostListener('window:resize', ['$event'])
   onResize(event: any) {
+    // Check if we have saved state and paginator isn't ready yet
+    const savedState = this.scriptservice.getPaginationState();
+    if (savedState && savedState.pageSize && !this.paginator) {
+      // If we have saved state and paginator is not ready yet, don't recalculate
+      return;
+    }
+
     // Adjust page size based on screen height
     const height = window.innerHeight;
     // Handle 4K and other very high resolution displays
@@ -300,6 +349,9 @@ export class ScriptListComponent {
           this.filterScript();
           this.scriptSorting();
           this.showLoader = false;
+
+          // AFTER data is loaded, filtered, and sorted, restore pagination
+          this.restorePaginationIfNeeded();
         } else {
           this.cdRef.detectChanges();
           this.scriptDataArr = [];
@@ -311,8 +363,59 @@ export class ScriptListComponent {
         if (errmsg && errmsg.includes('No script found for category')) {
           this.noScriptFound = 'No Rows To Show';
         }
+        this.showLoader = false;
       },
     });
+  }
+
+  /**
+   * Restores pagination state after data is loaded and filtered
+   */
+  private restorePaginationIfNeeded(): void {
+    const savedState = this.scriptservice.getPaginationState();
+
+    if (savedState && this.paginator) {
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        if (savedState.pageSize) {
+          this.paginator.pageSize = savedState.pageSize;
+          this.allPageSize = savedState.pageSize;
+        }
+
+        if (savedState.currentPage > 0) {
+          const dataLength =
+            this.viewName === 'testsuites'
+              ? this.testSuiteFilteredData.length
+              : this.scriptFilteredData.length;
+
+          const maxPage = Math.ceil(dataLength / this.paginator.pageSize) - 1;
+
+          if (savedState.currentPage <= maxPage) {
+            this.paginator.pageIndex = savedState.currentPage;
+            this.currentPage = savedState.currentPage;
+
+            // Trigger pagination update to show correct data
+            if (this.viewName === 'testsuites') {
+              this.paginateSuiteData();
+            } else {
+              this.scriptDataPagination();
+            }
+          } else {
+            this.paginator.pageIndex = maxPage >= 0 ? maxPage : 0;
+            this.currentPage = this.paginator.pageIndex;
+
+            if (this.viewName === 'testsuites') {
+              this.paginateSuiteData();
+            } else {
+              this.scriptDataPagination();
+            }
+          }
+        }
+
+        // Clear the restoration flag
+        this.scriptservice.clearRestorationFlag();
+      }, 100);
+    }
   }
 
   /**
@@ -439,9 +542,13 @@ export class ScriptListComponent {
           this.applyFilterSuite();
           this.toggleSortSuite();
           this.showLoader = false;
+
+          // AFTER data is loaded, filtered, and sorted, restore pagination
+          this.restorePaginationIfNeeded();
         } else {
           this.cdRef.detectChanges();
           this.testSuiteDataArr = [];
+          this.showLoader = false;
         }
       },
       error: (err) => {
@@ -452,6 +559,7 @@ export class ScriptListComponent {
         if (errmsg.message === " Test suite - 'RDKV' doesnt exist") {
           this.noScriptFound = 'No Rows To Show';
         }
+        this.showLoader = false;
       },
     });
   }
@@ -714,13 +822,13 @@ export class ScriptListComponent {
     this.uploadFileName = event.target.files[0].name;
     const file: File = event.target.files[0];
     if (file) {
-      if (file.name.endsWith('.zip')) {
+      if (file.name.endsWith('.zip') || file.name.endsWith('.tar.gz')) {
         this.uploadScriptForm.patchValue({ file: file });
         this.uploadFileName = file;
         this.uploadFileError = null;
       } else {
         this.uploadScriptForm.patchValue({ file: null });
-        this.uploadFileError = 'Please upload a valid zip file.';
+        this.uploadFileError = 'Please upload a valid .zip or .tar.gz file.';
       }
     }
   }
@@ -746,6 +854,7 @@ export class ScriptListComponent {
     } else {
       if (this.uploadFileName) {
         this.uploadFileError = null;
+        this.showLoader = true;
         this.scriptservice.uploadZipFile(this.uploadFileName).subscribe({
           next: (res) => {
             this._snakebar.open(res.message, '', {
@@ -755,7 +864,7 @@ export class ScriptListComponent {
               verticalPosition: 'top',
             });
             this.close();
-            this.ngOnInit();
+            this.findallScriptsByCategory(this.selectedCategory);
           },
           error: (err) => {
             this._snakebar.open(err.message, '', {
@@ -851,6 +960,12 @@ export class ScriptListComponent {
    * This method is triggered to initiate the creation of new scripts.
    */
   createScripts(): void {
+    // Save pagination state before navigation
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['script/create-scripts']);
   }
   /**
@@ -858,6 +973,11 @@ export class ScriptListComponent {
    * This method is used to initiate the creation of a new script group.
    */
   createScriptGroup(): void {
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['script/create-script-group']);
   }
   /**
@@ -866,6 +986,11 @@ export class ScriptListComponent {
    * @param value - The category of the video to be used for script creation.
    */
   createScriptVideo(value: string) {
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     let onlyVideoCategory = value;
     this.authservice.videoCategoryOnly = onlyVideoCategory;
     this.router.navigate(['script/create-script-group']);
@@ -875,6 +1000,11 @@ export class ScriptListComponent {
    * This method uses the Angular Router to navigate to the 'script/custom-testsuite' route.
    */
   customTestSuite() {
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['script/custom-testsuite'], {
       state: { category: this.selectedCategory },
     });
@@ -889,6 +1019,13 @@ export class ScriptListComponent {
    * @param editData - The data containing the ID of the script to be edited.
    */
   editScript(editData: any): void {
+    // Save pagination state before navigation
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
+
     this.scriptservice.scriptFindbyId(editData.id).subscribe({
       next: (res) => {
         this.scriptDetails = res.data;
@@ -961,6 +1098,29 @@ export class ScriptListComponent {
       const a = document.createElement('a');
       a.href = url;
       a.download = `${downloadData.name}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    });
+  }
+
+  /**
+   * Downloads a script as a TAR.GZ file.
+   *
+   * This method calls the `downloadSriptTar` service method with the provided script name,
+   * subscribes to the resulting blob, and creates a downloadable TAR.GZ file.
+   * The file is named using the script name with a `.tar.gz` extension.
+   * * @param downloadData - An object containing the name of the script to be downloaded.
+   **/
+
+  downloadScriptTar(downloadData: any) {
+    this.scriptservice.downloadSriptTar(downloadData.name).subscribe((blob) => {
+      const tarGzBlob = new Blob([blob], { type: 'application/gzip' });
+      const url = window.URL.createObjectURL(tarGzBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${downloadData.name}.tar.gz`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -1194,6 +1354,11 @@ export class ScriptListComponent {
    * @param testSuiteData - The data of the test suite to be edited.
    */
   editTestSuite(testSuiteData: any) {
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['script/edit-testsuite'], {
       state: { testSuiteData },
     });
@@ -1267,9 +1432,9 @@ export class ScriptListComponent {
   }
 
   /**
-   * Refreshes all test suites with module names that should contain all the 
+   * Refreshes all test suites with module names that should contain all the
    * scripts in a module by invoking the script service's refresh method.
-   * 
+   *
    * - Displays a loader while the refresh operation is in progress.
    * - On success, shows a success snackbar message and reloads the test suite data.
    * - On error, logs the error, displays an error snackbar message, and hides the loader.
@@ -1310,5 +1475,137 @@ export class ScriptListComponent {
         this.showLoader = false;
       },
     });
+  }
+
+  /**
+   * Downloads custom test suite in the specified format (ZIP or TAR.GZ).
+   * @param format - The format of the file to download ('zip' or 'tar.gz')
+   */
+  downloadCustomTestSuite(format: string) {
+    const fileExtension = format === 'zip' ? '.zip' : '.tar.gz';
+    const mimeType = format === 'zip' ? 'application/zip' : 'application/gzip';
+
+    this.scriptservice
+      .downloadCustomTestSuite(this.selectedCategory, format)
+      .subscribe({
+        next: (blob) => {
+          const downloadBlob = new Blob([blob], { type: mimeType });
+          const url = window.URL.createObjectURL(downloadBlob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `CustomTestSuite_${this.selectedCategory}${fileExtension}`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+        },
+        error: async (err) => {
+          let errorMessage = `Failed to download custom test suite ${format.toUpperCase()} file`;
+
+          if (err instanceof Blob) {
+            const text = await err.text();
+            const errorObj = JSON.parse(text);
+            errorMessage = errorObj.message || errorMessage;
+          } else if (err.message) {
+            errorMessage = err.message;
+          } else if (err.message) {
+            errorMessage = err.message;
+          }
+
+          this._snakebar.open(errorMessage, '', {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        },
+      });
+  }
+
+  /**
+   * Handles file change event for custom test suite upload.
+   * @param event - The file input change event.
+   */
+  onCustomTestSuiteFileChange(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      if (file.name.endsWith('.zip') || file.name.endsWith('.tar.gz')) {
+        this.uploadCustomTestSuiteForm.patchValue({ file: file });
+        this.customUploadFileName = file;
+        this.customUploadFileError = null;
+      } else {
+        this.uploadCustomTestSuiteForm.patchValue({ file: null });
+        this.customUploadFileError =
+          'Please upload a valid .zip or .tar.gz file.';
+      }
+    }
+  }
+  
+  /**
+   * Handles the submission of a custom test suite file upload form.
+   * 
+   * Validates the form, uploads the selected file, and handles the response.
+   * Shows loading indicators during upload and displays success/error messages
+   * via snackbar notifications. Resets the form and closes the modal after
+   * completion regardless of success or failure.
+   * 
+   * @returns {void} No return value
+   */
+  customTestSuiteFileSubmit() {
+    this.customFormSubmitted = true;
+    if (this.uploadCustomTestSuiteForm.invalid) {
+      return;
+    } else {
+      if (this.customUploadFileName) {
+        this.customUploadFileError = null;
+        this.showCustomUploadLoader = true;
+        this.scriptservice
+          .uploadCustomTestSuite(this.customUploadFileName)
+          .subscribe({
+            next: (res) => {
+              this.showCustomUploadLoader = false;
+              this._snakebar.open(res.message, '', {
+                duration: 3000,
+                panelClass: ['success-msg'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top',
+              });
+              this.uploadCustomTestSuiteForm.reset();
+              this.closeCustomSuiteModal();
+              this.allTestSuilteListByCategory();
+              this.showLoader = false;
+            },
+            error: (err) => {
+              this.showCustomUploadLoader = false;
+              this._snakebar.open(
+                err.message || 'Failed to upload custom test suite',
+                '',
+                {
+                  duration: 2000,
+                  panelClass: ['err-msg'],
+                  horizontalPosition: 'end',
+                  verticalPosition: 'top',
+                }
+              );
+              this.showLoader = false;
+              this.uploadCustomTestSuiteForm.reset();
+              this.closeCustomSuiteModal();
+            },
+          });
+      }
+    }
+  }
+  /**
+   * Closes the custom test suite upload modal.
+   */
+  closeCustomSuiteModal() {
+    this.uploadCustomTestSuiteForm.reset();
+    this.customFormSubmitted = false;
+    this.customUploadFileError = null;
+    this.showCustomUploadLoader = false;
+    (this.customTestSuiteModal?.nativeElement as HTMLElement).style.display =
+      'none';
+    this.renderer.removeStyle(document.body, 'overflow');
+    this.renderer.removeStyle(document.body, 'padding-right');
   }
 }

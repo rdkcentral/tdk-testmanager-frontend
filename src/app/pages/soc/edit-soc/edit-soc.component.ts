@@ -94,6 +94,8 @@ export class EditSocComponent {
             panelClass: ['success-msg'],
             verticalPosition: 'top'
           })
+          // Reset pagination state after successful creation
+          this.service.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(["configure/list-soc"]);
           }, 1000);

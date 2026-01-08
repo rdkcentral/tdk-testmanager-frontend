@@ -19,7 +19,14 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { MaterialModule } from '../../../material/material.module';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -37,13 +44,22 @@ import { LoaderComponent } from '../../../utility/component/loader/loader.compon
 @Component({
   selector: 'app-device-create',
   standalone: true,
-  imports: [CommonModule,ReactiveFormsModule,MaterialModule,MonacoEditorModule, FormsModule ,LoaderComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    MonacoEditorModule,
+    FormsModule,
+    LoaderComponent,
+  ],
   templateUrl: './device-create.component.html',
   styleUrl: './device-create.component.css',
 })
 export class DeviceCreateComponent implements OnInit {
-  @ViewChild('dialogTemplate', { static: true }) dialogTemplate!: TemplateRef<any>;
-  @ViewChild('newDeviceTemplate', { static: true }) newDeviceTemplate!: TemplateRef<any>;
+  @ViewChild('dialogTemplate', { static: true })
+  dialogTemplate!: TemplateRef<any>;
+  @ViewChild('newDeviceTemplate', { static: true })
+  newDeviceTemplate!: TemplateRef<any>;
   deviceForm!: FormGroup;
   rdkBForm!: FormGroup;
   deviceFormSubmitted = false;
@@ -56,7 +72,7 @@ export class DeviceCreateComponent implements OnInit {
   alloem: any;
   allsoc: any;
   rowData: any = [];
-  public themeClass: string = "ag-theme-quartz";
+  public themeClass: string = 'ag-theme-quartz';
   public paginationPageSize = 5;
   public paginationPageSizeSelector: number[] | boolean = [5, 10, 50, 100];
   gridApi!: any;
@@ -69,11 +85,11 @@ export class DeviceCreateComponent implements OnInit {
   isThunderchecked = false;
   public frameworkComponents: any;
   visibleGateway = true;
-  streamingMapObj!: { streamId: any; ocapId: any; }[];
+  streamingMapObj!: { streamId: any; ocapId: any }[];
   loggedinUser: any;
-  agentport = "8087";
-  agentStatusPort = "8088";
-  agentMonitoPort = "8090";
+  agentport = '8087';
+  agentStatusPort = '8088';
+  agentMonitoPort = '8090';
   selectedDeviceCategory!: string;
   categoryName: string = 'Video';
   checkOcapId: any;
@@ -112,18 +128,17 @@ export class DeviceCreateComponent implements OnInit {
   newDeviceDialogRef!: MatDialogRef<any>;
   isThunderPresent = false;
   preferedCategory!: string;
-  editorOptions = { 
-    theme: 'vs-light', 
+  editorOptions = {
+    theme: 'vs-light',
     language: 'ini',
     automaticLayout: true, // Add this line
     scrollBeyondLastLine: false, // Add this line
-    minimap: { enabled: false } // Add this line for better experience in dialogs
+    minimap: { enabled: false }, // Add this line for better experience in dialogs
   };
   editorInitialized = false;
   monacoEditorInstance: any;
   dialogOpened = false;
   isEditorLoading: boolean = true;
-
 
   /**
    * Constructor for DeviceCreateComponent.
@@ -137,15 +152,23 @@ export class DeviceCreateComponent implements OnInit {
    * @param deviceTypeService - DevicetypeService for device type operations
    * @param dialog - MatDialog for dialogs
    */
-  constructor( private router: Router,private fb:FormBuilder,private authservice: AuthService,
-    private _snakebar :MatSnackBar, private oemService:OemService, 
-    private service:DeviceService, private socService:SocService, private deviceTypeService:DevicetypeService,
+  constructor(
+    private router: Router,
+    private fb: FormBuilder,
+    private authservice: AuthService,
+    private _snakebar: MatSnackBar,
+    private oemService: OemService,
+    private service: DeviceService,
+    private socService: SocService,
+    private deviceTypeService: DevicetypeService,
     public dialog: MatDialog
   ) {
-    this.loggedinUser = JSON.parse(localStorage.getItem('loggedinUser')|| '{}');
+    this.loggedinUser = JSON.parse(
+      localStorage.getItem('loggedinUser') || '{}'
+    );
     this.frameworkComponents = {
-      inputCellRenderer: InputComponent
-    }
+      inputCellRenderer: InputComponent,
+    };
     this.preferedCategory = localStorage.getItem('preferedCategory') || '';
   }
 
@@ -171,7 +194,9 @@ export class DeviceCreateComponent implements OnInit {
     let ipregexp: RegExp =
       /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/; // IPv4 regex
     let ipv6regexp: RegExp = /^[0-9a-fA-F:]+$/; // IPv6 regex
-    let combinedIpRegexp: RegExp = new RegExp(`(${ipregexp.source})|(${ipv6regexp.source})`); // Combined regex for IPv4 and IPv6
+    let combinedIpRegexp: RegExp = new RegExp(
+      `(${ipregexp.source})|(${ipv6regexp.source})`
+    ); // Combined regex for IPv4 and IPv6
     let macregexp: RegExp = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/; // MAC address regex
 
     this.deviceForm = new FormGroup({
@@ -180,7 +205,7 @@ export class DeviceCreateComponent implements OnInit {
           Validators.required,
           Validators.pattern(/^[a-zA-Z0-9_]+$/),
         ],
-      }),           
+      }),
       deviceip: new FormControl<string | null>('', {
         validators: [Validators.required, Validators.pattern(combinedIpRegexp)],
       }),
@@ -232,13 +257,13 @@ export class DeviceCreateComponent implements OnInit {
     this.uploadConfigForm = this.fb.group({
       editorFilename: ['', { disabled: true }],
       editorContent: ['', [Validators.required]],
-      uploadFileModal: ['',Validators.required],
+      uploadFileModal: ['', Validators.required],
     });
     this.filesList = [];
     this.uploadDeviceConfigForm = this.fb.group({
       editorFilename: ['', { disabled: true }],
       editorContent: ['', [Validators.required]],
-      uploadConfigFileModal: ['',Validators.required],
+      uploadConfigFileModal: ['', Validators.required],
     });
     this.deviceForm.get('thunderport')?.valueChanges.subscribe((value) => {
       const cleanedValue = value.replace(/^\s+|[^0-9]/g, '');
@@ -307,21 +332,26 @@ export class DeviceCreateComponent implements OnInit {
         this.rdkBForm.get('gatewayName')?.setValue(value.toUpperCase());
       }
     });
-      this.uploadDeviceConfigForm.get('editorContent')?.setValidators([Validators.required]);
-      this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.clearValidators();
-      this.uploadDeviceConfigForm.get('editorContent')?.updateValueAndValidity();
-      this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.updateValueAndValidity();
+    this.uploadDeviceConfigForm
+      .get('editorContent')
+      ?.setValidators([Validators.required]);
+    this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.clearValidators();
+    this.uploadDeviceConfigForm.get('editorContent')?.updateValueAndValidity();
+    this.uploadDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.updateValueAndValidity();
 
-      this.uploadConfigForm.get('editorContent')?.setValidators([Validators.required]);
-      this.uploadConfigForm.get('uploadFileModal')?.clearValidators();
-      this.uploadConfigForm.get('editorContent')?.updateValueAndValidity();
-      this.uploadConfigForm.get('uploadFileModal')?.updateValueAndValidity();
-
+    this.uploadConfigForm
+      .get('editorContent')
+      ?.setValidators([Validators.required]);
+    this.uploadConfigForm.get('uploadFileModal')?.clearValidators();
+    this.uploadConfigForm.get('editorContent')?.updateValueAndValidity();
+    this.uploadConfigForm.get('uploadFileModal')?.updateValueAndValidity();
   }
 
   /**
    * Initializes the Monaco editor instance when the editor is ready.
-   * 
+   *
    * This method sets the `monacoEditorInstance` property, marks the editor as initialized,
    * and schedules a layout and focus operation after a short delay to ensure the editor
    * is properly rendered and ready for user interaction.
@@ -331,7 +361,7 @@ export class DeviceCreateComponent implements OnInit {
   onEditorInit(editor: any) {
     this.monacoEditorInstance = editor;
     this.editorInitialized = true;
-    
+
     // Give editor time to render and then layout
     setTimeout(() => {
       if (this.monacoEditorInstance) {
@@ -350,7 +380,7 @@ export class DeviceCreateComponent implements OnInit {
    * @remarks
    * This method checks if the Monaco editor instance exists before attempting to resize.
    */
-   resizeEditor() {
+  resizeEditor() {
     if (this.monacoEditorInstance) {
       // Force resize after dialog animation completes
       setTimeout(() => {
@@ -358,7 +388,6 @@ export class DeviceCreateComponent implements OnInit {
       }, 300);
     }
   }
-
 
   /**
    * Event handler for when the grid is ready.
@@ -369,7 +398,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param params - The grid ready event parameters.
    */
   onGridReady(params: any): void {
-
     this.gridApi = params.api;
   }
   /**
@@ -380,10 +408,11 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   getAlldeviceType(): void {
-
-    this.deviceTypeService.getfindallbycategory(this.selectedDeviceCategory).subscribe(res=>{
-      this.allDeviceType = res.data
-    })
+    this.deviceTypeService
+      .getfindallbycategory(this.selectedDeviceCategory)
+      .subscribe((res) => {
+        this.allDeviceType = res.data;
+      });
   }
   /**
    * list of all boxmanufacturer.
@@ -393,10 +422,11 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   getAllOem(): void {
-
-    this.oemService.getOemByList(this.selectedDeviceCategory).subscribe(res=>{
+    this.oemService
+      .getOemByList(this.selectedDeviceCategory)
+      .subscribe((res) => {
         this.alloem = res.data;
-    })
+      });
   }
   /**
    * list of all socVendors.
@@ -406,10 +436,9 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   getAllsoc(): void {
-
-    this.socService.getSoc(this.selectedDeviceCategory).subscribe(res=>{
+    this.socService.getSoc(this.selectedDeviceCategory).subscribe((res) => {
       this.allsoc = res.data;
-    })
+    });
   }
   /**
    * This methos is change the value of stbname inputfield
@@ -419,7 +448,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param event - Input event
    */
   valuechange(event: any): void {
-
     this.visibilityConfigFile();
     this.stbNameChange = event.target.value;
     if (this.isThunderchecked) {
@@ -441,7 +469,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param event - Input event
    */
   devicetypeChange(event: any): void {
-
     this.visibleDeviceconfigFile = false;
     let value = event.target.value;
     this.deviceTypeValue = value;
@@ -455,7 +482,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param event - Input event
    */
   thunderChecked(event: any): void {
-
     this.isThunderPresent = event.target.checked;
     this.isThunderchecked = event.target.checked;
     if (this.isThunderchecked) {
@@ -480,14 +506,22 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   visibilityConfigFile(): void {
-
     let boxNameConfig = this.deviceForm.value.devicename;
     let deviceTypeConfig = this.deviceForm.value.devicetype;
-    this.service.downloadDeviceConfigFile(boxNameConfig,deviceTypeConfig,this.isThunderPresent)
+    this.service
+      .downloadDeviceConfigFile(
+        boxNameConfig,
+        deviceTypeConfig,
+        this.isThunderPresent
+      )
       .subscribe({
         next: (res) => {
           this.configFileName = res.filename;
-      if(this.configFileName !== `${boxNameConfig}.config` && this.stbNameChange !== undefined && this.stbNameChange !== ""){
+          if (
+            this.configFileName !== `${boxNameConfig}.config` &&
+            this.stbNameChange !== undefined &&
+            this.stbNameChange !== ''
+          ) {
             this.visibleDeviceconfigFile = true;
           } else {
             this.visibleDeviceconfigFile = false;
@@ -496,7 +530,10 @@ export class DeviceCreateComponent implements OnInit {
             this.visibleDeviceconfigFile = true;
             this.newFileName = `${deviceTypeConfig}.config`;
           }
-      if(this.configFileName !== `${boxNameConfig}.config` && this.configFileName !== `${deviceTypeConfig}.config`){
+          if (
+            this.configFileName !== `${boxNameConfig}.config` &&
+            this.configFileName !== `${deviceTypeConfig}.config`
+          ) {
             this.visibleDeviceconfigFile = false;
             this.newFileName = `${boxNameConfig}.config`;
           }
@@ -506,14 +543,13 @@ export class DeviceCreateComponent implements OnInit {
           this.readDeviceFileContent(res.content);
           this.uploadDeviceConfigForm.patchValue({
             editorFilename: this.stbNameChange + '.config',
-        editorContent: this.configData
-      })
+            editorContent: this.configData,
+          });
         },
         error(err) {
           const sts = err.status;
-  }
-
-    })
+        },
+      });
   }
   /**
    * Reading the configfile
@@ -523,7 +559,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param file - Blob file to read
    */
   readFileContent(file: Blob): void {
-
     let boxNameConfig = this.deviceForm.value.devicename;
     const reader = new FileReader();
     reader.onload = () => {
@@ -531,12 +566,15 @@ export class DeviceCreateComponent implements OnInit {
       this.configData = content;
       if (this.configData) {
         this.uploadConfigForm.patchValue({
-            editorFilename: this.configFileName ===`${boxNameConfig}.config`?this.configFileName:this.newFileName,
+          editorFilename:
+            this.configFileName === `${boxNameConfig}.config`
+              ? this.configFileName
+              : this.newFileName,
           editorContent: this.configData,
-          })
+        });
       }
-  }
-    reader.readAsText(file)
+    };
+    reader.readAsText(file);
   }
 
   /**
@@ -547,7 +585,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param file - Blob file to read
    */
   readDeviceFileContent(file: Blob): void {
-
     const reader = new FileReader();
     reader.onload = () => {
       let content = reader.result as string;
@@ -555,11 +592,11 @@ export class DeviceCreateComponent implements OnInit {
       if (this.configData) {
         this.uploadDeviceConfigForm.patchValue({
           editorFilename: this.stbNameChange + '.config',
-            editorContent: this.configData
-          })
+          editorContent: this.configData,
+        });
       }
-  }
-    reader.readAsText(file)
+    };
+    reader.readAsText(file);
   }
 
   /**
@@ -574,13 +611,13 @@ export class DeviceCreateComponent implements OnInit {
    * @returns The formatted content
    */
   formatContent(content: any) {
-  if (!content) return '';
-  // Ensure content is a string and handle line endings
-  const textContent = content.toString(); 
-  // If content is already plain text, just return it
+    if (!content) return '';
+    // Ensure content is a string and handle line endings
+    const textContent = content.toString();
+    // If content is already plain text, just return it
     if (!textContent.includes('<')) {
-    return textContent;
-    } 
+      return textContent;
+    }
   }
 
   /**
@@ -588,7 +625,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param event - Input event
    */
   isConfigDevicePorts(event: any): void {
-
     if (event.target.checked) {
       this.showConfigPort = true;
       this.configDevicePorts = true;
@@ -602,7 +638,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param event - Input event
    */
   isCheckedConfigB(event: any): void {
-
     if (event.target.checked) {
       this.showConfigPortB = true;
       this.configuredevicePortB = true;
@@ -619,8 +654,7 @@ export class DeviceCreateComponent implements OnInit {
    * Angular lifecycle hook - called when component is destroyed.
    * No parameters.
    */
-  ngOnDestroy(): void {
-  }
+  ngOnDestroy(): void {}
   /**
    * Go back to the previous page.
    */
@@ -629,9 +663,8 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   goBack(): void {
-
     localStorage.removeItem('deviceCategory');
-    this.router.navigate(["/devices"]);
+    this.router.navigate(['/devices']);
   }
   /**
    * Reset the device form.
@@ -641,7 +674,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   reset(): void {
-
     this.deviceForm.reset();
   }
   /**
@@ -649,7 +681,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   resetFormB(): void {
-
     this.rdkBForm.reset();
   }
   /**
@@ -660,7 +691,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   deviceVSubmit(): void {
-
     this.deviceFormSubmitted = true;
     if (this.deviceForm.invalid) {
       return;
@@ -689,6 +719,7 @@ export class DeviceCreateComponent implements OnInit {
             panelClass: ['success-msg'],
             verticalPosition: 'top',
           });
+          this.service.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(['/devices']);
           }, 1000);
@@ -714,7 +745,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   deviceBSubmit(): void {
-
     this.rdkbFormSubmitted = true;
     if (this.rdkBForm.invalid) {
       return;
@@ -728,11 +758,11 @@ export class DeviceCreateComponent implements OnInit {
         socName: this.rdkBForm.value.soc,
         devicePort: this.rdkBForm.value.agentPortb,
         statusPort: this.rdkBForm.value.agentStatusportB,
-        agentMonitorPort: this.rdkBForm.value.agentMonitorportB,    
+        agentMonitorPort: this.rdkBForm.value.agentMonitorportB,
         devicestatus: 'FREE',
         userGroupName: this.loggedinUser.userGroupName,
         category: this.selectedDeviceCategory,
-        devicePortsConfigured: this.rdkBForm.value.configuredevicePortB
+        devicePortsConfigured: this.rdkBForm.value.configuredevicePortB,
       };
       this.service.createDevice(rdkbObj).subscribe({
         next: (res) => {
@@ -741,6 +771,7 @@ export class DeviceCreateComponent implements OnInit {
             panelClass: ['success-msg'],
             verticalPosition: 'top',
           });
+          this.service.resetPaginationState();
           setTimeout(() => {
             this.router.navigate(['/devices']);
           }, 1000);
@@ -765,7 +796,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   toggleIsEdit(): void {
-
     this.isEditingFile = !this.isEditingFile;
     if (this.isEditingFile) {
       this.uploadDeviceConfigForm.get('editorFilename')?.enable();
@@ -779,7 +809,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   toggleFileName(): void {
-
     const boxNameConfig = this.deviceForm.value.devicename;
     const deviceTypeConfig = this.deviceForm.value.devicetype;
     const currentName =
@@ -800,7 +829,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   toggleFileNameDialog(): void {
-
     const boxNameConfig = this.deviceForm.value.devicename;
     const deviceTypeConfig = this.deviceForm.value.devicetype;
     const currentName = this.uploadConfigForm.get('editorFilename')?.value;
@@ -820,14 +848,13 @@ export class DeviceCreateComponent implements OnInit {
    * @param event - Input event
    */
   onExistConfigChange(event: Event): void {
-
     let fileInput = event.target as HTMLInputElement;
     if (fileInput && fileInput.files) {
       const file = fileInput.files[0];
       this.uploadFileName = file;
       this.uploadExistConfigContent(file);
       this.uploadConfigForm.get('uploadFileModal')?.setValue(file);
-    }else{
+    } else {
       this.uploadConfigForm.get('uploadFileModal')?.setValue('');
     }
   }
@@ -836,7 +863,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param file - File to upload
    */
   uploadExistConfigContent(file: File): void {
-
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
       const content = e.target?.result as string;
@@ -863,7 +889,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   configFileUpload(): void {
-
     this.existConfigSubmitted = true;
     if (this.uploadConfigForm.invalid) {
       return;
@@ -880,20 +905,20 @@ export class DeviceCreateComponent implements OnInit {
       if (file.name.endsWith('.config')) {
         // Use the editor filename and content
         const editorFilename =
-        this.uploadConfigForm.get('editorFilename')!.value;
+          this.uploadConfigForm.get('editorFilename')!.value;
         const reader = new FileReader();
         reader.onload = (e: ProgressEvent<FileReader>) => {
           const content = e.target?.result as string;
           const editorContent = content;
           const contentBlob = new Blob([editorContent], { type: 'text/plain' });
           const contentFile = new File([contentBlob], editorFilename);
-          this.uploadConfigFileAndHandleResponse(contentFile,'dialog');
+          this.uploadConfigFileAndHandleResponse(contentFile, 'dialog');
         };
         reader.readAsText(file);
         return; // Prevent further execution, upload will happen in callback
       } else {
         // Not a .config file, upload as-is
-        this.uploadConfigFileAndHandleResponse(file,'dialog');
+        this.uploadConfigFileAndHandleResponse(file, 'dialog');
         return;
       }
     }
@@ -904,7 +929,7 @@ export class DeviceCreateComponent implements OnInit {
     const editorContent = content;
     const contentBlob = new Blob([editorContent], { type: 'text/plain' });
     const contentFile = new File([contentBlob], editorFilename);
-    this.uploadConfigFileAndHandleResponse(contentFile,'dialog');
+    this.uploadConfigFileAndHandleResponse(contentFile, 'dialog');
   }
   /**
    * The method is upload the configfile of fileupload
@@ -914,7 +939,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param event - Input event
    */
   onModalFileChange(event: Event): void {
-
     let fileInput = event.target as HTMLInputElement;
     if (fileInput && fileInput.files && fileInput.files.length > 0) {
       const file = fileInput.files[0];
@@ -933,7 +957,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param file - File to upload and read
    */
   uploadReadFileContent(file: File): void {
-
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
       const content = e.target?.result as string;
@@ -947,8 +970,7 @@ export class DeviceCreateComponent implements OnInit {
           editorContent: content,
         });
       } else {
-        this.uploadDeviceConfigForm.patchValue({
-        });
+        this.uploadDeviceConfigForm.patchValue({});
       }
     };
     reader.readAsText(file);
@@ -962,7 +984,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   configDeviceFileUpload(): void {
-
     this.submitted = true;
     if (this.uploadDeviceConfigForm.invalid) {
       return;
@@ -981,34 +1002,32 @@ export class DeviceCreateComponent implements OnInit {
       if (file.name.endsWith('.config')) {
         // Use the editor filename and content
         const editorFilename =
-        this.uploadDeviceConfigForm.get('editorFilename')!.value;
+          this.uploadDeviceConfigForm.get('editorFilename')!.value;
         const reader = new FileReader();
         reader.onload = (e: ProgressEvent<FileReader>) => {
           const content = e.target?.result as string;
           const editorContent = content;
           const contentBlob = new Blob([editorContent], { type: 'text/plain' });
           const contentFile = new File([contentBlob], editorFilename);
-          this.uploadConfigFileAndHandleResponse(contentFile,'newDevice');
+          this.uploadConfigFileAndHandleResponse(contentFile, 'newDevice');
         };
         reader.readAsText(file);
         return; // Prevent further execution, upload will happen in callback
       } else {
         // Not a .config file, upload as-is
-        this.uploadConfigFileAndHandleResponse(file,'newDevice');
+        this.uploadConfigFileAndHandleResponse(file, 'newDevice');
         return;
       }
     }
 
     // If uploading from the editor (no file input)
     const editorFilename =
-    this.uploadDeviceConfigForm.get('editorFilename')!.value;
+      this.uploadDeviceConfigForm.get('editorFilename')!.value;
     const content = this.uploadDeviceConfigForm.get('editorContent')!.value;
     const editorContent = content;
     const contentBlob = new Blob([editorContent], { type: 'text/plain' });
     const contentFile = new File([contentBlob], editorFilename);
-    this.uploadConfigFileAndHandleResponse(contentFile,'newDevice');
-
-    
+    this.uploadConfigFileAndHandleResponse(contentFile, 'newDevice');
   }
 
   // Helper function for upload and response handling
@@ -1017,44 +1036,46 @@ export class DeviceCreateComponent implements OnInit {
    * @param file - File to upload
    * @param modalType - Type of modal ('dialog' or 'newDevice')
    */
-  private uploadConfigFileAndHandleResponse(file: File, modalType: 'dialog' | 'newDevice'): void {
-
-  this.service.uploadConfigFile(file, this.isThunderPresent).subscribe({
-    next: (res) => {
-      this._snakebar.open(res.message, '', {
-        duration: 3000,
-        panelClass: ['success-msg'],
-        verticalPosition: 'top',
-      });
-      setTimeout(() => {
+  private uploadConfigFileAndHandleResponse(
+    file: File,
+    modalType: 'dialog' | 'newDevice'
+  ): void {
+    this.service.uploadConfigFile(file, this.isThunderPresent).subscribe({
+      next: (res) => {
+        this._snakebar.open(res.message, '', {
+          duration: 3000,
+          panelClass: ['success-msg'],
+          verticalPosition: 'top',
+        });
+        setTimeout(() => {
+          if (modalType === 'dialog') {
+            this.uploadConfigForm.get('uploadFileModal')?.reset();
+            this.backToExistingEditor();
+            this.closeDialog();
+          } else {
+            this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.reset();
+            this.backToEditor('Create New Device Config File');
+            this.closeNewDeviceDialog();
+          }
+          this.visibilityConfigFile();
+        }, 1000);
+      },
+      error: (err) => {
+        this._snakebar.open(err.message, '', {
+          duration: 2000,
+          panelClass: ['err-msg'],
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+        });
+        // Clear the editor content and filename if upload failed
         if (modalType === 'dialog') {
           this.uploadConfigForm.get('uploadFileModal')?.reset();
-          this.backToExistingEditor();
-          this.closeDialog();      
         } else {
           this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.reset();
-          this.backToEditor('Create New Device Config File');
-          this.closeNewDeviceDialog();
         }
-        this.visibilityConfigFile();
-      }, 1000);
-    },
-    error: (err) => {
-      this._snakebar.open(err.message, '', {
-        duration: 2000,
-        panelClass: ['err-msg'],
-        horizontalPosition: 'end',
-        verticalPosition: 'top',
-      });
-      // Clear the editor content and filename if upload failed
-      if (modalType === 'dialog') {
-        this.uploadConfigForm.get('uploadFileModal')?.reset();
-      } else {
-        this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.reset();
-      }
-    },
-  });
-}
+      },
+    });
+  }
 
   /**
    * Opens the upload file section and sets the necessary flags and values.
@@ -1065,12 +1086,15 @@ export class DeviceCreateComponent implements OnInit {
    * @param value - Heading value for upload section
    */
   openUploadFile(value: string): void {
-
-  this.submitted = false;
-  this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.setValidators([Validators.required]);
-  this.uploadDeviceConfigForm.get('editorContent')?.clearValidators();
-  this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.updateValueAndValidity();
-  this.uploadDeviceConfigForm.get('editorContent')?.updateValueAndValidity();
+    this.submitted = false;
+    this.uploadDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.setValidators([Validators.required]);
+    this.uploadDeviceConfigForm.get('editorContent')?.clearValidators();
+    this.uploadDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.updateValueAndValidity();
+    this.uploadDeviceConfigForm.get('editorContent')?.updateValueAndValidity();
 
     this.deviceEditor = false;
     this.uploadConfigSec = true;
@@ -1088,13 +1112,15 @@ export class DeviceCreateComponent implements OnInit {
    * @param value - Heading value for editor section
    */
   backToEditor(value: string): void {
-
-  this.submitted = false;
-  this.uploadDeviceConfigForm.get('editorContent')?.setValidators([Validators.required]);
-  this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.clearValidators();
-  this.uploadDeviceConfigForm.get('editorContent')?.updateValueAndValidity();
-  this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.updateValueAndValidity();
-
+    this.submitted = false;
+    this.uploadDeviceConfigForm
+      .get('editorContent')
+      ?.setValidators([Validators.required]);
+    this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.clearValidators();
+    this.uploadDeviceConfigForm.get('editorContent')?.updateValueAndValidity();
+    this.uploadDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.updateValueAndValidity();
 
     this.deviceEditor = true;
     this.uploadConfigSec = false;
@@ -1112,12 +1138,13 @@ export class DeviceCreateComponent implements OnInit {
    * @param val - Value to be passed to modal
    */
   openExistingModal(val: string): void {
-
-  this.existConfigSubmitted = false;
-   this.uploadConfigForm.get('uploadFileModal')?.setValidators([Validators.required]);
-  this.uploadConfigForm.get('editorContent')?.clearValidators();
-  this.uploadConfigForm.get('uploadFileModal')?.updateValueAndValidity();
-  this.uploadConfigForm.get('editorContent')?.updateValueAndValidity();
+    this.existConfigSubmitted = false;
+    this.uploadConfigForm
+      .get('uploadFileModal')
+      ?.setValidators([Validators.required]);
+    this.uploadConfigForm.get('editorContent')?.clearValidators();
+    this.uploadConfigForm.get('uploadFileModal')?.updateValueAndValidity();
+    this.uploadConfigForm.get('editorContent')?.updateValueAndValidity();
     this.existingConfigEditor = false;
     this.uploadExistingConfig = true;
     this.showExistUploadButton = false;
@@ -1132,9 +1159,10 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   backToExistingEditor(): void {
-
     this.existConfigSubmitted = false;
-    this.uploadConfigForm.get('editorContent')?.setValidators([Validators.required]);
+    this.uploadConfigForm
+      .get('editorContent')
+      ?.setValidators([Validators.required]);
     this.uploadConfigForm.get('uploadFileModal')?.clearValidators();
     this.uploadConfigForm.get('editorContent')?.updateValueAndValidity();
     this.uploadConfigForm.get('uploadFileModal')?.updateValueAndValidity();
@@ -1154,7 +1182,6 @@ export class DeviceCreateComponent implements OnInit {
    * @param configFileName - Name of the configuration file to delete
    */
   deleteDeviceConfigFile(configFileName: any) {
-
     if (configFileName) {
       if (confirm('Are you sure to delete ?')) {
         this.service
@@ -1209,7 +1236,7 @@ export class DeviceCreateComponent implements OnInit {
       this.deviceEditor = true;
       this.uploadConfigSec = false;
       this.backToEditorbtn = false;
-    
+
       this.newDeviceDialogRef = this.dialog.open(this.newDeviceTemplate, {
         width: '100vw',
         height: '90vh',
@@ -1219,7 +1246,6 @@ export class DeviceCreateComponent implements OnInit {
       this.dialogOpened = true;
       setTimeout(() => this.resizeEditor(), 300);
     } else {
-      
       this.dialogRef = this.dialog.open(this.dialogTemplate, {
         width: '100vw',
         height: '90vh',
@@ -1238,7 +1264,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   closeDialog(): void {
-
     this.dialogRef.close();
   }
   /**
@@ -1286,11 +1311,12 @@ export class DeviceCreateComponent implements OnInit {
                 {
                   width: '100vw',
                   height: '90vh',
-                   panelClass: 'full-width-dialog',
-               });
-                 // Add this to resize editor after dialog opens
-                 this.dialogOpened = true;
-                 setTimeout(() => this.resizeEditor(), 300);
+                  panelClass: 'full-width-dialog',
+                }
+              );
+              // Add this to resize editor after dialog opens
+              this.dialogOpened = true;
+              setTimeout(() => this.resizeEditor(), 300);
             };
             reader.readAsText(res.content);
           } else if (typeof res.content === 'string') {
@@ -1305,11 +1331,11 @@ export class DeviceCreateComponent implements OnInit {
             this.backToEditorbtn = false;
             this.showUploadButton = true;
             this.newDeviceDialogRef = this.dialog.open(this.newDeviceTemplate, {
-               width: '100vw',
+              width: '100vw',
               height: '90vh',
               panelClass: 'full-width-dialog',
             });
-             // Add this to resize editor after dialog opens
+            // Add this to resize editor after dialog opens
             this.dialogOpened = true;
             setTimeout(() => this.resizeEditor(), 300);
           }
@@ -1332,7 +1358,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   closeNewDeviceDialog(): void {
-
     this.newDeviceDialogRef.close();
   }
   /**
@@ -1343,7 +1368,6 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   downloadConfigFile() {
-
     this.service
       .downloadDeviceConfigFile(
         this.stbNameChange,

@@ -34,57 +34,119 @@ interface customcellRenderparams extends ICellRendererParams {
   imports: [MaterialModule, CommonModule],
   template: `
     <!-- <button [disabled]="isButtonDisabled()" class="btn btn-primary btn-sm delete-btn" (click)="onEditClick($event)"><mat-icon class="delete-icon">edit</mat-icon></button> -->
-    <button   class="btn  btn-sm delete-btn" (click)="onEditClick($event)" matTooltip="{{textforedit}}"><mat-icon class="extra-icon edit">edit</mat-icon></button>
-    &nbsp;
-    <button *ngIf="shouldShowDeleteButton()" class="btn  btn-sm delete-btn" (click)="onDeleteClick($event)" matTooltip="Delete"><mat-icon class="delete-icon extra-icon">delete_forever</mat-icon></button>
-   
-    <!-- <button *ngIf="viewShowHide"  class="btn  btn-sm delete-btn" (click)="onViewClick($event)" matTooltip="View"><mat-icon class=" view extra-icon">remove_red_eye</mat-icon></button> -->
-    &nbsp;
-    <button *ngIf="downloadShowHide" class="btn  btn-sm delete-btn" (click)="onDownloadClick($event)" matTooltip="Download XML" ><i class="bi bi-cloud-arrow-down-fill extra-icon download"></i></button>
-    &nbsp;
-    <button *ngIf="downloadSriptZip" class="btn  btn-sm delete-btn" (click)="onDownloadZip($event)" matTooltip="Download Zip" ><i class="bi bi-cloud-arrow-down-fill extra-icon download"></i></button>
-    &nbsp;
-    <button *ngIf="downloadScriptMd" class="btn btn-sm delete-btn" (click)="onDownloadMd($event)" matTooltip="Download MD">
-    <span style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: #fff; color: #00B2DC; font-weight: bold; line-height: 28px; text-align: center; font-size: 0.85rem;">
-      MD
-    </span>
+    <button
+      class="btn  btn-sm delete-btn"
+      (click)="onEditClick($event)"
+      matTooltip="{{ textforedit }}"
+    >
+      <mat-icon class="extra-icon edit">edit</mat-icon>
     </button>
     &nbsp;
-    <button *ngIf="downloadConfigShow" class="btn  btn-sm delete-btn download-config" (click)="onDownloadClick($event)" matTooltip="Download Config File" ><i class="bi bi-cloud-arrow-down-fill extra-icon download"></i></button>
+    <button
+      *ngIf="shouldShowDeleteButton()"
+      class="btn  btn-sm delete-btn"
+      (click)="onDeleteClick($event)"
+      matTooltip="Delete"
+    >
+      <mat-icon class="delete-icon extra-icon">delete_forever</mat-icon>
+    </button>
 
+    <!-- <button *ngIf="viewShowHide"  class="btn  btn-sm delete-btn" (click)="onViewClick($event)" matTooltip="View"><mat-icon class=" view extra-icon">remove_red_eye</mat-icon></button> -->
+    &nbsp;
+    <button
+      *ngIf="downloadShowHide"
+      class="btn  btn-sm delete-btn"
+      (click)="onDownloadClick($event)"
+      matTooltip="Download XML"
+    >
+      <i class="bi bi-cloud-arrow-down-fill extra-icon download"></i>
+    </button>
+    &nbsp;
+    <!-- Combined Download Button with Dropdown for Zip and Tar -->
+    <button
+      *ngIf="downloadSriptZip && downloadtarfile"
+      class="btn btn-sm delete-btn"
+      [matMenuTriggerFor]="downloadMenu"
+      matTooltip="Download"
+    >
+      <i class="bi bi-cloud-arrow-down-fill extra-icon download"></i>
+    </button>
+    <mat-menu #downloadMenu="matMenu">
+      <button mat-menu-item (click)="onDownloadZip($event)">
+        <i class="bi bi-file-earmark-zip-fill menu-icon"></i>
+        <span style="margin-left: 8px; color: inherit;">Download Zip</span>
+      </button>
+      <button mat-menu-item (click)="onDownloadTar($event)">
+        <i class="bi bi-file-earmark-zip-fill menu-icon"></i>
+        <span style="margin-left: 8px;">Download Tar</span>
+      </button>
+    </mat-menu>
+    &nbsp;
+    <button
+      *ngIf="downloadScriptMd"
+      class="btn btn-sm delete-btn"
+      (click)="onDownloadMd($event)"
+      matTooltip="Download MD"
+    >
+      <span
+        style="display: inline-block; width: 28px; height: 28px; border-radius: 50%; background: #fff; color: #00B2DC; font-weight: bold; line-height: 28px; text-align: center; font-size: 0.85rem;"
+      >
+        MD
+      </span>
+    </button>
+    &nbsp;
+    <button
+      *ngIf="downloadConfigShow"
+      class="btn  btn-sm delete-btn download-config"
+      (click)="onDownloadClick($event)"
+      matTooltip="Download Config File"
+    >
+      <i class="bi bi-cloud-arrow-down-fill extra-icon download"></i>
+    </button>
   `,
   styles: [
-    `.delete-btn{
+    `
+      .delete-btn {
         border: none;
         padding: 0px;
-        background:none;
-    }
-    .extra-icon{
-      font-size: 1.3rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    .edit{
-      color: #00B2DC;
-    }
-    .delete-icon{
-      color: #808080;
-    }
-    .view{
-      color: #fdb73b;
-    }
-    .download{
-      color: #00B2DC;
-    }
-    .download-config{
-      margin-left: -15px;
-    }
-    `
-  ]
+        background: none;
+      }
+      .extra-icon {
+        font-size: 1.3rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .tar-icon {
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .menu-icon {
+        color: #00b2dc;
+        font-size: 1.1rem;
+        margin-right: 8px;
+      }
+      .edit {
+        color: #00b2dc;
+      }
+      .delete-icon {
+        color: #808080;
+      }
+      .view {
+        color: #fdb73b;
+      }
+      .download {
+        color: #00b2dc;
+      }
+      .download-config {
+        margin-left: -15px;
+      }
+    `,
+  ],
 })
 export class ButtonComponent implements OnInit {
-  
   /**
    * Determines whether the delete button should be shown based on the context or URL.
    * @returns {boolean} - Returns false if in RDK Certification grid context, otherwise returns the value of deleteShowHide.
@@ -96,22 +158,28 @@ export class ButtonComponent implements OnInit {
   shouldShowDeleteButton(): boolean {
     // Hide delete button for RDK Certification grid based on context or URL
     const parent = this.params?.context?.componentParent;
-    const isRdkCertGrid = parent && (parent.constructor?.name === 'ListRdkCertificationComponent' || parent.categoryName === 'RDK Certification');
-    const isRdkCertUrl = window.location.pathname.includes('rdk-certification') || window.location.pathname.includes('list-rdk-certification');
+    const isRdkCertGrid =
+      parent &&
+      (parent.constructor?.name === 'ListRdkCertificationComponent' ||
+        parent.categoryName === 'RDK Certification');
+    const isRdkCertUrl =
+      window.location.pathname.includes('rdk-certification') ||
+      window.location.pathname.includes('list-rdk-certification');
     if (isRdkCertGrid || isRdkCertUrl) {
       return false;
     }
     return this.deleteShowHide;
   }
 
-  params: any
+  params: any;
   selectedRowCount: number = 0;
   lastSelectedNodeId: string = '';
   currentNodeId: string | undefined;
-  downloadShowHide = false
+  downloadShowHide = false;
   viewShowHide = true;
   textforedit!: string;
   downloadSriptZip = false;
+  downloadtarfile=false;
   downloadScriptMd = false;
   deleteShowHide = true;
   downloadConfigShow = false;
@@ -124,17 +192,14 @@ export class ButtonComponent implements OnInit {
     this.params = params;
     this.selectedRowCount = params.selectedRowCount();
     this.lastSelectedNodeId = params.lastSelectedNodeId;
-    this.currentNodeId = params.node.id
-
+    this.currentNodeId = params.node.id;
   }
-
 
   /**
    * Constructor for ButtonComponent.
    * @param route ActivatedRoute for accessing route information.
    */
-  constructor(private route: ActivatedRoute) { }
-
+  constructor(private route: ActivatedRoute) {}
 
   /**
    * Angular lifecycle hook called after component initialization.
@@ -150,17 +215,20 @@ export class ButtonComponent implements OnInit {
     }
     if (this.route.snapshot.url[0].path === 'script') {
       this.downloadSriptZip = true;
+      this.downloadtarfile=true;
       this.downloadScriptMd = true;
     } else {
       this.downloadSriptZip = false;
     }
     if (this.route.snapshot.url[1]) {
-      if (this.route.snapshot.url[1].path === 'list-devicetype' ||
+      if (
+        this.route.snapshot.url[1].path === 'list-devicetype' ||
         this.route.snapshot.url[1].path === 'list-oem' ||
         this.route.snapshot.url[1].path === 'list-soc' ||
         this.route.snapshot.url[1].path === 'create-group' ||
         this.route.snapshot.url[1].path === 'user-management' ||
-        this.route.snapshot.url[1].path === 'list-primitivetest') {
+        this.route.snapshot.url[1].path === 'list-primitivetest'
+      ) {
         this.viewShowHide = false;
         this.textforedit = 'Edit/View';
       } else {
@@ -174,7 +242,6 @@ export class ButtonComponent implements OnInit {
         this.viewShowHide = false;
       }
     }
-
   }
 
   //** Condition for disable edit and delete button to own user */
@@ -184,10 +251,11 @@ export class ButtonComponent implements OnInit {
    * @returns {boolean} True if the button should be disabled, false otherwise.
    */
   isButtonDisabled(): boolean {
-    return !(this.selectedRowCount === 1 && this.lastSelectedNodeId === this.currentNodeId);
+    return !(
+      this.selectedRowCount === 1 &&
+      this.lastSelectedNodeId === this.currentNodeId
+    );
   }
-
-
 
   /**
    * Refreshes the cell renderer with new parameters.
@@ -197,11 +265,9 @@ export class ButtonComponent implements OnInit {
   refresh(params: customcellRenderparams): boolean {
     this.selectedRowCount = params.selectedRowCount();
     this.lastSelectedNodeId = params.lastSelectedNodeId;
-    this.currentNodeId = params.node.id
+    this.currentNodeId = params.node.id;
     return true;
   }
-
-
 
   /**
    * Handles the edit button click event.
@@ -213,7 +279,6 @@ export class ButtonComponent implements OnInit {
     }
   }
 
-
   /**
    * Handles the delete button click event.
    * @param $event The click event object.
@@ -222,9 +287,7 @@ export class ButtonComponent implements OnInit {
     if (this.params.onDeleteClick instanceof Function) {
       this.params.onDeleteClick(this.params.node.data);
     }
-
   }
-
 
   /**
    * Handles the view button click event.
@@ -236,7 +299,6 @@ export class ButtonComponent implements OnInit {
     }
   }
 
-
   /**
    * Handles the download button click event.
    * @param $event The click event object.
@@ -246,7 +308,6 @@ export class ButtonComponent implements OnInit {
       this.params.onDownloadClick(this.params.node.data);
     }
   }
-
 
   /**
    * Handles the download zip button click event.
@@ -258,7 +319,15 @@ export class ButtonComponent implements OnInit {
     }
   }
 
-
+  /**
+   * Handles the download tar button click event.
+   * @param $event The click event object.
+   */
+  onDownloadTar($event: any) {
+    if (this.params.onDownloadTar instanceof Function) {
+      this.params.onDownloadTar(this.params.node.data);
+    }
+  }
 
   /**
    * Handles the download MD button click event.
@@ -269,7 +338,4 @@ export class ButtonComponent implements OnInit {
       this.params.onDownloadMd(this.params.node.data);
     }
   }
-
-
-
 }

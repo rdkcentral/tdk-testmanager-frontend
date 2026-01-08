@@ -101,6 +101,7 @@ export class CreateDeviceTypeComponent implements OnInit {
           setTimeout(() => {
             this.router.navigate(["configure/list-devicetype"]);
           }, 1000);
+           this.service.resetPaginationState();
         },
         error: (err) => {
           this._snakebar.open(err.message, '', {

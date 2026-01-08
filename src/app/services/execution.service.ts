@@ -300,13 +300,14 @@ export class ExecutionService {
   /**
    * Deletes a list of executions.
    * @param data The data containing executions to delete.
+   * @param isDataDeletionNeeded Whether to delete execution data along with logs.
    * @returns Observable with the deletion result.
    */
-  deleteExecutions(data:any): Observable<any>{
+  deleteExecutions(data:any, isDataDeletionNeeded: boolean = false): Observable<any>{
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-    return this.http.post(`${this.config.apiUrl}execution/deleteListOfExecutions`,data,{ headers });
+    return this.http.post(`${this.config.apiUrl}execution/deleteListOfExecutions?isDataDeletionNeeded=${isDataDeletionNeeded}`,data,{ headers });
   }
 
   /**
@@ -422,13 +423,14 @@ export class ExecutionService {
    * Deletes executions by date range.
    * @param fromdate The start date.
    * @param toDate The end date.
+   * @param isDataDeletionNeeded Whether to delete execution data along with logs.
    * @returns Observable with the deletion result.
    */
-  datewiseDeleteExe(fromdate:any,toDate:any): Observable<any>{
+  datewiseDeleteExe(fromdate:any,toDate:any, isDataDeletionNeeded: boolean = false): Observable<any>{
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-    return this.http.delete(`${this.config.apiUrl}execution/deleteByDateRange?fromDate=${fromdate}&toDate=${toDate}`, { headers }); 
+    return this.http.delete(`${this.config.apiUrl}execution/deleteByDateRange?fromDate=${fromdate}&toDate=${toDate}&isDataDeletionNeeded=${isDataDeletionNeeded}`, { headers }); 
   }
 
   /**

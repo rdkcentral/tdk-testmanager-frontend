@@ -17,7 +17,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Component ,HostListener} from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -27,7 +27,7 @@ import {
   GridReadyEvent,
   IMultiFilterParams,
   RowSelectedEvent,
-  SelectionChangedEvent
+  SelectionChangedEvent,
 } from 'ag-grid-community';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../../../utility/component/ag-grid-buttons/button/button.component';
@@ -150,6 +150,16 @@ export class ListPrimitiveTestComponent {
         this.showLoader = false;
       }
     });
+    const savedState = this.service.getPaginationState();
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.paginationPageSize = savedState.pageSize;
+      this.paginationPageSizeSelector = [
+        savedState.pageSize,
+        savedState.pageSize * 2,
+        savedState.pageSize * 5,
+      ];
+    }
     this.adjustPaginationToScreenSize();
   }
 
@@ -175,6 +185,12 @@ export class ListPrimitiveTestComponent {
    */
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
+    // Don't override if we're restoring from saved state
+    const savedState = this.service.getPaginationState();
+    if (savedState && savedState.pageSize && !this.gridApi) {
+      // If we have saved state and grid is not ready yet, don't recalculate
+      return;
+    }
 
     if (height > 1200) {
       this.paginationPageSize = 25;
@@ -206,7 +222,14 @@ export class ListPrimitiveTestComponent {
    */
   onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
-    this.adjustPaginationToScreenSize();
+
+    // Only apply screen-based sizing if no saved state
+    const savedState = this.service.getPaginationState();
+    if (!savedState) {
+      this.adjustPaginationToScreenSize();
+    }
+
+    // Pagination restoration will happen in getParameterDetails() after data loads
   }
 
   /**
@@ -278,6 +301,11 @@ export class ListPrimitiveTestComponent {
       .subscribe((res) => {
         this.service.allPassedData.next(res.data);
       });
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['configure/edit-primitivetest']);
   }
 
@@ -286,6 +314,11 @@ export class ListPrimitiveTestComponent {
    * No parameters.
    */
   createPrimitiveTest(): void {
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['/configure/create-primitivetest']);
   }
 
@@ -298,11 +331,41 @@ export class ListPrimitiveTestComponent {
     this.service.getParameterNames(selectedValue).subscribe({
       next: (res) => {
         this.rowData = res.data;
+        this.restorePaginationIfNeeded();
       },
       error: () => {
         this.rowData = [];
+        // Clear restoration flag on error
+        this.service.clearRestorationFlag();
       },
     });
+  }
+
+  /**
+   * Restores pagination state after data is loaded
+   *}*/
+  private restorePaginationIfNeeded(): void {
+    const savedState = this.service.getPaginationState();
+    if (savedState && this.gridApi) {
+      if (savedState.pageSize) {
+        this.gridApi.setGridOption('paginationPageSize', savedState.pageSize);
+      }
+
+      // Navigate to saved page (now totalPages > 0!)
+      if (savedState.currentPage > 0) {
+        setTimeout(() => {
+          const totalPages = this.gridApi.paginationGetTotalPages();
+
+          if (savedState.currentPage < totalPages) {
+            this.gridApi.paginationGoToPage(savedState.currentPage);
+          }
+
+          this.service.clearRestorationFlag();
+        }, 50);
+      } else {
+        this.service.clearRestorationFlag();
+      }
+    }
   }
 
   /**

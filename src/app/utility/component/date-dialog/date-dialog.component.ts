@@ -25,11 +25,14 @@ import { ExecutionService } from '../../../services/execution.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialogRef } from '@angular/material/dialog';
 import moment from 'moment-timezone';
+import { MaterialModule } from '../../../material/material.module';
+import { LoaderComponent } from '../loader/loader.component';
+
 
 @Component({
   selector: 'app-date-dialog',
   standalone: true,
-  imports: [BsDatepickerModule, CommonModule, FormsModule],
+  imports: [BsDatepickerModule, CommonModule, FormsModule, MaterialModule,LoaderComponent],
   templateUrl: './date-dialog.component.html',
   styleUrl: './date-dialog.component.css',
   encapsulation: ViewEncapsulation.None,
@@ -39,6 +42,8 @@ export class DateDialogComponent {
   utcDateRange: string[] | null = null;
   fromDate: string | null = null;
   toDate: string | null = null;
+  loader = false;
+  selectedOption: string = 'logs-only';
   bsConfig = {
     rangeInputFormat: 'YYYY-MM-DD',
     maxDate: new Date(),
@@ -86,8 +91,11 @@ export class DateDialogComponent {
   
   deleteData(): void {
     if (this.selectedDate) {
-      this.executionservice.datewiseDeleteExe(this.fromDate, this.toDate).subscribe({
+      const isDataDeletionNeeded = this.selectedOption === 'data-and-logs';
+      this.loader = true;
+      this.executionservice.datewiseDeleteExe(this.fromDate, this.toDate, isDataDeletionNeeded).subscribe({
         next:(res)=>{
+          this.loader = false;
           this._snakebar.open(res.message, '', {
             duration: 3000,
             panelClass: ['success-msg'],
@@ -95,10 +103,12 @@ export class DateDialogComponent {
           })
           setTimeout(() => {
             this.dialogRef.close();
+            this.loader = false;
           }, 2000);
         },
         error:(err)=>{
           let errmsg = err.message
+          this.loader = false;
           this._snakebar.open(errmsg,'',{
             duration: 2000,
             panelClass: ['err-msg'],
