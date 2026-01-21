@@ -98,6 +98,8 @@ export class ScriptListComponent {
   @ViewChild('testSuiteModal', { static: false }) testSuiteModal?: ElementRef;
   @ViewChild('customTestSuiteModal', { static: false })
   customTestSuiteModal?: ElementRef;
+  @ViewChild('bulkScriptUploadModal', { static: false })
+  bulkScriptUploadModal?: ElementRef;
   categories = ['Video', 'Broadband', 'Camera'];
   selectedCategory!: string;
   categoryName!: string;
@@ -147,6 +149,14 @@ export class ScriptListComponent {
   customUploadFileName!: File | null;
   customUploadFileError: string | null = null;
   showCustomUploadLoader = false;
+  uploadBulkSriptUploadForm!: FormGroup;
+  bulkFormSubmitted = false;
+  uploadBulkScriptFile!: File | null;
+  bulkUploadFileError: string | null = null;
+  showBulkUploadLoader = false;
+  bulkDownloadForm!: FormGroup;
+  bulkDownloadFormSubmitted = false;
+  bulkDownloadError = '';
 
   public columnDefs: ColDef[] = [
     {
@@ -261,7 +271,7 @@ export class ScriptListComponent {
       this.scriptPageSize = savedState.pageSize;
       this.testsuitePageSize = savedState.pageSize;
     }
-
+    this.initializeBulkDownloadForm();
     this.viewChange(localViewName);
     this.onResize(null);
     this.uploadScriptForm = new FormGroup({
@@ -274,6 +284,9 @@ export class ScriptListComponent {
     });
     this.uploadCustomTestSuiteForm = this.fb.group({
       uploadCustomFile: [null, Validators.required],
+    });
+    this.uploadBulkSriptUploadForm = this.fb.group({
+      uploadBulkScriptFile: [null, Validators.required],
     });
   }
 
@@ -329,6 +342,16 @@ export class ScriptListComponent {
    */
   onGridReady(params: GridReadyEvent<any>) {
     this.gridApi = params.api;
+  }
+
+  /**
+   * Initializes the bulk download form with default values and validators.
+   */
+  initializeBulkDownloadForm() {
+    this.bulkDownloadForm = this.fb.group({
+      scriptNames: ['', Validators.required],
+      downloadFormat: ['zip', Validators.required]
+    });
   }
   /**
    * Finds all scripts by the given category.
@@ -1608,4 +1631,196 @@ export class ScriptListComponent {
     this.renderer.removeStyle(document.body, 'overflow');
     this.renderer.removeStyle(document.body, 'padding-right');
   }
+
+  /**
+   * Handles file change event for bulk script upload.
+   * @param event - The file input change event.
+   */
+  onBulkScriptFileChange(event: any) {
+    const file: File = event.target.files[0];
+    if (file) {
+      if (file.name.endsWith('.zip') || file.name.endsWith('.tar.gz')) {
+        this.uploadBulkSriptUploadForm.patchValue({ file: file });
+        this.uploadBulkScriptFile = file;
+        this.bulkUploadFileError = null;
+      } else {
+        this.uploadBulkSriptUploadForm.patchValue({ file: null });
+        this.bulkUploadFileError =
+          'Please upload a valid .zip or .tar.gz file.';
+      }
+    }
+  }
+
+  /**
+   * Handles the submission of a bulk script upload form.
+   *
+   * Validates the form, uploads the selected file, and handles the response.
+   * Shows loading indicators during upload and displays success/error messages
+   * via snackbar notifications. Resets the form and closes the modal after
+   * completion regardless of success or failure.
+   * * @returns {void} No return value
+   **/
+  bulkSriptUploadFileSubmit() {
+    this.bulkFormSubmitted = true;
+    if (this.uploadBulkSriptUploadForm.invalid) {
+      return;
+    } else {
+      if (this.uploadBulkScriptFile) {
+        this.bulkUploadFileError = null;
+        this.showBulkUploadLoader = true;
+        this.scriptservice
+          .uploadBulkScript(this.uploadBulkScriptFile)
+          .subscribe({
+            next: (res) => {
+              this.showBulkUploadLoader = false;
+              this._snakebar.open(res.message, '', {
+                duration: 3000,
+                panelClass: ['success-msg'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top',
+              });
+              this.uploadBulkSriptUploadForm.reset();
+              this.closeBulkUploadModal();
+              this.findallScriptsByCategory(this.selectedCategory);
+              this.showLoader = false;
+            },
+            error: (err) => {
+              this.showBulkUploadLoader = false;
+              this._snakebar.open(
+                err.message || 'Failed to upload custom test suite',
+                '',
+                {
+                  duration: 2000,
+                  panelClass: ['err-msg'],
+                  horizontalPosition: 'end',
+                  verticalPosition: 'top',
+                }
+              );
+              this.showLoader = false;
+              this.uploadBulkSriptUploadForm.reset();
+              this.closeBulkUploadModal();
+            },
+          });
+      }
+    }
+  }
+
+  /**
+   * Closes the bulk upload modal.
+   */
+  closeBulkUploadModal() {
+    this.uploadBulkSriptUploadForm.reset();
+    this.bulkFormSubmitted = false;
+    this.bulkUploadFileError = null;
+    this.showBulkUploadLoader = false;
+    (this.bulkScriptUploadModal?.nativeElement as HTMLElement).style.display =
+      'none';
+    this.renderer.removeStyle(document.body, 'overflow');
+    this.renderer.removeStyle(document.body, 'padding-right');
+  }
+
+  /**
+   * Downloads multiple scripts in bulk as a ZIP or TAR.GZ file.
+   *
+   * @param scriptNames - An array of script names to be downloaded.
+   * @param format - The format of the download file ('zip' or 'tar.gz').
+   * This method sends a request to download the specified scripts in the chosen format.
+   * It handles the response by creating a downloadable blob and triggering the download.
+   * In case of an error, it parses the error message and displays it using a snackbar notification.
+   */
+  downloadBulkScripts(scriptNames: string[], format: string) {
+    
+    const requestData = {
+      scriptNames: scriptNames, 
+      format: format, 
+    };
+    const fileExtension = format === 'zip' ? '.zip' : '.tar.gz';
+    const mimeType = format === 'zip' ? 'application/zip' : 'application/gzip';
+
+    this.scriptservice.downloadBulkScript(requestData).subscribe({
+      next: (blob) => {
+        const downloadBlob = new Blob([blob], { type: mimeType });
+        const url = window.URL.createObjectURL(downloadBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `listofscripts${fileExtension}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        this.closeBulkDownloadModal();
+
+        this._snakebar.open(
+          `Successfully generated bulk script ${format.toUpperCase()} file`,
+          '',
+          {
+            duration: 3000,
+            panelClass: ['success-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          }
+        );
+      },
+      error: async (err) => {
+        let errorMessage = `Failed to download scripts of ${format.toUpperCase()} file`;
+
+        if (err instanceof Blob) {
+          const text = await err.text();
+          const errorObj = JSON.parse(text);
+          errorMessage = errorObj.message || errorMessage;
+        } else if (err.message) {
+          errorMessage = err.message;
+        } else if (err.message) {
+          errorMessage = err.message;
+        }
+
+        this._snakebar.open(errorMessage, '', {
+          duration: 2000,
+          panelClass: ['err-msg'],
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+        });
+      },
+    });
+  }
+
+ 
+  /**
+   * Handles the submission of the bulk script download form.
+   * Validates the form, processes script names by splitting and trimming,
+   * and initiates the bulk download operation.
+   * 
+   * @remarks
+   * This method sets the form submission flag, clears any previous errors,
+   * and validates the form before processing. Script names are expected to be
+   * comma-separated in the form input.
+   * 
+   * @returns void - No return value, but triggers download operation on success
+   */
+  bulkScriptDownloadSubmit() {
+    this.bulkDownloadFormSubmitted = true;
+    this.bulkDownloadError = '';
+
+    if (this.bulkDownloadForm.invalid) {
+      return;
+    } else {
+      const formData = this.bulkDownloadForm.value;
+      const scriptNames = formData.scriptNames
+        .split(',')
+        .map((name: string) => name.trim());
+      const downloadFormat = formData.downloadFormat;
+      this.downloadBulkScripts(scriptNames, downloadFormat);
+    }
+  }
+
+  /**
+   * Closes the bulk download modal and resets its state.
+   * Initializes the bulk download form, clears submission status, and removes any error messages.
+   */
+   closeBulkDownloadModal() {
+    this.initializeBulkDownloadForm();
+    this.bulkDownloadFormSubmitted = false;
+    this.bulkDownloadError = '';
+  }
+
 }
