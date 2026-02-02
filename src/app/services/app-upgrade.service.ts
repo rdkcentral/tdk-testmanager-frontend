@@ -215,4 +215,58 @@ export class AppUpgradeService {
       { headers, responseType: 'blob' }
     );
   }
+
+  /**
+   * Generates a WAR (Web Application Archive) file for the specified release tag.
+   * 
+   * @param releaseTag - The release tag identifier used for WAR generation
+   * @returns An Observable that emits the response from the WAR generation API endpoint
+   * 
+   * @remarks
+   * This method makes an authenticated POST request to the app-upgrade service
+   * to trigger WAR file generation for deployment purposes.
+   */
+  generateWar(releaseTag: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/app-upgrade/war-generation`,
+      null,
+      {
+        headers,
+        params: { releaseTag },
+      },
+    );
+  }
+
+  /**
+   * Retrieves war generation logs for a specific execution.
+   * 
+   * @param executionId - The unique identifier for the execution whose logs are to be retrieved
+   * @returns An Observable that emits the war generation logs data
+   * 
+   * @remarks
+   * This method makes an authenticated HTTP GET request to fetch war generation logs.
+   * The request includes an Authorization header with the API token.
+   */
+  getWarGenerationLogs(executionId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/app-upgrade/war-generation/logs?executionId=${executionId}`,
+      { headers },
+    );
+  }
+
+  /**
+   * Generates a URL for streaming WAR generation logs for a specific execution.
+   * 
+   * @param executionId - The unique identifier of the execution to retrieve logs for
+   * @returns The complete URL string for accessing the WAR generation log stream endpoint
+   */
+  getWarGenerationLogStreamUrl(executionId: string): string {
+    return `${this.config.apiUrl}/api/v1/app-upgrade/war-generation/logs?executionId=${executionId}`;
+  }
 }
