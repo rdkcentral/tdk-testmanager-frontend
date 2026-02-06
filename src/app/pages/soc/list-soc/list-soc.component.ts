@@ -78,7 +78,20 @@ export class ListSocComponent {
       field: 'socName',
       filter: 'agTextColumnFilter',
       flex: 1,
-      filterParams: {} as IMultiFilterParams,
+      filterParams: {
+      textMatcher: ({ value, filterText }: any) => {
+        // Trim both the filter text and the value before comparison
+        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+        const trimmedValue = value?.trim().toLowerCase() || '';
+        
+        if (trimmedFilterText === '') {
+          return true;
+        }
+        
+        return trimmedValue.includes(trimmedFilterText);
+      },
+      debounceMs: 300,
+      },
     },
     {
       headerName: 'Action',
