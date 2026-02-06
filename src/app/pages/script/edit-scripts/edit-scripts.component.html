@@ -264,16 +264,17 @@ limitations under the License.
                                     </div>
                                     <!-- Column for add/remove precondition buttons -->
                                     <div class="col-md-1 d-flex align-items-center">
-                                        <button type="button" *ngIf="i === preconditions.length - 1"
-                                            class="btn btn-outline-secondary btn-sm me-2"
-                                            style="border-color: grey; color: grey; background-color: white;"
-                                            matTooltip="Add Precondition" (click)="addPrecondition()">
+                                        <!-- Insert precondition after current (show on all preconditions) -->
+                                        <button type="button" class="btn btn-outline-success btn-sm me-1"
+                                            style="border-color: grey; color: grey; background-color: white;" (click)="insertPrecondition(i + 1)"
+                                            matTooltip="Insert Precondition After">
                                             <i class="bi bi-plus-circle" style="color: grey;"></i>
                                         </button>
-                                        <button type="button" *ngIf="i !== 0"
-                                            class="btn btn-outline-secondary btn-sm me-2"
-                                            style="border-color: grey; color: grey; background-color: white;"
-                                            matTooltip="Remove Precondition" (click)="removePrecondition(i)">
+                                    
+                                        <!-- Remove precondition (show on all except first) -->
+                                        <button type="button" *ngIf="i !== 0" class="btn btn-outline-danger btn-sm"
+                                            style="border-color: grey; color: grey; background-color: white;" (click)="removePrecondition(i)"
+                                            matTooltip="Remove Precondition">
                                             <i class="bi bi-dash-circle" style="color: grey;"></i>
                                         </button>
                                     </div>
@@ -334,21 +335,20 @@ limitations under the License.
                                             placeholder="Expected Result"></textarea>
                                     </div>
                                     <!-- Column for add/remove step buttons -->
-                                    <div class="col-md-1 d-flex align-items-center ">
-                                        <button type="button" *ngIf="i === steps.length - 1"
-                                            class="btn btn-outline-secondary btn-sm me-2"
-                                            style="border-color: grey; color: grey; background-color: white;"
-                                            (click)="addStep()" matTooltip="Add Step">
+                                    <div class="col-md-1 d-flex align-items-center">
+                                        <!-- Insert step after current (show on all steps) -->
+                                        <button type="button" class="btn btn-outline-success btn-sm me-1"
+                                            style="border-color: grey; color: grey; background-color: white;" (click)="insertStep(i + 1)"
+                                            matTooltip="Insert Step After">
                                             <i class="bi bi-plus-circle" style="color: grey;"></i>
                                         </button>
-
-                                        <button type="button" *ngIf="i !== 0"
-                                            class="btn btn-outline-secondary btn-sm me-2"
-                                            style="border-color: grey; color: grey; background-color: white;"
-                                            (click)="removeStep(i)" matTooltip="Remove Step">
+                                    
+                                        <!-- Remove step (show on all except first) -->
+                                        <button type="button" *ngIf="i !== 0" class="btn btn-outline-danger btn-sm"
+                                            style="border-color: grey; color: grey; background-color: white;" (click)="removeStep(i)"
+                                            matTooltip="Remove Step">
                                             <i class="bi bi-dash-circle" style="color: grey;"></i>
                                         </button>
-
                                     </div>
                                 </div>
                             </div>

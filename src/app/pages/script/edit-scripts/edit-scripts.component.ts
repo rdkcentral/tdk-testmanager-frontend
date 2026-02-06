@@ -204,6 +204,20 @@ export class EditScriptsComponent {
 
 
   /**
+   * Inserts a new step at the specified index.
+   * @param index The position where the new step should be inserted.
+   */
+  insertStep(index: number): void {
+    const newStep = this.fb.group({
+      testStepId: [''],
+      stepName: ['', Validators.required],
+      stepDescription: ['', Validators.required],
+      expectedResult: ['', Validators.required],
+    });
+
+    this.steps.insert(index, newStep);
+  }
+  /**
    * Sets up validation for the form groups and subscribes to value changes.
    */
   setUpValidation() {
@@ -253,6 +267,18 @@ export class EditScriptsComponent {
       preConditionId: [pre?.preConditionId || ''],
       preConditionDetails: [pre?.preConditionDetails || '', Validators.required]
     }));
+  }
+
+ /**
+   * Inserts a new precondition at the specified index.
+   * @param index The position where the new precondition should be inserted.
+   */
+  insertPrecondition(index: number): void {
+    const newPrecondition = this.fb.group({
+      preConditionDetails: ['', Validators.required],
+    });
+
+    this.preconditions.insert(index, newPrecondition);
   }
 
   // Method to remove a precondition from the FormArray

@@ -84,27 +84,39 @@ export class ExecutionComponent implements OnInit, OnDestroy {
 
   filterParams: IDateFilterParams = {
     comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
-      var dateAsString = cellValue;
-      if (dateAsString == null) return -1;
-      var dateParts = dateAsString.split('-');
-      var cellDate = new Date(
-        Number(dateParts[2]),
-        Number(dateParts[1]) - 1,
-        Number(dateParts[0])
+      if (!cellValue) return -1;
+
+      // Convert cellValue to Date object properly
+      const cellDate = new Date(cellValue);
+
+      // Check if valid date
+      if (isNaN(cellDate.getTime())) return -1;
+
+      // Compare dates at midnight level
+      const cellDateAtMidnight = new Date(
+        cellDate.getFullYear(),
+        cellDate.getMonth(),
+        cellDate.getDate(),
       );
-      if (filterLocalDateAtMidnight.getTime() === cellDate.getTime()) {
+      const filterDateAtMidnight = new Date(
+        filterLocalDateAtMidnight.getFullYear(),
+        filterLocalDateAtMidnight.getMonth(),
+        filterLocalDateAtMidnight.getDate(),
+      );
+
+      if (cellDateAtMidnight.getTime() === filterDateAtMidnight.getTime()) {
         return 0;
       }
-      if (cellDate < filterLocalDateAtMidnight) {
+      if (cellDateAtMidnight < filterDateAtMidnight) {
         return -1;
       }
-      if (cellDate > filterLocalDateAtMidnight) {
+      if (cellDateAtMidnight > filterDateAtMidnight) {
         return 1;
       }
       return 0;
     },
     minValidYear: 2000,
-    maxValidYear: 2024,
+    maxValidYear: 2050,
     inRangeFloatingFilterDateFormat: 'DD MMM YYYY',
   };
   public columnDefs: ColDef[] = [
@@ -122,6 +134,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Execution Name',
       field: 'executionName',
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       sortable: true,
       tooltipField: 'executionName',
       cellClass: 'selectable',
@@ -148,6 +174,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Scripts/Testsuite',
       field: 'scriptTestSuite',
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       sortable: true,
       tooltipField: 'scriptTestSuite',
       flex: 2,
@@ -173,6 +213,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Device',
       field: 'device',
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       sortable: true,
       tooltipField: 'device',
       cellClass: 'selectable',
@@ -204,7 +258,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'User',
       field: 'user',
       filter: 'agTextColumnFilter',
-      filterParams: this.filterParams,
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       width: 90,
       sortable: true,
       cellClass: 'selectable',
@@ -220,6 +287,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Result',
       field: 'status',
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       flex: 1,
       cellStyle: { textAlign: 'center' },
       sortable: true,
@@ -276,6 +357,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       field: 'jobName',
       flex: 3,
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       tooltipField: 'jobName',
       sortable: true,
       headerClass: 'header-center',
@@ -293,6 +388,37 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Execution Start Time',
       field: 'executionStartTime',
       filter: 'agDateColumnFilter',
+      filterParams: {
+        comparator: (filterLocalDateAtMidnight: Date, cellValue: string) => {
+          if (!cellValue) return -1;
+
+          // Parse the actual date from cronStartTime or executionTime
+          const dateValue = new Date(cellValue);
+          if (isNaN(dateValue.getTime())) return -1;
+
+          // Compare dates at midnight level
+          const cellDateAtMidnight = new Date(
+            dateValue.getFullYear(),
+            dateValue.getMonth(),
+            dateValue.getDate(),
+          );
+          const filterDateAtMidnight = new Date(
+            filterLocalDateAtMidnight.getFullYear(),
+            filterLocalDateAtMidnight.getMonth(),
+            filterLocalDateAtMidnight.getDate(),
+          );
+
+          if (cellDateAtMidnight.getTime() === filterDateAtMidnight.getTime()) {
+            return 0;
+          }
+          if (cellDateAtMidnight < filterDateAtMidnight) {
+            return -1;
+          }
+          return 1;
+        },
+        minValidYear: 2000,
+        maxValidYear: 2030,
+      },
       width: 120,
       sortable: true,
       resizable: false,
@@ -336,6 +462,15 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       sortable: true,
       resizable: false,
       headerClass: 'header-center',
+
+      // Make sure valueGetter returns exactly what cellRenderer shows
+      valueGetter: (params: any) => {
+        if (params.data.cronEndTime) {
+          return this.formatTime(params.data.cronEndTime);
+        }
+        return 'N/A';
+      },
+
       cellRenderer: (params: any) => {
         // If cronEndTime exists, it's a recurring schedule
         if (params.data.cronEndTime) {
@@ -350,6 +485,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Scripts/Testsuite',
       field: 'scriptTestSuite',
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       tooltipField: 'scriptTestSuite',
       flex: 2.5,
       sortable: true,
@@ -368,6 +517,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Device',
       field: 'device',
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       flex: 1.5,
       sortable: true,
       resizable: false,
@@ -378,7 +541,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Details',
       field: 'details',
       filter: 'agDateColumnFilter',
-      filterParams: this.filterParams,
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       flex: 1.5,
       sortable: true,
       resizable: false,
@@ -389,6 +565,20 @@ export class ExecutionComponent implements OnInit, OnDestroy {
       headerName: 'Status',
       field: 'status',
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       flex: 1.5,
       sortable: true,
       resizable: false,
@@ -592,7 +782,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
   if (this.selectedCategory === 'ExecutionName' && this.searchValue != '') {
       this.executionservice
         .getAllExecutionByName(
-          this.searchValue,
+          this.searchValue.trim(),
           this.selectedDfaultCategory,
           this.currentPage,
           this.pageSize
@@ -629,7 +819,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
     ) {
       this.executionservice
         .getAllExecutionByScript(
-          this.searchValue,
+          this.searchValue.trim(),
           this.selectedDfaultCategory,
           this.currentPage,
           this.pageSize
@@ -657,7 +847,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
   } else if (this.selectedCategory === 'Device' && this.searchValue != '') {
       this.executionservice
         .getAllExecutionByDevice(
-          this.searchValue,
+          this.searchValue.trim(),
           this.selectedDfaultCategory,
           this.currentPage,
           this.pageSize
@@ -1206,7 +1396,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
     if (
       this.selectedCategory === 'ExecutionName' ||
       this.selectedCategory === 'Scripts/Testsuite' ||
-      (this.selectedCategory === 'Device' && this.searchValue)
+      (this.selectedCategory === 'Device' && this.searchValue.trim())
     ) {
       this.currentPage = 0;
       this.paginator.firstPage();

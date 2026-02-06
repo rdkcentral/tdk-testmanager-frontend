@@ -301,6 +301,33 @@ export class CreateScriptsComponent {
     this.steps.removeAt(index);
   }
 
+   /**
+   * Inserts a new step at the specified index.
+   * @param index The position where the new step should be inserted.
+   */
+  insertStep(index: number): void {
+    const newStep = this.fb.group({
+      testStepId: [''],
+      stepName: ['', Validators.required],
+      stepDescription: ['', Validators.required],
+      expectedResult: ['', Validators.required],
+    });
+
+    this.steps.insert(index, newStep);
+  }
+
+  /**
+   * Inserts a new precondition at the specified index.
+   * @param index The position where the new precondition should be inserted.
+   */
+  insertPrecondition(index: number): void {
+    const newPrecondition = this.fb.group({
+      precondition: ['', Validators.required],
+    });
+
+    this.preconditions.insert(index, newPrecondition);
+  }
+
   /**
    * Loads all modules for the selected category.
    * @returns void
