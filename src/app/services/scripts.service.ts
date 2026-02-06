@@ -593,4 +593,50 @@ export class ScriptsService {
       { headers }
     );
   }
+
+  /**
+   * Uploads a bulk script file to the server.
+   * 
+   * @param file - The file containing bulk scripts to be uploaded
+   * @returns An Observable that emits the server response for the bulk script upload operation
+   * 
+   * @remarks
+   * This method sends a POST request to the bulk script upload endpoint with the file
+   * attached as form data. The request includes authorization headers for authentication.
+   */
+   uploadBulkScript(file: File): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/script/uploadBulkScripts`,
+      formData,
+      { headers }
+    );
+  }
+
+  /**
+   * Downloads multiple scripts in bulk as a blob response.
+   * 
+   * @param data - The request payload containing script identifiers or criteria for bulk download
+   * @returns Observable<any> - An observable that emits a blob containing the bulk script download
+   * 
+   * @remarks
+   * This method makes a POST request to the bulk script download endpoint with authorization headers.
+   * The response is returned as a blob type, typically used for file downloads.
+   */
+  downloadBulkScript(data :any ): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/script/downloadBulkScripts`,data,
+      {  
+        headers: headers,
+        responseType: 'blob' as 'json',
+      }
+    );
+  }
 }

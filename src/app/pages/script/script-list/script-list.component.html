@@ -54,9 +54,30 @@ limitations under the License.
           <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
         </button>
         <button type="button" class="download-btn" (click)="downloadAllMdZip()"
-  matTooltip="Download All Md files (zip)">
-  <i class="bi bi-file-earmark-zip download-icon"></i>
-</button>
+          matTooltip="Download All Md files (zip)">
+          <i class="bi bi-file-earmark-zip download-icon"></i>
+        </button>
+        <!-- Button group for Bulk upload/download actions -->
+        <button
+          type="button"
+          class="download-btn"
+          data-bs-toggle="modal"
+          data-bs-target="#bulkScriptUploadModal"
+          matTooltip="Bulk script upload"
+        >
+          <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
+        </button>
+       
+        <button
+          type="button"
+          class="download-btn"
+          data-bs-target="#bulkScriptDownloadModal"
+          data-bs-toggle="modal"
+          aria-expanded="false"
+          matTooltip="Bulk script download"
+        >
+          <i class="bi bi-cloud-arrow-down-fill download-icon"></i>
+        </button>
         <button class="download-btn" (click)="createScripts()" matTooltip="Create {{selectedCategory}} Script">
           <i class="bi bi-plus-circle-fill download-icon"></i>
         </button>
@@ -545,3 +566,223 @@ limitations under the License.
   </div>
 </div>
 <!--Custom TestSuite Upload Modal End-->
+<!--Bulk Script Upload Modal Start-->
+<div
+  class="modal fade"
+  #bulkScriptUploadModal
+  id="bulkScriptUploadModal"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="bulkScriptUploadModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog custom-modal">
+    <div class="modal-content">
+      <form
+        [formGroup]="uploadBulkSriptUploadForm"
+        (ngSubmit)="bulkSriptUploadFileSubmit()"
+      >
+        <div class="modal-header modaltitle">
+          <h1 class="modal-title custom-title" id="bulkScriptUploadModalLabel">
+            Bulk Script Upload 
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          
+          <div class="container mt-4">
+            <div class="row mb-3">
+              <label for="uploadBulkScriptFile" class="col-md-4 col-form-label"
+                >Select ZIP or TAR.GZ file<span
+                  style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <div class="col-md-8">
+                <input
+                  class="form-control form-control-sm"
+                  id="uploadBulkScriptFile"
+                  type="file"
+                  formControlName="uploadBulkScriptFile"
+                  accept=".zip,.tar.gz"
+                  (change)="onBulkScriptFileChange($event)"
+                />
+                <div
+                  *ngIf="
+                    bulkFormSubmitted &&
+                    uploadBulkSriptUploadForm.controls['uploadBulkScriptFile']
+                      ?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="uploadBulkSriptUploadForm.controls['uploadBulkScriptFile']?.errors?.['required']"
+                    >Please select a ZIP or TAR.GZ file.</small
+                  >
+                </div>
+                <small *ngIf="bulkUploadFileError" class="errorupload">{{
+                  bulkUploadFileError
+                }}</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="showBulkUploadLoader">
+            <app-loader></app-loader>
+          </div>
+        <div class="modal-footer">
+          
+          <button
+            type="button"
+            class="download-btn modal-btns"
+            (click)="closeBulkUploadModal()"
+          >
+            Close
+          </button>
+          <button type="submit" class="download-btn modal-btns">Upload</button>
+        </div>
+        
+      </form>
+    </div>
+  </div>
+</div>
+<!--Bulk Upload Modal End-->
+
+<!-- Bulk Script Download Modal Start -->
+<div
+  class="modal fade"
+  #bulkScriptDownloadModal
+  id="bulkScriptDownloadModal"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="bulkScriptDownloadModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog custom-modal">
+    <div class="modal-content">
+      <form [formGroup]="bulkDownloadForm" (ngSubmit)="bulkScriptDownloadSubmit()">
+        <div class="modal-header modaltitle">
+          <h1 class="modal-title custom-title" id="bulkScriptDownloadModalLabel">
+            Bulk Script Download
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="closeBulkDownloadModal()"
+          ></button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="container mt-4">
+            <!-- Script Names Input -->
+            <div class="row mb-4">
+              <label for="scriptNames" class="col-md-4 col-form-label">
+                Script Names
+                <span style="color: red; margin-left: 0.75em">*</span>
+              </label>
+              <div class="col-md-8">
+                <textarea
+                  class="form-control"
+                  id="scriptNames"
+                  rows="4"
+                  placeholder="Enter script names separated by commas (e.g. script1, script2, script3)"
+                  formControlName="scriptNames"
+                ></textarea>
+                
+                <div
+                  *ngIf="bulkDownloadFormSubmitted && bulkDownloadForm.controls['scriptNames']?.errors"
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="bulkDownloadForm.controls['scriptNames']?.errors?.['required']"
+                  >
+                    Please enter at least one script name.
+                  </small>
+                </div>
+                <small *ngIf="bulkDownloadError" class="errorupload">
+                  {{ bulkDownloadError }}
+                </small>
+              </div>
+            </div>
+
+            <!-- Download Format Selection -->
+            <div class="row mb-3 mt-4">
+              <label class="col-md-4 col-form-label">
+                Download Format
+                <span style="color: red; margin-left: 0.75em">*</span>
+              </label>
+              <div class="col-md-8">
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="downloadFormat"
+                    id="downloadZip"
+                    value="zip"                
+                    formControlName="downloadFormat"
+                  />
+                  <label class="form-check-label" for="downloadZip">
+                    <i class="bi bi-file-earmark-zip me-2"></i>
+                    Download as ZIP
+                  </label>
+                </div>
+                <div class="form-check">
+                  <input
+                    class="form-check-input"
+                    type="radio"
+                    name="downloadFormat"
+                    id="downloadTar"
+                    value="tar"
+                    formControlName="downloadFormat"
+                  />
+                  <label class="form-check-label" for="downloadTar">
+                    <i class="bi bi-file-earmark-arrow-down me-2"></i>
+                    Download as TAR
+                  </label>
+                </div>
+                <div
+                  *ngIf="bulkDownloadFormSubmitted && bulkDownloadForm.controls['downloadFormat']?.errors"
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="bulkDownloadForm.controls['downloadFormat']?.errors?.['required']"
+                  >
+                    Please select a download format.
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="download-btn modal-btns"
+            data-bs-dismiss="modal"
+            (click)="closeBulkDownloadModal()"
+          >
+            Close
+          </button>
+          <button 
+            type="submit" 
+            class="download-btn modal-btns"
+           
+          >
+            Download
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!-- Bulk Script Download Modal End -->

@@ -1,0 +1,164 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+/*
+ * Sets the default font family for the body and all elements except material icons.
+ */
+
+body,
+*:not(.material-icons) {
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+/*
+ * Ensures all heading tags in .mat-typography use the Roboto font.
+ */
+
+.mat-typography h1,
+.mat-typography h2,
+.mat-typography h3,
+.mat-typography h4,
+.mat-typography h5,
+.mat-typography h6 {
+  font-family: Roboto, "Helvetica Neue", sans-serif !important;
+}
+/*
+ * Styles for the title text in the delete dialog.
+ */
+
+.title {
+  font-size: 1rem !important;
+  text-align: center;
+  padding: 1px 0 1px 0;
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  margin: 0;
+}
+/*
+ * Styles for the radio group container.
+ */
+
+.radio-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  margin-top: 10px;
+}
+/*
+ * Styles for individual radio option.
+ */
+
+.radio-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+/*
+ * Styles for the radio input.
+ */
+
+.radio-input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+/*
+ * Styles for the radio label.
+ */
+
+.radio-label {
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  margin: 0;
+}
+/*
+ * Styles for the info icon.
+ */
+
+.info-icon {
+  color: #00b2dc;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-left: 5px;
+}
+/*
+ * Styles for all main action buttons in the dialog.
+ */
+
+.all-btn {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 7px 20px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-top: 15px;
+  margin-left: 15px;
+}
+/*
+ * Styles for the disabled state of action buttons.
+ */
+
+.all-btn:disabled {
+  background-color: gray;
+}
+/*
+ * Styles for the close section container.
+ */
+
+.close-sec {
+  float: right;
+  margin-right: 30px;
+  margin-top: 50px;
+  margin-bottom: 20px;
+}
+/*
+ * Styles for the close button.
+ */
+
+.close-btn {
+  width: 100px;
+}
+/*
+ * Styles for the delete button.
+ */
+
+.delete-btn {
+  width: 100px;
+  background-color: #d32f2f;
+}
+/*
+ * Hover styles for the delete button.
+ */
+
+.delete-btn:hover {
+  background-color: #b71c1c;
+}
