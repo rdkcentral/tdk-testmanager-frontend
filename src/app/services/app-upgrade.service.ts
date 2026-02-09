@@ -241,26 +241,6 @@ export class AppUpgradeService {
   }
 
   /**
-   * Retrieves war generation logs for a specific execution.
-   * 
-   * @param executionId - The unique identifier for the execution whose logs are to be retrieved
-   * @returns An Observable that emits the war generation logs data
-   * 
-   * @remarks
-   * This method makes an authenticated HTTP GET request to fetch war generation logs.
-   * The request includes an Authorization header with the API token.
-   */
-  getWarGenerationLogs(executionId: string): Observable<any> {
-    const headers = new HttpHeaders({
-      Authorization: this.authService.getApiToken(),
-    });
-    return this.http.get(
-      `${this.config.apiUrl}api/v1/app-upgrade/war-generation/logs?executionId=${executionId}`,
-      { headers },
-    );
-  }
-
-  /**
    * Generates a URL for streaming WAR generation logs for a specific execution.
    * 
    * @param executionId - The unique identifier of the execution to retrieve logs for
