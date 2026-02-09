@@ -71,7 +71,20 @@ export class ListOemComponent {
       filter: 'agTextColumnFilter',
       flex: 1,
       sort: 'asc',
-      filterParams: {} as IMultiFilterParams,
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
     },
     {
       headerName: 'Action',

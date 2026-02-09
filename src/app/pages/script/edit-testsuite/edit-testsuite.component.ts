@@ -228,7 +228,7 @@ dragEndIndexRight: number | null = null;
     this.filteredLeftList = this.container1;
     if (searchTerm) {
        this.filteredLeftList = this.container1.filter((item:any) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        item.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
       );
     }
       return this.filteredLeftList;
