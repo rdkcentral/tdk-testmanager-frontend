@@ -17,7 +17,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild, NgZone} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -95,6 +95,15 @@ export class AppServiceUpgradeComponent implements OnInit {
   showDeploymentLogs = false;
   deploymentLogs: string = '';
   upgradeInProgress: boolean = false;
+   // Add these properties to your class
+  warTabIndex = 0;
+  warGenerationForm: FormGroup;
+  warGenerationFormSubmitted = false;
+  warGenerationInProgress = false;
+  warGenerationExecutionId: string | null = null;
+  warGenerationStatus: string | null = null;
+  warGenerationLogs: string = '';
+  private warLogEventSource: EventSource | null = null;
 
   /**
    * Constructor: Initializes forms and injects required services.
@@ -103,7 +112,8 @@ export class AppServiceUpgradeComponent implements OnInit {
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     private dialogRef: MatDialogRef<AppServiceUpgradeComponent>,
-    private appBackendUpgradeService: AppUpgradeService
+    private appBackendUpgradeService: AppUpgradeService,
+    private ngZone: NgZone
   ) {
     // Initialize forms
     this.uploadForm = this.fb.group({
@@ -114,6 +124,11 @@ export class AppServiceUpgradeComponent implements OnInit {
       backupLocation: [''],
       warLocation: ['', Validators.required],
     });
+
+    // Initialize war generation form
+    this.warGenerationForm = this.fb.group({
+       releaseTag: ['', Validators.required],
+     });
   }
 
   /**
@@ -132,6 +147,7 @@ export class AppServiceUpgradeComponent implements OnInit {
     if (this.healthCheckSubscription) {
       this.healthCheckSubscription.unsubscribe();
     }
+    this.closeLogStream();
   }
 
   /**
@@ -425,5 +441,199 @@ export class AppServiceUpgradeComponent implements OnInit {
   close() {
     this.resetForms();
     this.dialogRef.close();
+  }
+
+   /**
+   * Initiates WAR generation for a given release tag.
+   * Establishes SSE connection for real-time log streaming.
+   */
+  generateWar(): void {
+    this.warGenerationFormSubmitted = true;
+    if (this.warGenerationForm.invalid) {
+      return;
+    }
+
+    const releaseTag = this.warGenerationForm.get('releaseTag')?.value;
+    this.appBackendUpgradeService.generateWar(releaseTag).subscribe({
+      next: (response) => {
+        if (response.data?.status === 'RUNNING' && response.data?.executionId) {
+          this.warGenerationExecutionId = response.data.executionId;
+          this.warGenerationInProgress = true;
+          this.warGenerationLogs = '';
+          this.warGenerationStatus = 'PENDING';
+          this.initializeLogStreaming();
+        } else {
+          this.warGenerationInProgress = false;
+        }
+      },
+      error: (err) => {
+        this.upgradeInProgress = false;
+        this.snackBar.open(err.message, '', {
+          duration: 2000,
+          panelClass: ['err-msg'],
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+        });
+      },
+    });
+  }
+
+  /**
+   * Initializes Server-Sent Events (SSE) connection for real-time log streaming.
+   * Listens for log, status, complete, and error events from backend.
+   */
+  private initializeLogStreaming(): void {
+    if (!this.warGenerationExecutionId) return;
+
+    const logStreamUrl =
+      this.appBackendUpgradeService.getWarGenerationLogStreamUrl(
+        this.warGenerationExecutionId,
+      );
+    this.warLogEventSource = new EventSource(logStreamUrl);
+
+    // Listen for status updates
+    this.warLogEventSource.addEventListener('status', (event) => {
+      this.ngZone.run(() => {
+        const statusData = JSON.parse(event.data);
+        if (statusData.message) {
+          this.warGenerationLogs += statusData.message + '\n';
+          this.scrollToBottomOfLogs();
+        }
+      });
+    });
+
+    // Listen for log events
+    this.warLogEventSource.addEventListener('log', (event) => {
+      this.ngZone.run(() => {
+        if (event.data && event.data.trim() !== '') {
+          try {
+            const logData = JSON.parse(event.data);
+            if (logData.message) {
+              this.warGenerationLogs += logData.message + '\n';
+            }
+          } catch {
+            // If parsing fails, append raw data
+            this.warGenerationLogs += event.data + '\n';
+          }
+          this.scrollToBottomOfLogs();
+        }
+      });
+    });
+
+    // Listen for completion event
+    this.warLogEventSource.addEventListener('complete', (event) => {
+      this.ngZone.run(() => {
+        const completeData = JSON.parse(event.data);
+        this.warGenerationStatus = completeData.status;
+        this.warGenerationInProgress = false;
+
+        // Add completion message to logs
+        const completionMsg = `\n=== ${completeData.status} ===\n${completeData.message}\n`;
+        this.warGenerationLogs += completionMsg;
+        this.scrollToBottomOfLogs();
+
+        // Update form with war location if successful
+        if (completeData.status === 'SUCCESS' && completeData.upgradeDir) {
+          this.upgradeForm.patchValue({
+            warLocation: completeData.upgradeDir,
+          });
+
+          this.snackBar.open('WAR generated successfully!', '', {
+            duration: 5000,
+            panelClass: ['success-msg'],
+          });
+        } else if (completeData.status === 'FAILED') {
+          this.snackBar.open(
+            `WAR generation failed: ${completeData.message}`,
+            '',
+            {
+              duration: 5000,
+              panelClass: ['err-msg'],
+            },
+          );
+        }
+
+        this.closeLogStream();
+      });
+    });
+
+    // Listen for error events from backend
+    this.warLogEventSource.addEventListener('error', (event: any) => {
+      this.ngZone.run(() => {
+        if (event.data) {
+          const errorData = JSON.parse(event.data);
+          this.warGenerationStatus = errorData.status || 'ERROR';
+          this.warGenerationInProgress = false;
+
+          const errorMsg = `\n=== ERROR ===\n${errorData.message || 'Unknown error occurred'}\n`;
+          this.warGenerationLogs += errorMsg;
+          this.scrollToBottomOfLogs();
+
+          this.snackBar.open(errorData.message || 'WAR generation error', '', {
+            duration: 5000,
+            panelClass: ['err-msg'],
+          });
+
+          this.closeLogStream();
+        }
+      });
+    });
+
+    // Handle SSE connection errors
+    this.warLogEventSource.onerror = () => {
+      this.ngZone.run(() => {
+        if (this.warGenerationInProgress) {
+          this.warGenerationLogs +=
+            '\n[Connection lost. Please check your network and try again.]\n';
+          this.scrollToBottomOfLogs();
+          this.warGenerationStatus = 'ERROR';
+          this.warGenerationInProgress = false;
+          this.closeLogStream();
+
+          this.snackBar.open('Connection lost during WAR generation', '', {
+            duration: 5000,
+            panelClass: ['err-msg'],
+          });
+        }
+      });
+    };
+  }
+
+  /**
+   * Switches between war upload and generation tabs
+   * @param tabIndex Tab index to switch to
+   */
+  switchWarTab(tabIndex: number): void {
+    this.warTabIndex = tabIndex;
+  }
+
+  /**
+   * Scrolls the log display to show the most recent entries
+   */
+  private scrollToBottomOfLogs(): void {
+    setTimeout(() => {
+      const logsElement = document.querySelector('.war-generation-logs');
+      if (logsElement) {
+        logsElement.scrollTop = logsElement.scrollHeight;
+      }
+    }, 100);
+  }
+
+  /**
+   * Closes the SSE connection and cleans up resources
+   */
+  private closeLogStream(): void {
+    if (this.warLogEventSource) {
+      this.warLogEventSource.close();
+      this.warLogEventSource = null;
+    }
+  }
+
+  /**
+   * Determines if user can proceed to upgrade step
+   * @returns true if file upload or WAR generation completed successfully
+   */
+  canProceedToUpgrade(): boolean {
+    return this.uploadComplete || this.warGenerationStatus === 'SUCCESS';
   }
 }

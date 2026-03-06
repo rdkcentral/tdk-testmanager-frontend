@@ -70,8 +70,21 @@ export class FunctionListComponent {
       headerName: 'Function Name',
       field: 'functionName',
       filter: 'agTextColumnFilter',
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
+      },
       sort: 'asc',
-      filterParams: {} as IMultiFilterParams,
     },
     {
       headerName: 'Action',

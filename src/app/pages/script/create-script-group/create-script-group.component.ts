@@ -340,7 +340,7 @@ export class CreateScriptGroupComponent {
     this.filteredLeftList = this.container1;
     if (searchTerm) {
        this.filteredLeftList = this.container1.filter((item:any) =>
-        item.name.toLowerCase().includes(searchTerm.toLowerCase())
+        item.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
       );
     }
     // Sort the filtered list based on the current sort order    

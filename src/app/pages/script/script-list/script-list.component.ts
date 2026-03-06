@@ -170,6 +170,20 @@ export class ScriptListComponent {
       headerName: 'Script Name',
       field: 'name',
       filter: 'agTextColumnFilter',
+      filterParams: {
+      textMatcher: ({ value, filterText }: any) => {
+        // Trim both the filter text and the value before comparison
+        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+        const trimmedValue = value?.trim().toLowerCase() || '';
+        
+        if (trimmedFilterText === '') {
+          return true;
+        }
+        
+        return trimmedValue.includes(trimmedFilterText);
+      },
+      debounceMs: 300,
+    },
       flex: 2,
       sortable: true,
       cellRenderer: (params: any) => {
@@ -205,6 +219,20 @@ export class ScriptListComponent {
       headerName: 'Script Name',
       field: 'name',
       filter: 'agTextColumnFilter',
+      filterParams: {
+      textMatcher: ({ value, filterText }: any) => {
+        // Trim both the filter text and the value before comparison
+        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+        const trimmedValue = value?.trim().toLowerCase() || '';
+        
+        if (trimmedFilterText === '') {
+          return true;
+        }
+        
+        return trimmedValue.includes(trimmedFilterText);
+      },
+      debounceMs: 300,
+      },
       flex: 1,
       sortable: true,
       cellRenderer: (params: any) => {
@@ -719,7 +747,7 @@ export class ScriptListComponent {
   filterScript() {
     if (this.filterText) {
       this.scriptFilteredData = this.scriptDataArr.filter((parent: any) =>
-        parent.moduleName.toLowerCase().includes(this.filterText.toLowerCase())
+        parent.moduleName.toLowerCase().includes(this.filterText.trim().toLowerCase())
       );
     } else {
       this.scriptFilteredData = [...this.scriptDataArr];
@@ -741,7 +769,7 @@ export class ScriptListComponent {
   applyFilterSuite() {
     if (this.filterTextSuite) {
       this.testSuiteFilteredData = this.testSuiteDataArr.filter((parent: any) =>
-        parent.name.toLowerCase().includes(this.filterTextSuite.toLowerCase())
+        parent.name.toLowerCase().includes(this.filterTextSuite.trim().toLowerCase())
       );
     } else {
       this.testSuiteFilteredData = [...this.testSuiteDataArr];
@@ -755,6 +783,7 @@ export class ScriptListComponent {
    * Handles the input event for th e global search box with debounce.
    */
   onSearchInput() {
+    this.globalSearchTerm = this.globalSearchTerm.trim();
     if (this.debounceTimer) {
       clearTimeout(this.debounceTimer);
     }

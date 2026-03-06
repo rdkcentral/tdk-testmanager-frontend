@@ -38,76 +38,238 @@ limitations under the License.
             >
               1
             </div>
-            <span>War Upload</span>
+            <span>War Generation or Upload</span>
           </div>
         </ng-template>
-        <form [formGroup]="uploadForm">
-          <div class="row mt-4 mb-3">
-            <div class="col-md-4">
-              <label for="uploadfile" class="form-label">
-                Select the War file<span style="color: red; margin-left: 0.25em"
-                  >*</span
+
+        <!-- War Generation or Upload Toggle Switch - Modern Design -->
+        <div class="row mt-3 mb-4">
+          <div class="col-12">
+            <div class="custom-toggle-container">
+              <div class="toggle-switch">
+                <div
+                  class="toggle-slider"
+                  [ngClass]="{ 'slide-right': warTabIndex === 1 }"
+                ></div>
+                <button
+                  type="button"
+                  class="toggle-option"
+                  [class.active]="warTabIndex === 0"
+                  (click)="switchWarTab(0)"
                 >
-              </label>
-            </div>
-            <div class="col-md-6">
-              <input
-                class="form-control form-control-sm"
-                id="uploadfile"
-                type="file"
-                #fileInput
-                (change)="onFileChange($event)"
-                formControlName="uploadForm"
-                accept=".war"
-              />
-              <div class="text-danger" *ngIf="uploadAttempted && !fileSelected">
-                <small>Please select a .war file to upload.</small>
+                  <span>War Generation</span>
+                </button>
+                <button
+                  type="button"
+                  class="toggle-option"
+                  [class.active]="warTabIndex === 1"
+                  (click)="switchWarTab(1)"
+                >
+                  <span>War Upload</span>
+                </button>
               </div>
-              <div *ngIf="uploading" class="mt-2">
-                <mat-progress-bar
-                  mode="determinate"
-                  [value]="progress"
-                ></mat-progress-bar>
-                <div class="text-center mt-1">
-                  <small>Uploading... {{ progress }}%</small>
+            </div>
+          </div>
+        </div>
+
+        <!-- War Upload Content -->
+        <div *ngIf="warTabIndex === 1">
+          <form [formGroup]="uploadForm">
+            <div class="row mt-4 mb-3">
+              <div class="col-md-4">
+                <label for="uploadfile" class="form-label">
+                  Select the War file<span
+                    style="color: red; margin-left: 0.25em"
+                    >*</span
+                  >
+                </label>
+              </div>
+              <div class="col-md-6">
+                <input
+                  class="form-control form-control-sm"
+                  id="uploadfile"
+                  type="file"
+                  #fileInput
+                  (change)="onFileChange($event)"
+                  formControlName="warFile"
+                  accept=".war"
+                />
+                <div
+                  class="text-danger"
+                  *ngIf="uploadAttempted && !fileSelected"
+                >
+                  <small>Please select a .war file to upload.</small>
+                </div>
+                <div *ngIf="uploading" class="mt-2">
+                  <mat-progress-bar
+                    mode="determinate"
+                    [value]="progress"
+                  ></mat-progress-bar>
+                  <div class="text-center mt-1">
+                    <small>Uploading... {{ progress }}%</small>
+                  </div>
+                </div>
+                <div *ngIf="uploadComplete" class="text-success mt-2">
+                  <small>Upload completed successfully!</small>
                 </div>
               </div>
-              <div *ngIf="uploadComplete" class="text-success mt-2">
-                <small>Upload completed successfully!</small>
+              <div class="col-md-2 d-flex align-items-start">
+                <button
+                  class="modal-btns"
+                  (click)="uploadFile()"
+                  matTooltip="Upload the War file"
+                  [disabled]="uploadComplete || uploading"
+                >
+                  Upload
+                </button>
               </div>
             </div>
-            <div class="col-md-2 d-flex align-items-start">
-              <button
-                class="modal-btns"
-                (click)="uploadFile()"
-                matTooltip="Upload the War file"
-                [disabled]="uploadComplete || uploading"
-              >
-                Upload
-              </button>
+          </form>
+        </div>
+
+        <!-- War Generation Content -->
+        <div *ngIf="warTabIndex === 0">
+          <form [formGroup]="warGenerationForm">
+            <div class="row mt-4 mb-3">
+              <div class="col-md-4">
+                <label for="releaseTag" class="form-label">
+                  Release Tag<span style="color: red; margin-left: 0.25em"
+                    >*</span
+                  >
+                </label>
+              </div>
+              <div class="col-md-6">
+                <input
+                  type="text"
+                  id="releaseTag"
+                  class="form-control form-control-sm"
+                  placeholder="Enter release tag"
+                  formControlName="releaseTag"
+                />
+                <div
+                  class="text-danger"
+                  *ngIf="
+                    warGenerationFormSubmitted &&
+                    warGenerationForm.get('releaseTag')?.errors?.['required']
+                  "
+                >
+                  <small>Release tag is required</small>
+                </div>
+              </div>
+              <div class="col-md-2 d-flex align-items-start gap-2">
+                <button
+                  class="modal-btns"
+                  (click)="generateWar()"
+                  matTooltip="Generate War file"
+                  [disabled]="
+                    warGenerationInProgress || warGenerationForm.invalid
+                  "
+                >
+                  Generate
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- War Generation Status and Logs -->
+          <div
+            class="row mt-4"
+            *ngIf="warGenerationExecutionId || warGenerationInProgress"
+          >
+            <div class="col-12">
+              <div class="logsection">
+                <div
+                  class="d-flex justify-content-between align-items-center mb-3"
+                >
+                  <span class="sub-titel" style="color: #06667d"
+                    >War Generation</span
+                  >
+                  <div
+                    *ngIf="warGenerationStatus"
+                    class="badge"
+                    [ngClass]="{
+                      'bg-success': warGenerationStatus === 'SUCCESS',
+                      'bg-danger':
+                        warGenerationStatus === 'FAILED' ||
+                        warGenerationStatus === 'ERROR' ||
+                        warGenerationStatus === 'INTERRUPTED',
+                      'bg-secondary':
+                        warGenerationStatus === 'RUNNING' ||
+                        warGenerationStatus === 'PENDING',
+                      'bg-warning ': warGenerationStatus === 'CANCELLED',
+                    }"
+                  >
+                    {{ warGenerationStatus }}
+                  </div>
+                </div>
+
+                <!-- Progress indicator -->
+                <div *ngIf="warGenerationInProgress" class="mb-3">
+                  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+                  <div class="text-center mt-1">
+                    <small>Generating WAR file... Please wait.</small>
+                  </div>
+                </div>
+
+                <!-- Logs Section -->
+                <div class="execution-result">
+                  <div class="logs-content">
+                    <ng-container *ngIf="warGenerationLogs; else noWarLogs">
+                      <pre class="war-generation-logs">{{
+                        warGenerationLogs
+                      }}</pre>
+                    </ng-container>
+                    <ng-template #noWarLogs>
+                      <div class="text-muted">
+                        No logs available. Logs will appear here during the
+                        generation process.
+                      </div>
+                    </ng-template>
+
+                    <!-- Success/Error Messages -->
+                    <div
+                      *ngIf="warGenerationStatus === 'SUCCESS'"
+                      class="alert alert-success mt-3"
+                    >
+                      <i class="bi bi-check-circle-fill me-2"></i>
+                      WAR generation completed successfully!
+                    </div>
+
+                    <div
+                      *ngIf="warGenerationStatus === 'FAILED'"
+                      class="alert alert-danger mt-3"
+                    >
+                      <i class="bi bi-x-circle-fill me-2"></i>
+                      WAR generation failed. Please check the logs above.
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="row mt-4">
-            <div class="col-12 d-flex justify-content-center">
-              <button
-                class="close-btns"
-                style="margin-right: 8px"
-                matTooltip="Close the tab"
-                (click)="close()"
-              >
-                Close
-              </button>
-              <button
-                class="close-btns"
-                matTooltip="Move to next tab"
-                (click)="nextTab()"
-                [disabled]="!uploadComplete"
-              >
-                Next
-              </button>
-            </div>
+        </div>
+
+        <!-- Next Button -->
+        <div class="row mt-4">
+          <div class="col-12 d-flex justify-content-center">
+            <button
+              class="close-btns"
+              style="margin-right: 8px"
+              matTooltip="Close the tab"
+              (click)="close()"
+            >
+              Close
+            </button>
+            <button
+              class="close-btns"
+              matTooltip="Move to next tab"
+              (click)="nextTab()"
+              [disabled]="!canProceedToUpgrade()"
+            >
+              Next
+            </button>
           </div>
-        </form>
+        </div>
       </mat-tab>
       <mat-tab class="tab-label" matTooltip="Complete step 1 and click on next">
         <ng-template mat-tab-label>
@@ -157,7 +319,10 @@ limitations under the License.
               />
               <div
                 class="text-danger"
-                *ngIf="upgradeFormSubmitted && upgradeForm.get('warLocation')?.errors?.['required']"
+                *ngIf="
+                  upgradeFormSubmitted &&
+                  upgradeForm.get('warLocation')?.errors?.['required']
+                "
               >
                 <small>War location is required</small>
               </div>
