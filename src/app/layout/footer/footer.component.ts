@@ -20,13 +20,13 @@ http://www.apache.org/licenses/LICENSE-2.0
 import { Component } from '@angular/core';
 import { ThemeService } from '../../services/theme.service';
 import { CommonModule } from '@angular/common';
-import { UsergroupService } from '../../services/usergroup.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { VersionService } from '../../services/version.service';
 
 /** FooterComponent is responsible for displaying the footer of the application.
 * It includes functionality to toggle themes, display the application version,
 * and show the logged-in user's information.
-* * It uses the UsergroupService to fetch the application version and the MatSnackBar
+* * It uses the VersionService to fetch the application version and the MatSnackBar
  * to display messages.
 * @remarks
  * - The component uses Angular's dependency injection to access services.
@@ -35,7 +35,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
  * ```html
  * <app-footer></app-footer>
  * ```
- * @see {@link UsergroupService} for fetching application version.
+ * @see {@link VersionService} for fetching application version.
  * @see {@link MatSnackBar} for displaying messages.
  */
 @Component({
@@ -51,7 +51,7 @@ export class FooterComponent {
   vesionName!:string;
   loggedinUser:any;
 
-  constructor(private userservice: UsergroupService,
+  constructor(private versionservice: VersionService,
     private _snakebar: MatSnackBar,
   ) { 
 
@@ -67,7 +67,7 @@ export class FooterComponent {
    * This method is for getting the version name.
    */
   getAppVersion():void{
-    this.userservice.appVersion().subscribe({      
+    this.versionservice.getTDKCoreVersion().subscribe({      
       next:(res)=>{
         this.vesionName = res.data;        
       },
