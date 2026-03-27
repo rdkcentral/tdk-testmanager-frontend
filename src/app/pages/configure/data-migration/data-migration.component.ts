@@ -61,7 +61,7 @@ export class DataMigrationComponent implements OnInit {
   
   // Common output logs
   outputLogs: string = '';
-  
+  jsonData: any = null;
   // Date/time input for checking changes since a specific time
   sinceDateTime: string = '';
 
@@ -86,6 +86,7 @@ export class DataMigrationComponent implements OnInit {
    */
   private clearAllData(): void {
     this.outputLogs = '';
+    this.jsonData = null;
   }
 
   /**
@@ -124,7 +125,7 @@ export class DataMigrationComponent implements OnInit {
 
     this.operationInProgress = true;
     this.outputLogs = 'Checking for new changes...\n';
-
+    this.jsonData = null;
     // Convert browser time to UTC
     const localDate = new Date(this.sinceDateTime);
     const utcDate = localDate.toISOString();
@@ -139,10 +140,10 @@ export class DataMigrationComponent implements OnInit {
         next: (response: any) => {
           this.outputLogs += `SUCCESS: Changes retrieved successfully.\n`;
           
-          // Display the response data directly in the operation output
+          // Store the JSON data separately for better formatting
           if (response && response.data) {
-            this.outputLogs += `\nFETCH RESULTS:\n`;
-            this.outputLogs += `${JSON.stringify(response.data, null, 2)}\n`;
+            this.jsonData = response.data;
+            this.outputLogs += `\nSee JSON output below.\n`;
           } else {
             this.outputLogs += `\nNo data found in the response.\n`;
           }
@@ -160,7 +161,14 @@ export class DataMigrationComponent implements OnInit {
         }
       });
   }
-
+/**
+   * Gets formatted JSON for display
+   */
+  getFormattedJson(): string {
+    if (!this.jsonData) return '';
+    return JSON.stringify(this.jsonData, null, 2);
+  }
+  
   /**
    * Downloads changes as SQL file since the specified date/time
    */
@@ -234,11 +242,6 @@ export class DataMigrationComponent implements OnInit {
           return `<div style="color: red; font-weight: bold;">${line}</div>`;
         } else if (line.startsWith('SUCCESS:')) {
           return `<div style="color: green; font-weight: bold;">${line}</div>`;
-        } else if (line.startsWith('FETCH RESULTS:')) {
-          return `<div style="color: #007bff; font-weight: bold; margin-top: 10px;">${line}</div>`;
-        } else if (line.trim().startsWith('{') || line.trim().startsWith('[') || line.trim().includes('"')) {
-          // JSON content - format with monospace and smaller font
-          return `<div style="font-family: 'Courier New', monospace; font-size: 12px; background-color: #f8f9fa; padding: 2px; margin: 1px 0;">${line}</div>`;
         }
         return `<div>${line}</div>`;
       })

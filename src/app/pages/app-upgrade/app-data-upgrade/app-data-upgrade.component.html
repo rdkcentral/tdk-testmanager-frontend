@@ -139,6 +139,13 @@ http://www.apache.org/licenses/LICENSE-2.0
           
           <ng-container *ngIf="outputLogs; else noLogs">
             <div class="upgradation-logs" [innerHTML]="getFormattedLogs()"></div>
+            <!-- JSON Output Section -->
+          <div *ngIf="jsonData" class="json-output-container mt-3">
+            <div class="json-header">
+              <strong style="color: #007bff;">JSON Output:</strong>
+            </div>
+            <pre class="json-content">{{ getFormattedJson() }}</pre>
+          </div>
           </ng-container>
           
           <ng-template #noLogs>
