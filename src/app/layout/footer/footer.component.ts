@@ -26,7 +26,7 @@ import { VersionService } from '../../services/version.service';
 /** FooterComponent is responsible for displaying the footer of the application.
 * It includes functionality to toggle themes, display the application version,
 * and show the logged-in user's information.
-* * It uses the VersionService to fetch the application version and the MatSnackBar
+* It uses the VersionService to fetch the application version and the MatSnackBar
  * to display messages.
 * @remarks
  * - The component uses Angular's dependency injection to access services.
@@ -48,10 +48,10 @@ import { VersionService } from '../../services/version.service';
 export class FooterComponent {
 
   isChecked = false;
-  vesionName!:string;
+  versionName!:string;
   loggedinUser:any;
 
-  constructor(private versionservice: VersionService,
+  constructor(private versionService: VersionService,
     private _snakebar: MatSnackBar,
   ) { 
 
@@ -67,12 +67,12 @@ export class FooterComponent {
    * This method is for getting the version name.
    */
   getAppVersion():void{
-    this.versionservice.getTDKCoreVersion().subscribe({      
+    this.versionService.getTDKCoreVersion().subscribe({
       next:(res)=>{
-        this.vesionName = res.data;        
+        this.versionName = res.data;
       },
-      error:(err)=>{        
-         this.vesionName = "";
+      error:()=>{
+        this.versionName = "";
       }
     })
   }
