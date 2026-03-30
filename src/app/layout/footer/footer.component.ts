@@ -17,7 +17,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { VersionService } from '../../services/version.service';
 
@@ -44,13 +44,11 @@ import { VersionService } from '../../services/version.service';
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css'
 })
-export class FooterComponent {
+export class FooterComponent implements OnInit{
 
   versionName:string= '';
-  loggedinUser:any;
 
   constructor(private versionService: VersionService) {
-    this.loggedinUser = JSON.parse(localStorage.getItem('loggedinUser')|| '{}');
   }
   /**
    * Initializes the component
