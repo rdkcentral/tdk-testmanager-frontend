@@ -46,7 +46,7 @@ import { VersionService } from '../../services/version.service';
 })
 export class FooterComponent {
 
-  versionName!:string;
+  versionName:string= '';
   loggedinUser:any;
 
   constructor(private versionService: VersionService,
