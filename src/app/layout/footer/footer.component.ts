@@ -18,25 +18,25 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { Component } from '@angular/core';
-import { ThemeService } from '../../services/theme.service';
 import { CommonModule } from '@angular/common';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { VersionService } from '../../services/version.service';
 
-/** FooterComponent is responsible for displaying the footer of the application.
-* It includes functionality to toggle themes, display the application version,
-* and show the logged-in user's information.
-* It uses the VersionService to fetch the application version and the MatSnackBar
- * to display messages.
-* @remarks
+/**
+ * FooterComponent is responsible for displaying the footer of the application.
+ * It includes functionality to display the application version,
+ * and show the logged-in user's information.
+ * It uses the VersionService to fetch the application version.
+ *
+ * @remarks
  * - The component uses Angular's dependency injection to access services.
- * - It imports CommonModule for common directives and features.  
- * * @example
+ * - It imports CommonModule for common directives and features.
+ *
+ * @example
  * ```html
  * <app-footer></app-footer>
  * ```
+ *
  * @see {@link VersionService} for fetching application version.
- * @see {@link MatSnackBar} for displaying messages.
  */
 @Component({
   selector: 'app-footer',
@@ -52,7 +52,6 @@ export class FooterComponent {
   loggedinUser:any;
 
   constructor(private versionService: VersionService,
-    private _snakebar: MatSnackBar,
   ) { 
 
     this.loggedinUser = JSON.parse(localStorage.getItem('loggedinUser')|| '{}');
