@@ -47,7 +47,6 @@ import { VersionService } from '../../services/version.service';
 })
 export class FooterComponent {
 
-  isChecked = false;
   versionName!:string;
   loggedinUser:any;
 
