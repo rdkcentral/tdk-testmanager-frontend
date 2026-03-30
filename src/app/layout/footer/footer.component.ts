@@ -49,15 +49,13 @@ export class FooterComponent {
   versionName:string= '';
   loggedinUser:any;
 
-  constructor(private versionService: VersionService,
-  ) { 
-
+  constructor(private versionService: VersionService) {
     this.loggedinUser = JSON.parse(localStorage.getItem('loggedinUser')|| '{}');
   }
   /**
    * Initializes the component
    */
-  ngOnInit(): void {
+  ngOnInit():void{
     this.getAppVersion();
   }
   /**
