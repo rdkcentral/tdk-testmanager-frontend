@@ -23,8 +23,7 @@ import { VersionService } from '../../services/version.service';
 
 /**
  * FooterComponent is responsible for displaying the footer of the application.
- * It includes functionality to display the application version,
- * and show the logged-in user's information.
+ * It includes functionality to display the application version.
  * It uses the VersionService to fetch the application version.
  *
  * @remarks
