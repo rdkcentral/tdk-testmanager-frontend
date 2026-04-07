@@ -45,16 +45,20 @@ http://www.apache.org/licenses/LICENSE-2.0
  * Styles for the live log area container.
  */
 
-.livelog-area{
-    width: 100%;
-    border: 1px solid gray;
-    text-align: justify;
+.livelog-area {
+  width: 100%;
+  border: 1px solid gray;
+  text-align: justify;
+  height: calc(65vh - 150px);
+  min-height: 200px;
+  resize: none;
+  overflow-y: auto;
 }
 /**
  * Styles for the spinner element.
  */
 
-.spinner{
+.spinner {
   color: #00b2dc !important;
   margin-left: 10px;
 }
@@ -62,7 +66,8 @@ http://www.apache.org/licenses/LICENSE-2.0
  * Styles for focused form select and form control elements (ng-deep).
  */
 
-::ng-deep.form-select:focus, .form-control:focus{
+::ng-deep.form-select:focus,
+.form-control:focus {
   border-color: gray !important;
   box-shadow: none !important;
 }

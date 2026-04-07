@@ -14,7 +14,7 @@ limitations under the License.
 -->
 
 <!-- Container for the live log dialog -->
-<div class="container">
+<div class="container-fluid">
     <!-- Row for main content spacing -->
     <div class="row mt-2">
         <!-- Main column for live log details -->
@@ -31,11 +31,11 @@ limitations under the License.
                     <!-- Loader spinner shown when loading -->
                     <div *ngIf="loader" class="spinner-border spinner-border-sm text-warning spinner" role="status">
                         <span class="visually-hidden">Loading...</span>
-                      </div>
+                    </div>
                 </div>
                 <!-- Section for displaying live log text area -->
                 <div class="text-area mt-3">
-                    <textarea rows="14" class="livelog-area" readonly #logArea>{{ logs }}</textarea>
+                    <textarea class="livelog-area" readonly #logArea>{{ logs }}</textarea>
                 </div>
             </div>
 
@@ -43,11 +43,11 @@ limitations under the License.
             <div class="row">
                 <!-- Section for close button alignment -->
                 <div class="mt-2 text-end mb-2">
-                <button class="view-btn close" (click)="onClose()" *ngIf="!data.cancel">
-                    Close
-                </button>
+                    <button class="view-btn close" (click)="onClose()" *ngIf="!data.cancel">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-  </div>
+</div>

@@ -17,26 +17,25 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Component } from '@angular/core';
-import { ThemeService } from '../../services/theme.service';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { UsergroupService } from '../../services/usergroup.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { VersionService } from '../../services/version.service';
 
-/** FooterComponent is responsible for displaying the footer of the application.
-* It includes functionality to toggle themes, display the application version,
-* and show the logged-in user's information.
-* * It uses the UsergroupService to fetch the application version and the MatSnackBar
- * to display messages.
-* @remarks
+/**
+ * FooterComponent is responsible for displaying the footer of the application.
+ * It includes functionality to display the application version.
+ * It uses the VersionService to fetch the application version.
+ *
+ * @remarks
  * - The component uses Angular's dependency injection to access services.
- * - It imports CommonModule for common directives and features.  
- * * @example
+ * - It imports CommonModule for common directives and features.
+ *
+ * @example
  * ```html
  * <app-footer></app-footer>
  * ```
- * @see {@link UsergroupService} for fetching application version.
- * @see {@link MatSnackBar} for displaying messages.
+ *
+ * @see {@link VersionService} for fetching application version.
  */
 @Component({
   selector: 'app-footer',
@@ -45,34 +44,28 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   templateUrl: './footer.component.html',
   styleUrl: './footer.component.css'
 })
-export class FooterComponent {
+export class FooterComponent implements OnInit{
 
-  isChecked = false;
-  vesionName!:string;
-  loggedinUser:any;
+  versionName:string= '';
 
-  constructor(private userservice: UsergroupService,
-    private _snakebar: MatSnackBar,
-  ) { 
-
-    this.loggedinUser = JSON.parse(localStorage.getItem('loggedinUser')|| '{}');
+  constructor(private versionService: VersionService) {
   }
   /**
    * Initializes the component
    */
-  ngOnInit(): void {
+  ngOnInit():void{
     this.getAppVersion();
   }
   /**
    * This method is for getting the version name.
    */
   getAppVersion():void{
-    this.userservice.appVersion().subscribe({      
+    this.versionService.getTDKCoreVersion().subscribe({
       next:(res)=>{
-        this.vesionName = res.data;        
+        this.versionName = res.data;
       },
-      error:(err)=>{        
-         this.vesionName = "";
+      error:()=>{
+        this.versionName = "";
       }
     })
   }
