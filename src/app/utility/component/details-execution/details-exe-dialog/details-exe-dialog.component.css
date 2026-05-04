@@ -898,7 +898,7 @@ background-color: transparent;
 .left-info{
   border-right: 1px solid #b9b3b3;
   margin: 5px 0px 5px 5px;
-  width: 315px;
+  flex: 1;
 }
 
 /*
@@ -906,7 +906,7 @@ background-color: transparent;
  */
 .right-info{
   margin: 5px 5px;
-  width: 300px;
+  flex: 1;
 }
 
 /*
@@ -991,6 +991,7 @@ background-color: transparent;
  */
 .first{
   padding-left: 3px;
+  padding-right: 0px;
 }
 
 /*
@@ -1013,7 +1014,7 @@ background-color: transparent;
  * .common-card: Styles for common card container.
  */
 .common-card{
-  width: 100px;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
