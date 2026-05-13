@@ -64,8 +64,6 @@ export class CloneScriptsComponent {
   secondFormGroup!: FormGroup;
   thirdFormGroup!: FormGroup;
   allDeviceType: any;
-  selectedDeviceCategory: string = 'RDKV';
-  allsocVendors!: any[];
   deviceTypeSettings = {};
   code: string = '';
   editorOptions = { theme: 'vs-dark', language: 'python' };
@@ -80,7 +78,7 @@ export class CloneScriptsComponent {
   deviceNameArr: any[] = [];
   defaultPrimitive: any;
   changePriorityValue!: string;
-  scriptDeatilsObj: any;
+  scriptDetailsObj: any;
   RDKFlavor: any;
 
   constructor(
@@ -118,7 +116,7 @@ export class CloneScriptsComponent {
       this.router.navigate(['/script']);
       return;
     }
-    this.scriptDeatilsObj = scriptDetails;
+    this.scriptDetailsObj = scriptDetails;
     this.deviceTypeSettings = {
       singleSelection: false,
       idField: 'deviceTypeName',
@@ -136,9 +134,9 @@ export class CloneScriptsComponent {
       this.selectedCategoryName = 'Video';
     }
     this.getAllModules();
-    this.deviceNameArr = this.scriptDeatilsObj.deviceTypes;
-    this.getAllPrimitiveTest(this.scriptDeatilsObj.moduleName);
-    this.code = this.scriptDeatilsObj.scriptContent;
+    this.deviceNameArr = this.scriptDetailsObj.deviceTypes;
+    this.getAllPrimitiveTest(this.scriptDetailsObj.moduleName);
+    this.code = this.scriptDetailsObj.scriptContent;
     this.initializeForm();
     this.setUpValidation();
     this.getAlldeviceType();
@@ -200,30 +198,30 @@ export class CloneScriptsComponent {
   }
 
   loadData() {
-    if (this.scriptDeatilsObj) {
+    if (this.scriptDetailsObj) {
       this.firstFormGroup.patchValue({
-        scriptname: 'Clone of ' + this.scriptDeatilsObj.name,
-        module: this.scriptDeatilsObj.moduleName,
-        primitiveTest: this.scriptDeatilsObj.primitiveTestName,
-        devicetype: this.scriptDeatilsObj.deviceTypes,
-        executiontimeout: this.scriptDeatilsObj.executionTimeOut,
-        longdurationtest: this.scriptDeatilsObj.longDuration,
-        skipexecution: this.scriptDeatilsObj.skipExecution,
-        synopsis: this.scriptDeatilsObj.synopsis,
+        scriptname: 'Clone of ' + this.scriptDetailsObj.name,
+        module: this.scriptDetailsObj.moduleName,
+        primitiveTest: this.scriptDetailsObj.primitiveTestName,
+        devicetype: this.scriptDetailsObj.deviceTypes,
+        executiontimeout: this.scriptDetailsObj.executionTimeOut,
+        longdurationtest: this.scriptDetailsObj.longDuration,
+        skipexecution: this.scriptDetailsObj.skipExecution,
+        synopsis: this.scriptDetailsObj.synopsis,
       });
       this.secondFormGroup.patchValue({
-        testcaseID: this.scriptDeatilsObj.testId,
-        testObjective: this.scriptDeatilsObj.objective,
-        priority: this.scriptDeatilsObj.priority,
-        releaseVersion: this.scriptDeatilsObj.releaseVersion,
+        testcaseID: this.scriptDetailsObj.testId,
+        testObjective: this.scriptDetailsObj.objective,
+        priority: this.scriptDetailsObj.priority,
+        releaseVersion: this.scriptDetailsObj.releaseVersion,
       });
 
       this.preconditions.clear();
       if (
-        this.scriptDeatilsObj.preConditions &&
-        Array.isArray(this.scriptDeatilsObj.preConditions)
+        this.scriptDetailsObj.preConditions &&
+        Array.isArray(this.scriptDetailsObj.preConditions)
       ) {
-        this.scriptDeatilsObj.preConditions.forEach((pre: any) =>
+        this.scriptDetailsObj.preConditions.forEach((pre: any) =>
           this.addPrecondition(pre),
         );
       } else {
@@ -232,10 +230,10 @@ export class CloneScriptsComponent {
 
       this.steps.clear();
       if (
-        this.scriptDeatilsObj.testSteps &&
-        Array.isArray(this.scriptDeatilsObj.testSteps)
+        this.scriptDetailsObj.testSteps &&
+        Array.isArray(this.scriptDetailsObj.testSteps)
       ) {
-        this.scriptDeatilsObj.testSteps.forEach((step: any) =>
+        this.scriptDetailsObj.testSteps.forEach((step: any) =>
           this.addStep(step),
         );
       } else {
@@ -243,7 +241,7 @@ export class CloneScriptsComponent {
       }
 
       this.thirdFormGroup.patchValue({
-        pythonEditor: this.scriptDeatilsObj.scriptContent,
+        pythonEditor: this.scriptDetailsObj.scriptContent,
       });
 
       setTimeout(() => {
@@ -359,15 +357,6 @@ export class CloneScriptsComponent {
       return { required: true };
     }
     return control.value.startsWith(' ') ? { noLeadingSpaces: true } : null;
-  }
-
-  mindeviceValidator(min: number): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      if (!control.value || control.value.length < min) {
-        return { minSelection: true };
-      }
-      return null;
-    };
   }
 
   onlyNumbersValidator(control: AbstractControl): ValidationErrors | null {
@@ -538,10 +527,10 @@ export class CloneScriptsComponent {
       synopsis: this.firstFormGroup.value.synopsis,
       executionTimeOut: this.firstFormGroup.value.executiontimeout,
       moduleName:
-        this.firstFormGroup.value.module || this.scriptDeatilsObj.moduleName,
+        this.firstFormGroup.value.module || this.scriptDetailsObj.moduleName,
       primitiveTestName:
         this.firstFormGroup.value.primitiveTest ||
-        this.scriptDeatilsObj.primitiveTestName,
+        this.scriptDetailsObj.primitiveTestName,
       deviceTypes: this.deviceNameArr,
       skipExecution: this.firstFormGroup.value.skipexecution,
       longDuration: this.firstFormGroup.value.longdurationtest,
@@ -549,7 +538,7 @@ export class CloneScriptsComponent {
       objective: this.secondFormGroup.value.testObjective,
       priority: this.changePriorityValue
         ? this.changePriorityValue
-        : this.scriptDeatilsObj.priority,
+        : this.scriptDetailsObj.priority,
       preConditions: preConditionsArray,
       releaseVersion: this.secondFormGroup.value.releaseVersion,
       userGroup: this.loggedinUser.userGroupName,

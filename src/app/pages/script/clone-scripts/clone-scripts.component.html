@@ -54,6 +54,7 @@ limitations under the License.
                     autocomplete="off"
                     placeholder="Enter script name"
                     formControlName="scriptname"
+                    (input)="onScritName($event)"
                   />
                   <mat-error
                     *ngIf="
@@ -61,6 +62,15 @@ limitations under the License.
                     "
                   >
                     Script name is required
+                  </mat-error>
+                  <mat-error
+                    *ngIf="
+                      firstFormGroup
+                        .get('scriptname')
+                        ?.hasError('noLeadingSpaces')
+                    "
+                  >
+                    Script name must not start with a space
                   </mat-error>
                 </div>
               </div>
@@ -92,7 +102,7 @@ limitations under the License.
 
               <!-- Row for primitive test selection -->
               <div class="row mb-3">
-                <label for="primitivetest" class="col-md-3 col-form-label"
+                <label for="primitiveTest" class="col-md-3 col-form-label"
                   >Primitive Test</label
                 >
                 <!-- Column for primitive test select -->
