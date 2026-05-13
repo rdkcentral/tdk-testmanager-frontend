@@ -178,9 +178,13 @@ export class CloneScriptsComponent {
         ),
       )
       .subscribe((selectedDeviceTypes: any[] = []) => {
-        this.deviceNameArr = Array.isArray(selectedDeviceTypes)
-          ? selectedDeviceTypes
-          : [];
+        if (!Array.isArray(selectedDeviceTypes)) {
+          this.deviceNameArr = [];
+        } else if (selectedDeviceTypes.length > 0 && typeof selectedDeviceTypes[0] === 'object') {
+          this.deviceNameArr = selectedDeviceTypes.map((item: any) => item.deviceTypeName);
+        } else {
+          this.deviceNameArr = selectedDeviceTypes;
+        }
       });
 
     this.secondFormGroup = this.fb.group({
