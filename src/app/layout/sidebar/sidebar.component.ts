@@ -82,8 +82,7 @@ export class SidebarComponent implements OnInit {
           event.url === '/configure/create-streamdetails' ||
           event.url === '/configure/create-radiostreamdetails' ||
           event.url === '/configure/edit-radiostreamdetails' ||
-          event.url === '/cofigure/edit-streamdetails' ||
-          event.url === '/cofigure/edit-streamdetails' ||
+          event.url === '/configure/edit-streamdetails' ||
           event.url === '/configure/streamingtemplates-list' ||
           event.url === '/configure/streamingtemplates-create' ||
           event.url === '/configure/streamingtemplates-edit' ||

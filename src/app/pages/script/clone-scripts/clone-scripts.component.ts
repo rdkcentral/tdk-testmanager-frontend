@@ -516,7 +516,6 @@ export class CloneScriptsComponent {
     );
 
     const testStepsArray = this.steps.value.map((s: any) => ({
-      testStepId: s.testStepId,
       stepName: s.stepName,
       stepDescription: s.stepDescription,
       expectedResult: s.expectedResult,

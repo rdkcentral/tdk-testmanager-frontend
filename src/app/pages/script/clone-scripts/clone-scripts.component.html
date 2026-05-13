@@ -600,6 +600,11 @@ limitations under the License.
               type="button"
               (click)="onSubmit()"
               class="reset-btn"
+              [disabled]="
+                firstFormGroup.invalid ||
+                secondFormGroup.invalid ||
+                thirdFormGroup.invalid
+              "
             >
               Submit
             </button>
