@@ -21,9 +21,7 @@ limitations under the License.
     <div class="col"></div>
     <!-- Center column with the page title -->
     <div class="col">
-      <h1 class="title">
-        <h1 class="title">Clone {{ selectedCategoryName }} Script</h1>
-      </h1>
+      <h1 class="title">Clone {{ selectedCategoryName }} Script</h1>
     </div>
     <!-- Right column (empty for spacing) -->
     <div class="col"></div>
@@ -62,6 +60,7 @@ limitations under the License.
                       firstFormGroup.get('scriptname')?.hasError('required')
                     "
                   >
+                    Script name is required
                   </mat-error>
                 </div>
               </div>
@@ -211,6 +210,7 @@ limitations under the License.
                         ?.hasError('required')
                     "
                   >
+                    Execution timeout is required
                   </mat-error>
                 </div>
               </div>
@@ -234,6 +234,7 @@ limitations under the License.
                   <mat-error
                     *ngIf="firstFormGroup.get('synopsis')?.hasError('required')"
                   >
+                    Synopsis is required
                   </mat-error>
                 </div>
               </div>
@@ -586,7 +587,7 @@ limitations under the License.
             </button>
             <button
               mat-button
-              type="submit"
+              type="button"
               (click)="onSubmit()"
               class="reset-btn"
             >

@@ -19,7 +19,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { Component, inject, TemplateRef, ViewChild } from '@angular/core';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -34,16 +34,14 @@ import {
 import { MaterialModule } from '../../../material/material.module';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { AuthService } from '../../../auth/auth.service';
+import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { ModulesService } from '../../../services/modules.service';
 import { PrimitiveTestService } from '../../../services/primitive-test.service';
 import { ScriptsService } from '../../../services/scripts.service';
 import { DevicetypeService } from '../../../services/devicetype.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatStepper, MatStepperIntl } from '@angular/material/stepper';
-
+import { MatStepper } from '@angular/material/stepper';
 import { distinctUntilChanged } from 'rxjs';
 
 @Component({
@@ -72,11 +70,6 @@ export class CloneScriptsComponent {
   code: string = '';
   editorOptions = { theme: 'vs-dark', language: 'python' };
   selectedCategoryName!: string;
-  private _matStepperIntl = inject(MatStepperIntl);
-  optionalLabelText!: string;
-  newtestDialogRef!: MatDialogRef<any>;
-  @ViewChild('newtestCaseTemplate', { static: true })
-  newtestCaseTemplate!: TemplateRef<any>;
   @ViewChild('stepper', { static: true }) stepper!: MatStepper;
   @ViewChild('confirmCloneDialog', { static: true })
   confirmCloneDialog!: TemplateRef<any>;
@@ -91,7 +84,6 @@ export class CloneScriptsComponent {
   RDKFlavor: any;
 
   constructor(
-    private authservice: AuthService,
     private router: Router,
     private fb: FormBuilder,
     public dialog: MatDialog,
@@ -107,9 +99,26 @@ export class CloneScriptsComponent {
   }
 
   ngOnInit(): void {
-    this.scriptDeatilsObj = JSON.parse(
+    const scriptDetails = JSON.parse(
       localStorage.getItem('scriptDetails') || '{}',
     );
+    if (
+      !scriptDetails?.id ||
+      !scriptDetails?.name ||
+      !scriptDetails?.moduleName ||
+      !Array.isArray(scriptDetails?.deviceTypes)
+    ) {
+      this._snakebar.open(
+        'Script details are missing. Please select a script to clone again.',
+        'Close',
+        {
+          duration: 3000,
+        },
+      );
+      this.router.navigate(['/script']);
+      return;
+    }
+    this.scriptDeatilsObj = scriptDetails;
     this.deviceTypeSettings = {
       singleSelection: false,
       idField: 'deviceTypeName',
@@ -135,17 +144,46 @@ export class CloneScriptsComponent {
     this.getAlldeviceType();
   }
 
+  minSelectionValidator(min: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      return Array.isArray(value) && value.length >= min
+        ? null
+        : {
+            minSelection: {
+              required: min,
+              actual: Array.isArray(value) ? value.length : 0,
+            },
+          };
+    };
+  }
+
   initializeForm() {
     this.firstFormGroup = this.fb.group({
       scriptname: ['', [Validators.required, this.noSpacesValidator]],
       module: [''],
       primitiveTest: [''],
-      devicetype: [[], []],
+      devicetype: [[], [this.minSelectionValidator(1)]],
       executiontimeout: ['', [Validators.required, this.onlyNumbersValidator]],
       longdurationtest: [''],
       skipexecution: [''],
       synopsis: ['', [Validators.required, this.noSpacesValidator]],
     });
+
+    this.deviceNameArr = this.firstFormGroup.get('devicetype')?.value || [];
+    this.firstFormGroup
+      .get('devicetype')
+      ?.valueChanges.pipe(
+        distinctUntilChanged(
+          (previous, current) =>
+            JSON.stringify(previous || []) === JSON.stringify(current || []),
+        ),
+      )
+      .subscribe((selectedDeviceTypes: any[] = []) => {
+        this.deviceNameArr = Array.isArray(selectedDeviceTypes)
+          ? selectedDeviceTypes
+          : [];
+      });
 
     this.secondFormGroup = this.fb.group({
       testcaseID: ['', [Validators.required, this.noSpacesValidator]],
@@ -436,11 +474,7 @@ export class CloneScriptsComponent {
   }
 
   onItemSelect(item: any): void {
-    if (
-      !this.deviceNameArr.some(
-        (selectedItem) => selectedItem.deviceTypeName === item.deviceTypeName,
-      )
-    ) {
+    if (!this.deviceNameArr.includes(item.deviceTypeName)) {
       this.deviceNameArr.push(item.deviceTypeName);
     }
     this.updateDeviceTypeValidity();
@@ -455,13 +489,9 @@ export class CloneScriptsComponent {
   }
 
   onSelectAll(items: any[]): void {
-    let devices = this.allDeviceType.filter(
-      (item: any) =>
-        !this.deviceNameArr.find(
-          (selected) => selected.deviceTypeId === item.deviceTypeId,
-        ),
+    this.deviceNameArr = this.allDeviceType.map(
+      (item: any) => item.deviceTypeName,
     );
-    this.deviceNameArr = devices.map((item: any) => item.deviceTypeName);
     this.updateDeviceTypeValidity();
   }
 
@@ -476,17 +506,6 @@ export class CloneScriptsComponent {
     if (!control) return;
     control.markAsTouched();
     control.updateValueAndValidity();
-  }
-
-  onCodeChange(value: string): void {
-    let val = value;
-  }
-
-  back(): void {
-    this.router.navigate(['/script']);
-    localStorage.removeItem('scriptCategory');
-    localStorage.removeItem('category');
-    localStorage.removeItem('categoryname');
   }
 
   onSubmit(): void {
