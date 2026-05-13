@@ -18,7 +18,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { Component, OnInit } from '@angular/core';
-import { ICellRendererParams } from "ag-grid-community";
+import { ICellRendererParams } from 'ag-grid-community';
 import { MaterialModule } from '../../../../material/material.module';
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -40,6 +40,15 @@ interface customcellRenderparams extends ICellRendererParams {
       matTooltip="{{ textforedit }}"
     >
       <mat-icon class="extra-icon edit">edit</mat-icon>
+    </button>
+    &nbsp;
+    <button
+      *ngIf="downloadSriptZip"
+      class="btn  btn-sm delete-btn"
+      (click)="onCloneClick($event)"
+      matTooltip="Clone Script"
+    >
+      <mat-icon class="extra-icon edit">content_copy</mat-icon>
     </button>
     &nbsp;
     <button
@@ -179,7 +188,7 @@ export class ButtonComponent implements OnInit {
   viewShowHide = true;
   textforedit!: string;
   downloadSriptZip = false;
-  downloadtarfile=false;
+  downloadtarfile = false;
   downloadScriptMd = false;
   deleteShowHide = true;
   downloadConfigShow = false;
@@ -215,7 +224,7 @@ export class ButtonComponent implements OnInit {
     }
     if (this.route.snapshot.url[0].path === 'script') {
       this.downloadSriptZip = true;
-      this.downloadtarfile=true;
+      this.downloadtarfile = true;
       this.downloadScriptMd = true;
     } else {
       this.downloadSriptZip = false;
@@ -276,6 +285,16 @@ export class ButtonComponent implements OnInit {
   onEditClick($event: any) {
     if (this.params.onEditClick instanceof Function) {
       this.params.onEditClick(this.params.node.data);
+    }
+  }
+
+  /**
+   * Handles the clone button click event.
+   * @param $event The click event object.
+   */
+  onCloneClick($event: any) {
+    if (this.params.onCloneClick instanceof Function) {
+      this.params.onCloneClick(this.params.node.data);
     }
   }
 

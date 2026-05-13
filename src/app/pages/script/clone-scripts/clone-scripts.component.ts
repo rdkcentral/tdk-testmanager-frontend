@@ -1,0 +1,578 @@
+/*
+* If not stated otherwise in this file or this component's LICENSE file the
+* following copyright and licenses apply:
+*
+* Copyright 2024 RDK Management
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*
+http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
+import { CommonModule } from '@angular/common';
+import { HttpClientModule } from '@angular/common/http';
+import { Component, inject, TemplateRef, ViewChild } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  FormArray,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
+import { MaterialModule } from '../../../material/material.module';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { AuthService } from '../../../auth/auth.service';
+import { Router } from '@angular/router';
+import { ModulesService } from '../../../services/modules.service';
+import { PrimitiveTestService } from '../../../services/primitive-test.service';
+import { ScriptsService } from '../../../services/scripts.service';
+import { DevicetypeService } from '../../../services/devicetype.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatStepper, MatStepperIntl } from '@angular/material/stepper';
+
+import { distinctUntilChanged } from 'rxjs';
+
+@Component({
+  selector: 'app-clone-scripts',
+  standalone: true,
+  imports: [
+    CommonModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    MaterialModule,
+    FormsModule,
+    NgMultiSelectDropDownModule,
+    MonacoEditorModule,
+  ],
+  templateUrl: './clone-scripts.component.html',
+  styleUrl: './clone-scripts.component.css',
+})
+export class CloneScriptsComponent {
+  firstFormGroup!: FormGroup;
+  secondFormGroup!: FormGroup;
+  thirdFormGroup!: FormGroup;
+  allDeviceType: any;
+  selectedDeviceCategory: string = 'RDKV';
+  allsocVendors!: any[];
+  deviceTypeSettings = {};
+  code: string = '';
+  editorOptions = { theme: 'vs-dark', language: 'python' };
+  selectedCategoryName!: string;
+  private _matStepperIntl = inject(MatStepperIntl);
+  optionalLabelText!: string;
+  newtestDialogRef!: MatDialogRef<any>;
+  @ViewChild('newtestCaseTemplate', { static: true })
+  newtestCaseTemplate!: TemplateRef<any>;
+  @ViewChild('stepper', { static: true }) stepper!: MatStepper;
+  @ViewChild('confirmCloneDialog', { static: true })
+  confirmCloneDialog!: TemplateRef<any>;
+  isLinear = false;
+  allModules: any;
+  allPrimitiveTest: any[] = [];
+  loggedinUser: any;
+  deviceNameArr: any[] = [];
+  defaultPrimitive: any;
+  changePriorityValue!: string;
+  scriptDeatilsObj: any;
+  RDKFlavor: any;
+
+  constructor(
+    private authservice: AuthService,
+    private router: Router,
+    private fb: FormBuilder,
+    public dialog: MatDialog,
+    private modulesService: ModulesService,
+    private deviceTypeService: DevicetypeService,
+    private primitiveTestService: PrimitiveTestService,
+    private scriptservice: ScriptsService,
+    private _snakebar: MatSnackBar,
+  ) {
+    this.loggedinUser = JSON.parse(
+      localStorage.getItem('loggedinUser') || '{}',
+    );
+  }
+
+  ngOnInit(): void {
+    this.scriptDeatilsObj = JSON.parse(
+      localStorage.getItem('scriptDetails') || '{}',
+    );
+    this.deviceTypeSettings = {
+      singleSelection: false,
+      idField: 'deviceTypeName',
+      textField: 'deviceTypeName',
+      selectAllText: 'Select All',
+      unSelectAllText: 'UnSelect All',
+      itemsShowLimit: 3,
+      allowSearchFilter: false,
+    };
+    const selectedCategory = localStorage.getItem('category');
+    this.RDKFlavor = selectedCategory;
+    if (selectedCategory === 'RDKB') {
+      this.selectedCategoryName = 'Broadband';
+    } else {
+      this.selectedCategoryName = 'Video';
+    }
+    this.getAllModules();
+    this.deviceNameArr = this.scriptDeatilsObj.deviceTypes;
+    this.getAllPrimitiveTest(this.scriptDeatilsObj.moduleName);
+    this.code = this.scriptDeatilsObj.scriptContent;
+    this.initializeForm();
+    this.setUpValidation();
+    this.getAlldeviceType();
+  }
+
+  initializeForm() {
+    this.firstFormGroup = this.fb.group({
+      scriptname: ['', [Validators.required, this.noSpacesValidator]],
+      module: [''],
+      primitiveTest: [''],
+      devicetype: [[], []],
+      executiontimeout: ['', [Validators.required, this.onlyNumbersValidator]],
+      longdurationtest: [''],
+      skipexecution: [''],
+      synopsis: ['', [Validators.required, this.noSpacesValidator]],
+    });
+
+    this.secondFormGroup = this.fb.group({
+      testcaseID: ['', [Validators.required, this.noSpacesValidator]],
+      testObjective: ['', [Validators.required, this.noSpacesValidator]],
+      priority: ['', [Validators.required]],
+      preconditions: this.fb.array([], [Validators.required]),
+      steps: this.fb.array([], [Validators.required]),
+      releaseVersion: [''],
+    });
+
+    this.thirdFormGroup = this.fb.group({
+      pythonEditor: ['', Validators.required],
+    });
+  }
+
+  loadData() {
+    if (this.scriptDeatilsObj) {
+      this.firstFormGroup.patchValue({
+        scriptname: 'Clone of ' + this.scriptDeatilsObj.name,
+        module: this.scriptDeatilsObj.moduleName,
+        primitiveTest: this.scriptDeatilsObj.primitiveTestName,
+        devicetype: this.scriptDeatilsObj.deviceTypes,
+        executiontimeout: this.scriptDeatilsObj.executionTimeOut,
+        longdurationtest: this.scriptDeatilsObj.longDuration,
+        skipexecution: this.scriptDeatilsObj.skipExecution,
+        synopsis: this.scriptDeatilsObj.synopsis,
+      });
+      this.secondFormGroup.patchValue({
+        testcaseID: this.scriptDeatilsObj.testId,
+        testObjective: this.scriptDeatilsObj.objective,
+        priority: this.scriptDeatilsObj.priority,
+        releaseVersion: this.scriptDeatilsObj.releaseVersion,
+      });
+
+      this.preconditions.clear();
+      if (
+        this.scriptDeatilsObj.preConditions &&
+        Array.isArray(this.scriptDeatilsObj.preConditions)
+      ) {
+        this.scriptDeatilsObj.preConditions.forEach((pre: any) =>
+          this.addPrecondition(pre),
+        );
+      } else {
+        this.addPrecondition();
+      }
+
+      this.steps.clear();
+      if (
+        this.scriptDeatilsObj.testSteps &&
+        Array.isArray(this.scriptDeatilsObj.testSteps)
+      ) {
+        this.scriptDeatilsObj.testSteps.forEach((step: any) =>
+          this.addStep(step),
+        );
+      } else {
+        this.addStep();
+      }
+
+      this.thirdFormGroup.patchValue({
+        pythonEditor: this.scriptDeatilsObj.scriptContent,
+      });
+
+      setTimeout(() => {
+        this.markFormFieldsTouched(this.firstFormGroup);
+        this.markFormFieldsTouched(this.secondFormGroup);
+        this.markFormFieldsTouched(this.thirdFormGroup);
+      });
+
+      setTimeout(() => {
+        this.updateDeviceTypeValidity();
+      });
+    }
+  }
+
+  insertStep(index: number): void {
+    const newStep = this.fb.group({
+      testStepId: [''],
+      stepName: ['', Validators.required],
+      stepDescription: ['', Validators.required],
+      expectedResult: ['', Validators.required],
+    });
+    this.steps.insert(index, newStep);
+  }
+
+  setUpValidation() {
+    this.firstFormGroup.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(() => {
+        this.firstFormGroup.updateValueAndValidity({ emitEvent: false });
+      });
+
+    this.secondFormGroup.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(() => {
+        this.secondFormGroup.updateValueAndValidity({ emitEvent: false });
+      });
+
+    this.thirdFormGroup.valueChanges
+      .pipe(distinctUntilChanged())
+      .subscribe(() => {
+        this.thirdFormGroup.updateValueAndValidity({ emitEvent: false });
+      });
+  }
+
+  markFormFieldsTouched(formGroup: FormGroup) {
+    Object.values(formGroup.controls).forEach((control) => {
+      control.markAsTouched();
+      control.markAsDirty();
+      control.updateValueAndValidity();
+    });
+  }
+
+  get preconditions(): FormArray {
+    return this.secondFormGroup.get('preconditions') as FormArray;
+  }
+
+  addPrecondition(pre?: any): void {
+    this.preconditions.push(
+      this.fb.group({
+        preConditionId: [pre?.preConditionId || ''],
+        preConditionDetails: [
+          pre?.preConditionDetails || '',
+          Validators.required,
+        ],
+      }),
+    );
+  }
+
+  insertPrecondition(index: number): void {
+    const newPrecondition = this.fb.group({
+      preConditionDetails: ['', Validators.required],
+    });
+    this.preconditions.insert(index, newPrecondition);
+  }
+
+  removePrecondition(index: number): void {
+    this.preconditions.removeAt(index);
+  }
+
+  get steps(): FormArray {
+    return this.secondFormGroup.get('steps') as FormArray;
+  }
+
+  addStep(step?: any): void {
+    this.steps.push(
+      this.fb.group({
+        testStepId: [step?.testStepId || ''],
+        stepName: [step?.stepName || '', Validators.required],
+        stepDescription: [step?.stepDescription || '', Validators.required],
+        expectedResult: [step?.expectedResult || '', Validators.required],
+      }),
+    );
+  }
+
+  removeStep(index: number): void {
+    this.steps.removeAt(index);
+  }
+
+  goToNext(stepIndex: number) {
+    if (stepIndex === 1 && this.firstFormGroup.valid) {
+      this.stepper.next();
+    } else if (stepIndex === 2 && this.secondFormGroup.valid) {
+      this.stepper.next();
+    }
+  }
+
+  get f() {
+    return this.firstFormGroup.controls;
+  }
+
+  noSpacesValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return { required: true };
+    }
+    return control.value.startsWith(' ') ? { noLeadingSpaces: true } : null;
+  }
+
+  mindeviceValidator(min: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value || control.value.length < min) {
+        return { minSelection: true };
+      }
+      return null;
+    };
+  }
+
+  onlyNumbersValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value ? control.value.toString().trim() : '';
+    if (!value) {
+      return { required: true };
+    }
+    return /^[0-9]+$/.test(value) ? null : { onlyNumbers: true };
+  }
+
+  onNumberInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement;
+    let value = inputElement.value.replace(/\D/g, '');
+    const control = this.firstFormGroup.get('executiontimeout');
+    control?.setValue(value, { emitEvent: true });
+    control?.updateValueAndValidity();
+  }
+
+  onInput(event: Event): void {
+    const inputElement = event.target as HTMLInputElement | HTMLTextAreaElement;
+    const value = inputElement.value;
+    const trimmedValue = value.replace(/^\s+/, '');
+    this.firstFormGroup
+      .get('synopsis')
+      ?.setValue(trimmedValue, { emitEvent: false });
+  }
+
+  onScritName(event: Event): void {
+    const inputElement = event.target as HTMLTextAreaElement;
+    const value = inputElement.value;
+    if (value.startsWith(' ')) {
+      this.firstFormGroup
+        .get('scriptname')
+        ?.setValue(value.trimStart(), { emitEvent: false });
+    }
+  }
+
+  onTestcaseID(event: Event): void {
+    const inputElement = event.target as HTMLTextAreaElement;
+    const value = inputElement.value;
+    if (value.startsWith(' ')) {
+      this.secondFormGroup
+        .get('testcaseID')
+        ?.setValue(value.trimStart(), { emitEvent: false });
+    }
+  }
+
+  onTestObjective(event: Event): void {
+    const inputElement = event.target as HTMLTextAreaElement;
+    const value = inputElement.value;
+    if (value.startsWith(' ')) {
+      this.secondFormGroup
+        .get('testObjective')
+        ?.setValue(value.trimStart(), { emitEvent: false });
+    }
+  }
+
+  getAllModules(): void {
+    this.modulesService.findallbyCategory(this.RDKFlavor).subscribe((res) => {
+      this.allModules = res.data;
+    });
+  }
+
+  changeModule(event: any): void {
+    let moduleName = event.target.value;
+    this.defaultPrimitive = '';
+    this.firstFormGroup.get('primitiveTest')?.setValue('');
+    this.getAllPrimitiveTest(moduleName);
+  }
+
+  getAllPrimitiveTest(value: any): void {
+    this.primitiveTestService.getParameterNames(value).subscribe({
+      next: (res) => {
+        this.allPrimitiveTest = res.data;
+      },
+      error: (err) => {
+        this._snakebar.open(err.message, '', {
+          duration: 2000,
+          panelClass: ['err-msg'],
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+        });
+      },
+    });
+  }
+
+  onChangePrimitive(event: any): void {
+    let primitiveValue = event.target.value;
+    this.defaultPrimitive = primitiveValue;
+  }
+
+  changePriority(event: any): void {
+    const priorityValue = event.target.value;
+    this.changePriorityValue = priorityValue;
+  }
+
+  getAlldeviceType(): void {
+    this.deviceTypeService
+      .getfindallbycategory(this.RDKFlavor)
+      .subscribe((res) => {
+        this.allDeviceType = res.data;
+        this.loadData();
+      });
+  }
+
+  onItemSelect(item: any): void {
+    if (
+      !this.deviceNameArr.some(
+        (selectedItem) => selectedItem.deviceTypeName === item.deviceTypeName,
+      )
+    ) {
+      this.deviceNameArr.push(item.deviceTypeName);
+    }
+    this.updateDeviceTypeValidity();
+  }
+
+  onDeSelect(item: any): void {
+    let filterDevice = this.deviceNameArr.filter(
+      (name) => name != item.deviceTypeName,
+    );
+    this.deviceNameArr = filterDevice;
+    this.updateDeviceTypeValidity();
+  }
+
+  onSelectAll(items: any[]): void {
+    let devices = this.allDeviceType.filter(
+      (item: any) =>
+        !this.deviceNameArr.find(
+          (selected) => selected.deviceTypeId === item.deviceTypeId,
+        ),
+    );
+    this.deviceNameArr = devices.map((item: any) => item.deviceTypeName);
+    this.updateDeviceTypeValidity();
+  }
+
+  onDeSelectAll(item: any): void {
+    this.deviceNameArr = [];
+    this.firstFormGroup.get('devicetype')?.setValue([]);
+    this.updateDeviceTypeValidity();
+  }
+
+  updateDeviceTypeValidity() {
+    const control = this.firstFormGroup.get('devicetype');
+    if (!control) return;
+    control.markAsTouched();
+    control.updateValueAndValidity();
+  }
+
+  onCodeChange(value: string): void {
+    let val = value;
+  }
+
+  back(): void {
+    this.router.navigate(['/script']);
+    localStorage.removeItem('scriptCategory');
+    localStorage.removeItem('category');
+    localStorage.removeItem('categoryname');
+  }
+
+  onSubmit(): void {
+    const dialogRef = this.dialog.open(this.confirmCloneDialog, {
+      width: '400px',
+      disableClose: true,
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.submitClonedScript();
+      }
+    });
+  }
+
+  private submitClonedScript(): void {
+    const preConditionsArray = this.preconditions.value.map(
+      (p: any) => p.preConditionDetails,
+    );
+
+    const testStepsArray = this.steps.value.map((s: any) => ({
+      testStepId: s.testStepId,
+      stepName: s.stepName,
+      stepDescription: s.stepDescription,
+      expectedResult: s.expectedResult,
+    }));
+
+    const scriptCloneData = {
+      name: this.firstFormGroup.value.scriptname,
+      synopsis: this.firstFormGroup.value.synopsis,
+      executionTimeOut: this.firstFormGroup.value.executiontimeout,
+      moduleName:
+        this.firstFormGroup.value.module || this.scriptDeatilsObj.moduleName,
+      primitiveTestName:
+        this.firstFormGroup.value.primitiveTest ||
+        this.scriptDeatilsObj.primitiveTestName,
+      deviceTypes: this.deviceNameArr,
+      skipExecution: this.firstFormGroup.value.skipexecution,
+      longDuration: this.firstFormGroup.value.longdurationtest,
+      testId: this.secondFormGroup.value.testcaseID,
+      objective: this.secondFormGroup.value.testObjective,
+      priority: this.changePriorityValue
+        ? this.changePriorityValue
+        : this.scriptDeatilsObj.priority,
+      preConditions: preConditionsArray,
+      releaseVersion: this.secondFormGroup.value.releaseVersion,
+      userGroup: this.loggedinUser.userGroupName,
+      testSteps: testStepsArray,
+    };
+
+    const pythonContent = this.thirdFormGroup.value.pythonEditor;
+    const filename = `${this.firstFormGroup.value.scriptname}.py`;
+    const scriptFile = new File([pythonContent], filename, {
+      type: 'text/x-python',
+    });
+
+    this.scriptservice.createScript(scriptCloneData, scriptFile).subscribe({
+      next: (res) => {
+        this._snakebar.open(res.message || 'Script cloned successfully!', '', {
+          duration: 2000,
+          panelClass: ['success-msg'],
+          verticalPosition: 'top',
+        });
+        this.scriptservice.resetPaginationState();
+        setTimeout(() => {
+          this.router.navigate(['/script']);
+        }, 1000);
+      },
+      error: (err) => {
+        this._snakebar.open(
+          err.error?.message || 'Failed to clone script.',
+          '',
+          {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          },
+        );
+      },
+    });
+  }
+
+  goBack(): void {
+    localStorage.removeItem('scriptDetails');
+    localStorage.removeItem('category');
+    this.router.navigate(['/script']);
+  }
+}

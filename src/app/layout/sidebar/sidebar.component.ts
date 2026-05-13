@@ -72,7 +72,7 @@ export class SidebarComponent implements OnInit {
           event.url === '/configure/scripttag-create' || event.url === '/configure/scripttag-edit' || event.url === '/configure/list-rdkversions' ||
           event.url === '/configure/create-rdkversions' || event.url === '/configure/edit-rdkversions' || event.url === '/configure/list-primitivetest' || event.url === '/configure/create-primitivetest' || event.url === '/configure/edit-primitivetest' || 
           event.url === '/configure/modules-edit' || event.url === '/configure/parameter-edit' || event.url === '/configure/function-edit' || event.url ==='/script' || event.url ==='/script/create-scripts' || event.url === '/execution' ||
-          event.url === '/script/create-script-group' || event.url ==='/script/edit-scripts' || event.url ==='/script/custom-testsuite' || event.url === '/script/edit-testsuite' || event.url === '/configure/list-rdk-certifications' || 
+          event.url === '/script/create-script-group' || event.url ==='/script/edit-scripts' || event.url === '/script/clone-scripts' || event.url ==='/script/custom-testsuite' || event.url === '/script/edit-testsuite' || event.url === '/configure/list-rdk-certifications' || 
           event.url === '/configure/create-rdk-certifications' || event.url === '/configure/edit-rdk-certifications' || event.url ==='/analysis' || event.url ==='/prefered-category' ||  event.url === '/app-upgrade' && this.sidenav) {
           this.sidenav.close();
         } else {

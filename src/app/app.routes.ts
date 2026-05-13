@@ -61,6 +61,7 @@ import { EditDeviceTypeComponent } from './pages/device-type/edit-device-type/ed
 import { ExecutionComponent } from './pages/execution/execution.component';
 import { CreateScriptGroupComponent } from './pages/script/create-script-group/create-script-group.component';
 import { EditScriptsComponent } from './pages/script/edit-scripts/edit-scripts.component';
+import { CloneScriptsComponent } from './pages/script/clone-scripts/clone-scripts.component';
 import { CustomTestsuiteComponent } from './pages/script/custom-testsuite/custom-testsuite.component';
 import { EditTestsuiteComponent } from './pages/script/edit-testsuite/edit-testsuite.component';
 import { PreferedCategoryComponent } from './pages/prefered-category/prefered-category.component';
@@ -78,62 +79,243 @@ import { AppUpgradeComponent } from './pages/app-upgrade/app-upgrade.component';
  * @type {Routes}
  */
 export const routes: Routes = [
-    { path: '', redirectTo: '/login', pathMatch: 'full' },
-    { path: 'login', title: 'Login', component: LoginComponent },
-    { path: 'forgot-password', title: 'Forgot-password', component: ForgotPasswordComponent },
-    { path: 'change-password', title: 'Change-password', component: ChangePasswordComponent, canActivate: [authGuard] },
-    { path: 'system-information', title: 'TDK-version-details', component: SystemInformationComponent, canActivate: [authGuard] },
-    
-    {
-        path: '',
-        component: MainComponent,
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: 'login', title: 'Login', component: LoginComponent },
+  {
+    path: 'forgot-password',
+    title: 'Forgot-password',
+    component: ForgotPasswordComponent,
+  },
+  {
+    path: 'change-password',
+    title: 'Change-password',
+    component: ChangePasswordComponent,
+    canActivate: [authGuard],
+  },
+  {
+    path: 'system-information',
+    title: 'TDK-version-details',
+    component: SystemInformationComponent,
+    canActivate: [authGuard],
+  },
+
+  {
+    path: '',
+    component: MainComponent,
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'prefered-category',
+        title: 'prefered-category',
+        component: PreferedCategoryComponent,
         canActivate: [authGuard],
-        children: [
-            { path: 'prefered-category', title: 'prefered-category', component: PreferedCategoryComponent, canActivate: [authGuard] },
-            { path: 'configure', title: 'Configure', component: ConfigureComponent },
-            { path: 'configure/user-management', title: 'UserManagement', component: UserListComponent, data: { role: ['admin'] }, canActivate: [roleGuard] },
-            { path: 'configure/create-user', title: 'Create User', component: UserAddComponent },
-            { path: 'configure/edit-user', title: 'Edit User', component: UserEditComponent },
-            { path: 'configure/create-group', title: 'Group List', component: GroupListComponent, data: { role: ['admin'] }, canActivate: [roleGuard] },
-            { path: 'configure/group-add', title: 'Group Add', component: GroupAddComponent },
-            { path: 'configure/group-edit/:id', title: 'Group Edit', component: GroupEditComponent },
-            { path: 'configure/list-oem', title: 'OEM', component: ListOemComponent},
-            { path: 'configure/create-oem', title: 'OEM Add', component: CreateOemComponent },
-            { path: 'configure/oem-edit', title: 'OEM Edit', component: EditOemComponent },
-            { path: 'configure/list-soc', title: 'Soc', component: ListSocComponent },
-            { path: 'configure/create-soc', title: 'Soc Add', component: CreateSocComponent },
-            { path: 'configure/edit-soc', title: 'Soc Edit', component: EditSocComponent },
-            { path: 'configure/list-devicetype', title: 'DeviceType', component: ListDeviceTypeComponent },
-            { path: 'configure/create-devicetype', title: 'DeviceType Add', component: CreateDeviceTypeComponent },
-            { path: 'configure/edit-devicetype', title: 'DeviceType Edit', component: EditDeviceTypeComponent },
-            { path: 'devices', title: 'Devices', component: DevicesComponent },
-            { path: 'devices/device-create', title: 'Device Create', component: DeviceCreateComponent },
-            { path: 'devices/device-edit', title: 'Device Edit', component: DeviceEditComponent },
-            { path: 'configure/modules-list', title: 'Modules', component: ModulesListComponent },
-            {path: 'configure/function-list', title: 'Function', component:FunctionListComponent},
-            {path: 'configure/parameter-list', title: 'Parameter', component:ParameterListComponent},
-            {path: 'configure/modules-create', title: 'Module Create', component:ModulesCreateComponent},
-            {path: 'configure/modules-edit', title: 'Module Edit', component:ModulesEditComponent},
-            {path: 'configure/function-create', title: 'Function Create', component:FunctionCreateComponent},
-            {path: 'configure/function-edit', title: 'Function Edit', component:FunctionEditComponent},
-            {path: 'configure/parameter-create', title: 'Parameter Create', component:ParameterCreateComponent},
-            {path: 'configure/parameter-edit', title: 'Parameter Edit', component:ParameterEditComponent},
-            {path: 'configure/list-primitivetest',title:'List PrimitiveTest',component:ListPrimitiveTestComponent},
-            {path: 'configure/edit-primitivetest',title:'Edit PrimitiveTest',component:EditPrimitiveTestComponent},
-            {path:'configure/create-primitivetest', title:'Create PrimitiveTest', component:CreatePrimitiveTestComponent},
-            {path:'script', title:'Script', component:ScriptListComponent},
-            {path:'script/create-scripts', title:'Create Script', component:CreateScriptsComponent},
-            {path:'script/edit-scripts', title:'Edit Script', component:EditScriptsComponent},
-            {path:'script/create-script-group', title:'Create Script Group', component:CreateScriptGroupComponent},
-            {path:'execution', title:'Execution', component: ExecutionComponent,data: { refreshable: true }},
-            {path:'script/custom-testsuite', title:'Custom TestSuite', component:CustomTestsuiteComponent},
-            {path:'script/edit-testsuite',title:'Edit TestSuite',component:EditTestsuiteComponent},
-            {path:'configure/list-rdk-certifications',title:'List RDK Certifications', component:ListRdkCertificationComponent},
-            {path:'configure/create-rdk-certifications',title:'Create RDK Certifications', component:CreateRdkCertificationComponent},
-            {path:'configure/edit-rdk-certifications', title:'Edit RDK Certifications', component:EditRdkCertificationComponent},
-            {path:'analysis', title:'Analysis', component:AnalysisComponent},
-            {path:'analysis/create-jira', title:'Create Jira', component:CreateJiraComponent},
-            {path:'app-upgrade', title:'App-Upgrade', component:AppUpgradeComponent}
-        ]
-    }
+      },
+      { path: 'configure', title: 'Configure', component: ConfigureComponent },
+      {
+        path: 'configure/user-management',
+        title: 'UserManagement',
+        component: UserListComponent,
+        data: { role: ['admin'] },
+        canActivate: [roleGuard],
+      },
+      {
+        path: 'configure/create-user',
+        title: 'Create User',
+        component: UserAddComponent,
+      },
+      {
+        path: 'configure/edit-user',
+        title: 'Edit User',
+        component: UserEditComponent,
+      },
+      {
+        path: 'configure/create-group',
+        title: 'Group List',
+        component: GroupListComponent,
+        data: { role: ['admin'] },
+        canActivate: [roleGuard],
+      },
+      {
+        path: 'configure/group-add',
+        title: 'Group Add',
+        component: GroupAddComponent,
+      },
+      {
+        path: 'configure/group-edit/:id',
+        title: 'Group Edit',
+        component: GroupEditComponent,
+      },
+      { path: 'configure/list-oem', title: 'OEM', component: ListOemComponent },
+      {
+        path: 'configure/create-oem',
+        title: 'OEM Add',
+        component: CreateOemComponent,
+      },
+      {
+        path: 'configure/oem-edit',
+        title: 'OEM Edit',
+        component: EditOemComponent,
+      },
+      { path: 'configure/list-soc', title: 'Soc', component: ListSocComponent },
+      {
+        path: 'configure/create-soc',
+        title: 'Soc Add',
+        component: CreateSocComponent,
+      },
+      {
+        path: 'configure/edit-soc',
+        title: 'Soc Edit',
+        component: EditSocComponent,
+      },
+      {
+        path: 'configure/list-devicetype',
+        title: 'DeviceType',
+        component: ListDeviceTypeComponent,
+      },
+      {
+        path: 'configure/create-devicetype',
+        title: 'DeviceType Add',
+        component: CreateDeviceTypeComponent,
+      },
+      {
+        path: 'configure/edit-devicetype',
+        title: 'DeviceType Edit',
+        component: EditDeviceTypeComponent,
+      },
+      { path: 'devices', title: 'Devices', component: DevicesComponent },
+      {
+        path: 'devices/device-create',
+        title: 'Device Create',
+        component: DeviceCreateComponent,
+      },
+      {
+        path: 'devices/device-edit',
+        title: 'Device Edit',
+        component: DeviceEditComponent,
+      },
+      {
+        path: 'configure/modules-list',
+        title: 'Modules',
+        component: ModulesListComponent,
+      },
+      {
+        path: 'configure/function-list',
+        title: 'Function',
+        component: FunctionListComponent,
+      },
+      {
+        path: 'configure/parameter-list',
+        title: 'Parameter',
+        component: ParameterListComponent,
+      },
+      {
+        path: 'configure/modules-create',
+        title: 'Module Create',
+        component: ModulesCreateComponent,
+      },
+      {
+        path: 'configure/modules-edit',
+        title: 'Module Edit',
+        component: ModulesEditComponent,
+      },
+      {
+        path: 'configure/function-create',
+        title: 'Function Create',
+        component: FunctionCreateComponent,
+      },
+      {
+        path: 'configure/function-edit',
+        title: 'Function Edit',
+        component: FunctionEditComponent,
+      },
+      {
+        path: 'configure/parameter-create',
+        title: 'Parameter Create',
+        component: ParameterCreateComponent,
+      },
+      {
+        path: 'configure/parameter-edit',
+        title: 'Parameter Edit',
+        component: ParameterEditComponent,
+      },
+      {
+        path: 'configure/list-primitivetest',
+        title: 'List PrimitiveTest',
+        component: ListPrimitiveTestComponent,
+      },
+      {
+        path: 'configure/edit-primitivetest',
+        title: 'Edit PrimitiveTest',
+        component: EditPrimitiveTestComponent,
+      },
+      {
+        path: 'configure/create-primitivetest',
+        title: 'Create PrimitiveTest',
+        component: CreatePrimitiveTestComponent,
+      },
+      { path: 'script', title: 'Script', component: ScriptListComponent },
+      {
+        path: 'script/create-scripts',
+        title: 'Create Script',
+        component: CreateScriptsComponent,
+      },
+      {
+        path: 'script/edit-scripts',
+        title: 'Edit Script',
+        component: EditScriptsComponent,
+      },
+      {
+        path: 'script/clone-scripts',
+        title: 'Clone Script',
+        component: CloneScriptsComponent,
+      },
+      {
+        path: 'script/create-script-group',
+        title: 'Create Script Group',
+        component: CreateScriptGroupComponent,
+      },
+      {
+        path: 'execution',
+        title: 'Execution',
+        component: ExecutionComponent,
+        data: { refreshable: true },
+      },
+      {
+        path: 'script/custom-testsuite',
+        title: 'Custom TestSuite',
+        component: CustomTestsuiteComponent,
+      },
+      {
+        path: 'script/edit-testsuite',
+        title: 'Edit TestSuite',
+        component: EditTestsuiteComponent,
+      },
+      {
+        path: 'configure/list-rdk-certifications',
+        title: 'List RDK Certifications',
+        component: ListRdkCertificationComponent,
+      },
+      {
+        path: 'configure/create-rdk-certifications',
+        title: 'Create RDK Certifications',
+        component: CreateRdkCertificationComponent,
+      },
+      {
+        path: 'configure/edit-rdk-certifications',
+        title: 'Edit RDK Certifications',
+        component: EditRdkCertificationComponent,
+      },
+      { path: 'analysis', title: 'Analysis', component: AnalysisComponent },
+      {
+        path: 'analysis/create-jira',
+        title: 'Create Jira',
+        component: CreateJiraComponent,
+      },
+      {
+        path: 'app-upgrade',
+        title: 'App-Upgrade',
+        component: AppUpgradeComponent,
+      },
+    ],
+  },
 ];
