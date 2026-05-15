@@ -138,6 +138,7 @@ export class CloneScriptsComponent {
     this.getAllPrimitiveTest(this.scriptDetailsObj.moduleName);
     this.code = this.scriptDetailsObj.scriptContent;
     this.initializeForm();
+    this.loadData();
     this.setUpValidation();
     this.getAlldeviceType();
   }
@@ -180,8 +181,13 @@ export class CloneScriptsComponent {
       .subscribe((selectedDeviceTypes: any[] = []) => {
         if (!Array.isArray(selectedDeviceTypes)) {
           this.deviceNameArr = [];
-        } else if (selectedDeviceTypes.length > 0 && typeof selectedDeviceTypes[0] === 'object') {
-          this.deviceNameArr = selectedDeviceTypes.map((item: any) => item.deviceTypeName);
+        } else if (
+          selectedDeviceTypes.length > 0 &&
+          typeof selectedDeviceTypes[0] === 'object'
+        ) {
+          this.deviceNameArr = selectedDeviceTypes.map(
+            (item: any) => item.deviceTypeName,
+          );
         } else {
           this.deviceNameArr = selectedDeviceTypes;
         }
@@ -462,7 +468,12 @@ export class CloneScriptsComponent {
       .getfindallbycategory(this.RDKFlavor)
       .subscribe((res) => {
         this.allDeviceType = res.data;
-        this.loadData();
+        this.firstFormGroup.patchValue({
+          devicetype: this.scriptDetailsObj.deviceTypes,
+        });
+        setTimeout(() => {
+          this.updateDeviceTypeValidity();
+        });
       });
   }
 
