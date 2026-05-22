@@ -46,6 +46,10 @@ limitations under the License.
   <div class="row loader-row" *ngIf="showLoader">
     <app-loader></app-loader>
   </div>
+  <!-- No data message -->
+  <div class="row loader-row" style="top: 45%;left:47%" *ngIf="isNoDataVisible && !showLoader">
+    <span>No Rows to Display</span>
+  </div>
   <!-- Table section row for ag-grid -->
   <div class="grid-container" [class]="themeClass">
     <ag-grid-angular

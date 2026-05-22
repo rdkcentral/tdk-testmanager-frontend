@@ -163,6 +163,7 @@ export class ModulesListComponent {
   defaultCategory!: string;
   preferedCategory!: string;
   showLoader = false;
+  isNoDataVisible = false;
 
   /**
    * Constructor for ModulesListComponent.
@@ -281,7 +282,8 @@ export class ModulesListComponent {
     this.moduleservice
       .findallbyCategory(this.configureName)
       .subscribe((res) => {
-        this.rowData = res.data;
+        this.rowData = Array.isArray(res?.data) ? res.data : [];
+        this.isNoDataVisible = this.rowData.length === 0;
 
         // After data is loaded, restore pagination state if available
         setTimeout(() => {
@@ -301,14 +303,7 @@ export class ModulesListComponent {
             }, 100);
           }
         }, 100);
-        if (
-          this.rowData == null ||
-          this.rowData == undefined ||
-          this.rowData.length > 0 ||
-          this.rowData.length == 0
-        ) {
-          this.showLoader = false;
-        }
+        this.showLoader = false;
       });
   }
 

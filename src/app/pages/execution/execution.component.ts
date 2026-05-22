@@ -653,6 +653,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
   showLoader = false;
   noDataFound: string = '';
   isNoDataVisible = false;
+  isExeHistoryNoDataVisible = false;
 
   /**
    * Constructor for ExecutionComponent.
@@ -779,6 +780,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    */
   getAllExecutions(): void {
     this.storeSelection();
+    this.isExeHistoryNoDataVisible = false;
   if (this.selectedCategory === 'ExecutionName' && this.searchValue != '') {
       this.executionservice
         .getAllExecutionByName(
@@ -800,6 +802,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.rowData = data.executions || [];
               this.totalItems = data.totalItems || this.rowData.length;
             }
+            this.isExeHistoryNoDataVisible = this.rowData.length === 0;
             setTimeout(() => {
               this.reSoreSelection();
             }, 100);
@@ -834,6 +837,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.rowData = data.executions;
               this.totalItems = data.totalItems;
             }
+            this.isExeHistoryNoDataVisible = this.rowData.length === 0;
           },
           error: (err) => {
             this._snakebar.open(err.message, '', {
@@ -862,6 +866,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.rowData = data.executions;
               this.totalItems = data.totalItems;
             }
+            this.isExeHistoryNoDataVisible = this.rowData.length === 0;
           },
           error: (err) => {
             this._snakebar.open(err.message, '', {
@@ -891,6 +896,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
                 this.rowData = data.executions;
                 this.totalItems = data.totalItems;
               }
+              this.isExeHistoryNoDataVisible = this.rowData.length === 0;
             },
             error: (err) => {
               this._snakebar.open(err.message, '', {
@@ -905,6 +911,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
         // If no user is selected, clear the data
         this.rowData = [];
         this.totalItems = 0;
+        this.isExeHistoryNoDataVisible = true;
       }
     } else if (this.selectedCategory === 'Result' && this.searchValue != '') {
       this.executionservice
@@ -927,6 +934,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.rowData = data.executions || [];
               this.totalItems = data.totalItems || this.rowData.length;
             }
+            this.isExeHistoryNoDataVisible = this.rowData.length === 0;
           },
           error: (err) => {
             this._snakebar.open(err.message, '', {
@@ -954,6 +962,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.rowData = data.executions;
               this.totalItems = data.totalItems;
             }
+            this.isExeHistoryNoDataVisible = this.rowData.length === 0;
             setTimeout(() => {
               this.reSoreSelection();
             }, 0);

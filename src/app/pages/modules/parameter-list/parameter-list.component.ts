@@ -127,6 +127,7 @@ export class ParameterListComponent {
   dynamicFunctionName!: string;
   categoryName: any;
   showLoader = false;
+  isNoDataVisible = false;
 
   /**
    * Constructor for ParameterListComponent.
@@ -230,7 +231,8 @@ export class ParameterListComponent {
       .findAllByFunction(this.dynamicFunctionName, this.configureName)
       .subscribe({
         next: (data) => {
-          this.rowData = data.data;
+          this.rowData = Array.isArray(data?.data) ? data.data : [];
+          this.isNoDataVisible = this.rowData.length === 0;
           // After data is loaded, restore pagination state if available
         setTimeout(() => {
           const savedState = this.moduleservice.getPaginationState("parameters");
@@ -249,13 +251,7 @@ export class ParameterListComponent {
             }, 100);
           }
         }, 100);
-          if (
-            this.rowData == null ||
-            this.rowData == undefined ||
-            this.rowData.length > 0
-          ) {
-            this.showLoader = false;
-          }
+          this.showLoader = false;
         },
         error: (err) => {
           this.showLoader = false;

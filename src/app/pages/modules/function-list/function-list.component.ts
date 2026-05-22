@@ -120,6 +120,7 @@ export class FunctionListComponent {
   dynamicModuleName!: string;
   categoryName: any;
   showLoader = false;
+  isNoDataVisible = false;
 
   /**
    * Constructor for FunctionListComponent.
@@ -221,7 +222,8 @@ export class FunctionListComponent {
   functionListByModule(): void {
     this.showLoader = true;
     this.moduleservice.functionList(this.dynamicModuleName).subscribe((res) => {
-      this.rowData = res.data;
+      this.rowData = Array.isArray(res?.data) ? res.data : [];
+      this.isNoDataVisible = this.rowData.length === 0;
       // After data is loaded, restore pagination state if available
         setTimeout(() => {
           const savedState = this.moduleservice.getPaginationState("functions");
@@ -240,13 +242,7 @@ export class FunctionListComponent {
             }, 100);
           }
         }, 100);
-      if (
-        this.rowData == null ||
-        this.rowData == undefined ||
-        this.rowData.length > 0
-      ) {
-        this.showLoader = false;
-      }
+      this.showLoader = false;
     });
   }
 

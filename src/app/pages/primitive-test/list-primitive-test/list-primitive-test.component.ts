@@ -79,6 +79,7 @@ export class ListPrimitiveTestComponent {
   names: any[] = [];
   categoryName!: string;
   showLoader = false;
+  isNoDataVisible = false;
 
   public columnDefs: ColDef[] = [
     {
@@ -150,7 +151,7 @@ export class ListPrimitiveTestComponent {
     this.authservice.currentRoute = this.router.url.split('?')[0];
     this.showLoader = true;
     this.service.getlistofModules(this.configureName).subscribe((res) => {
-      this.moduleNames = res.data.sort(); // Sort ascending
+      this.moduleNames = Array.isArray(res?.data) ? [...res.data].sort() : [];
       // Restore selected module if available
       const storedModule = localStorage.getItem('selectedModule');
       if (storedModule && this.moduleNames.includes(storedModule)) {
@@ -158,10 +159,13 @@ export class ListPrimitiveTestComponent {
       } else {
         this.selectedValue = this.moduleNames[0];
       }
-      this.getParameterDetails(this.selectedValue);
       if (this.moduleNames.length > 0) {
-        this.showLoader = false;
+        this.getParameterDetails(this.selectedValue);
+      } else {
+        this.rowData = [];
+        this.isNoDataVisible = true;
       }
+      this.showLoader = false;
     });
     const savedState = this.service.getPaginationState();
     if (savedState && savedState.pageSize) {
@@ -343,11 +347,13 @@ export class ListPrimitiveTestComponent {
     this.rowData = [];
     this.service.getParameterNames(selectedValue).subscribe({
       next: (res) => {
-        this.rowData = res.data;
+        this.rowData = Array.isArray(res?.data) ? res.data : [];
+        this.isNoDataVisible = this.rowData.length === 0;
         this.restorePaginationIfNeeded();
       },
       error: () => {
         this.rowData = [];
+        this.isNoDataVisible = true;
         // Clear restoration flag on error
         this.service.clearRestorationFlag();
       },

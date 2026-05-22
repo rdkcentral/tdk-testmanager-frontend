@@ -84,6 +84,7 @@ export class DevicesComponent {
   userCategory!: string;
   showLoader = false;
   uploadXml!: File | null;
+  isNoDataVisible = false;
 
   public gridApi!: GridApi;
   public columnDefs: ColDef[] = [
@@ -292,9 +293,7 @@ export class DevicesComponent {
     this.showLoader = true;
     this.service.findallbyCategory(this.selectedDeviceCategory).subscribe({
       next: (res) => {
-        this.rowData = [];
-        let data = res.data;
-        this.rowData = data;
+        this.rowData = Array.isArray(res?.data) ? res.data : [];
 
         // After data is loaded, restore pagination state if available
         setTimeout(() => {
@@ -315,21 +314,8 @@ export class DevicesComponent {
           }
         }, 100);
 
-        if (
-          this.rowData == null ||
-          this.rowData == undefined ||
-          this.rowData.length > 0 ||
-          this.rowData.length == 0
-        ) {
-          this.showLoader = false;
-        }
-        if (
-          this.rowData == null ||
-          this.rowData == undefined ||
-          this.rowData.length == 0
-        ) {
-          this.rowData = [];
-        }
+        this.showLoader = false;
+        this.isNoDataVisible = this.rowData.length === 0;
       },
       error: (err) => {
         this.showLoader = false;

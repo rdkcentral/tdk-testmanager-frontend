@@ -62,6 +62,7 @@ export class GroupListComponent implements OnInit {
   selectedRowCount = 0;
   showUpdateButton = false;
   seletecUserGroup: any;
+  isNoDataVisible = false;
 
   public columnDefs: ColDef[] = [
     {
@@ -109,7 +110,10 @@ export class GroupListComponent implements OnInit {
    * Retrieves the user group list from the service and assigns it to the rowData property.
    */
   ngOnInit(): void {
-    this.service.getuserGroupList().subscribe((data) => (this.rowData = data));
+    this.service.getuserGroupList().subscribe((data) => {
+      this.rowData = data;
+      this.isNoDataVisible = this.rowData.length === 0;
+    });
   }
 
 

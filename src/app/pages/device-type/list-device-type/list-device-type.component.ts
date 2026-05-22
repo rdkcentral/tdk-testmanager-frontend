@@ -66,6 +66,7 @@ export class ListDeviceTypeComponent implements OnInit {
   selectedRowCount = 0;
   showUpdateButton = false;
   categoryName!: string;
+  isNoDataVisible = false;
   /**
    * The column definitions for the grid.
    */
@@ -145,7 +146,8 @@ export class ListDeviceTypeComponent implements OnInit {
     this.service
       .getfindallbycategory(this.authservice.selectedConfigVal)
       .subscribe((res) => {
-        this.rowData = res.data;
+        this.rowData = Array.isArray(res?.data) ? res.data : [];
+        this.isNoDataVisible = this.rowData.length === 0;
          setTimeout(() => {
           const savedState = this.service.getPaginationState();
           if (savedState && this.gridApi) {
@@ -163,13 +165,7 @@ export class ListDeviceTypeComponent implements OnInit {
             }, 100);
           }
         }, 100);
-        if (
-          this.rowData == null ||
-          this.rowData == undefined ||
-          this.rowData.length > 0
-        ) {
-          this.showLoader = false;
-        }
+        this.showLoader = false;
       });
     this.configureName = this.authservice.selectedConfigVal;
     if (this.configureName === 'RDKB') {

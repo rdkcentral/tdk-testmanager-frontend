@@ -72,6 +72,7 @@ export class ListSocComponent {
   showUpdateButton = false;
   categoryName!: string;
   showLoader = false;
+  isNoDataVisible = false;
   public columnDefs: ColDef[] = [
     {
       headerName: 'Name',
@@ -154,7 +155,9 @@ export class ListSocComponent {
     this.authservice.currentRoute = this.router.url.split('?')[0];
     this.showLoader = true;
     this.service.getSoc(this.authservice.selectedConfigVal).subscribe((res) => {
-      this.rowData = res.data;
+      this.rowData = Array.isArray(res?.data) ? res.data : [];
+      this.isNoDataVisible = this.rowData.length === 0;
+      this.showLoader = false;
       setTimeout(() => {
         const savedState = this.service.getPaginationState();
         if (savedState && this.gridApi) {
@@ -169,13 +172,6 @@ export class ListSocComponent {
           }, 100);
         }
       }, 100);
-      if (
-        this.rowData == null ||
-        this.rowData == undefined ||
-        this.rowData.length > 0
-      ) {
-        this.showLoader = false;
-      }
     });
     this.adjustPaginationToScreenSize();
   }

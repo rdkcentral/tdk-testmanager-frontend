@@ -187,6 +187,9 @@ limitations under the License.
                           <div class="row loader-row" *ngIf="showLoader">
                             <app-loader></app-loader>
                           </div>
+                          <div class="row loader-row" style="top: 45%;left:47%" *ngIf="isExeHistoryNoDataVisible">
+                           <span>No Rows to Display</span>
+                          </div>
                           <ag-grid-angular
                             #historyTable
                             style="width: 100%;"
