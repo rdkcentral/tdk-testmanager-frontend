@@ -91,6 +91,7 @@ export class ListRdkCertificationComponent {
   uploadFileName: File | undefined;
   configureName!: string;
   showLoader = false;
+  isNoDataVisible = false;
   /**
    * Column definitions for the ag-Grid table in the RDK Certification List component.
    *
@@ -247,7 +248,7 @@ export class ListRdkCertificationComponent {
       ) {
         this.rowData = certificationNames.map((name: any) => ({ name }));
       }
-      setTimeout(() => {
+      this.isNoDataVisible = !this.rowData || this.rowData.length === 0;      setTimeout(() => {
           const savedState = this.service.getPaginationState();
           if (savedState && this.gridApi) {
            // Set the page size first

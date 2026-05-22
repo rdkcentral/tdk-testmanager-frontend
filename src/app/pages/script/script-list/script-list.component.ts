@@ -396,26 +396,32 @@ export class ScriptListComponent {
     this.scriptservice.getallbymodules(category).subscribe({
       next: (res) => {
         if (res) {
-          this.scriptDataArr = res.data;
+          this.scriptDataArr = Array.isArray(res?.data) ? res.data : [];
           this.cdRef.detectChanges();
           this.filterScript();
           this.scriptSorting();
           this.showLoader = false;
+
+          if (this.scriptDataArr.length === 0) {
+            this.noScriptFound = 'No Rows to Show';
+          }
 
           // AFTER data is loaded, filtered, and sorted, restore pagination
           this.restorePaginationIfNeeded();
         } else {
           this.cdRef.detectChanges();
           this.scriptDataArr = [];
+          this.noScriptFound = 'No Rows to Show';
           this.showLoader = false;
         }
       },
       error: (err) => {
-        let errmsg = err.message;
-        if (errmsg && errmsg.includes('No script found for category')) {
-          this.noScriptFound = 'No Rows To Show';
-        }
+        this.scriptDataArr = [];
+        this.scriptFilteredData = [];
+        this.paginatedScriptData = [];
+        this.noScriptFound = 'No Rows to Show';
         this.showLoader = false;
+        this.cdRef.detectChanges();
       },
     });
   }
@@ -589,29 +595,32 @@ export class ScriptListComponent {
     this.scriptservice.getAllTestSuite(this.selectedCategory).subscribe({
       next: (res) => {
         if (res) {
-          this.testSuiteDataArr = res.data;
+          this.testSuiteDataArr = Array.isArray(res?.data) ? res.data : [];
           this.cdRef.detectChanges();
           this.applyFilterSuite();
           this.toggleSortSuite();
           this.showLoader = false;
+
+          if (this.testSuiteDataArr.length === 0) {
+            this.noScriptFound = 'No Rows to Show';
+          }
 
           // AFTER data is loaded, filtered, and sorted, restore pagination
           this.restorePaginationIfNeeded();
         } else {
           this.cdRef.detectChanges();
           this.testSuiteDataArr = [];
+          this.noScriptFound = 'No Rows to Show';
           this.showLoader = false;
         }
       },
       error: (err) => {
-        let errmsg = err.message;
-        if (errmsg.message === " Test suite - 'RDKB' doesnt exist") {
-          this.noScriptFound = 'No Rows To Show';
-        }
-        if (errmsg.message === " Test suite - 'RDKV' doesnt exist") {
-          this.noScriptFound = 'No Rows To Show';
-        }
+        this.testSuiteDataArr = [];
+        this.testSuiteFilteredData = [];
+        this.paginatedSuiteData = [];
+        this.noScriptFound = 'No Rows to Display';
         this.showLoader = false;
+        this.cdRef.detectChanges();
       },
     });
   }

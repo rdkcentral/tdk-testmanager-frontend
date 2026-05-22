@@ -205,7 +205,7 @@ body,
   position: absolute;
   top: 50%;
   z-index: 1;
-  right: 50%;
+  left: 50%;
 }
 
 .grid-container {
