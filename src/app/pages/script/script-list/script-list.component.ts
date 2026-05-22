@@ -403,7 +403,7 @@ export class ScriptListComponent {
           this.showLoader = false;
 
           if (this.scriptDataArr.length === 0) {
-            this.noScriptFound = 'No Rows to Display';
+            this.noScriptFound = 'No Rows to Show';
           }
 
           // AFTER data is loaded, filtered, and sorted, restore pagination
@@ -411,13 +411,17 @@ export class ScriptListComponent {
         } else {
           this.cdRef.detectChanges();
           this.scriptDataArr = [];
-          this.noScriptFound = 'No Rows to Display';
+          this.noScriptFound = 'No Rows to Show';
           this.showLoader = false;
         }
       },
       error: (err) => {
-        this.noScriptFound = 'No Rows to Display';
+        this.scriptDataArr = [];
+        this.scriptFilteredData = [];
+        this.paginatedScriptData = [];
+        this.noScriptFound = 'No Rows to Show';
         this.showLoader = false;
+        this.cdRef.detectChanges();
       },
     });
   }
@@ -598,7 +602,7 @@ export class ScriptListComponent {
           this.showLoader = false;
 
           if (this.testSuiteDataArr.length === 0) {
-            this.noScriptFound = 'No Rows to Display';
+            this.noScriptFound = 'No Rows to Show';
           }
 
           // AFTER data is loaded, filtered, and sorted, restore pagination
@@ -606,13 +610,17 @@ export class ScriptListComponent {
         } else {
           this.cdRef.detectChanges();
           this.testSuiteDataArr = [];
-          this.noScriptFound = 'No Rows to Display';
+          this.noScriptFound = 'No Rows to Show';
           this.showLoader = false;
         }
       },
       error: (err) => {
+        this.testSuiteDataArr = [];
+        this.testSuiteFilteredData = [];
+        this.paginatedSuiteData = [];
         this.noScriptFound = 'No Rows to Display';
         this.showLoader = false;
+        this.cdRef.detectChanges();
       },
     });
   }

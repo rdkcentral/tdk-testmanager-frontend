@@ -18,11 +18,18 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 
-import { Component ,HostListener} from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { OemService } from '../../../services/oem.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { GridApi, ColDef, IMultiFilterParams, GridReadyEvent, RowSelectedEvent, SelectionChangedEvent } from 'ag-grid-community';
+import {
+  GridApi,
+  ColDef,
+  IMultiFilterParams,
+  GridReadyEvent,
+  RowSelectedEvent,
+  SelectionChangedEvent,
+} from 'ag-grid-community';
 import { AuthService } from '../../../auth/auth.service';
 import { ButtonComponent } from '../../../utility/component/ag-grid-buttons/button/button.component';
 import { CommonModule } from '@angular/common';
@@ -120,7 +127,7 @@ export class ListOemComponent {
     private router: Router,
     private authservice: AuthService,
     private service: OemService,
-    private _snakebar: MatSnackBar
+    private _snakebar: MatSnackBar,
   ) {}
 
   /**
@@ -129,21 +136,20 @@ export class ListOemComponent {
    */
   ngOnInit(): void {
     this.showLoader = true;
-    this.service
-      .getOemByList(this.authservice.selectedConfigVal)
-      .subscribe((res) => {
+    this.service.getOemByList(this.authservice.selectedConfigVal).subscribe({
+      next: (res) => {
         this.rowData = Array.isArray(res?.data) ? res.data : [];
         this.isNoDataVisible = this.rowData.length === 0;
         this.showLoader = false;
-        
+
         // After data is loaded, restore pagination state if available
         setTimeout(() => {
           const savedState = this.service.getPaginationState();
           if (savedState && this.gridApi) {
-           // Set the page size first
+            // Set the page size first
             this.gridApi.setGridOption(
               'paginationPageSize',
-              savedState.pageSize
+              savedState.pageSize,
             );
 
             // Then navigate to the saved page
@@ -154,7 +160,13 @@ export class ListOemComponent {
             }, 100);
           }
         }, 100);
-      });
+      },
+      error: () => {
+        this.rowData = [];
+        this.isNoDataVisible = true;
+        this.showLoader = false;
+      },
+    });
     this.configureName = this.authservice.selectedConfigVal;
     this.authservice.currentRoute = this.router.url.split('?')[0];
     if (this.configureName === 'RDKB') {
@@ -163,20 +175,18 @@ export class ListOemComponent {
       this.categoryName = 'Video';
     }
 
-     // Get saved state FIRST before loading data
-  const savedState = this.service.getPaginationState();
- 
-  
-  if (savedState && savedState.pageSize) {
-    // Restore pagination settings BEFORE loading data
-    this.paginationPageSize = savedState.pageSize;
-    this.paginationPageSizeSelector = [
-      savedState.pageSize,
-      savedState.pageSize * 2,
-      savedState.pageSize * 5,
-    ];
-  
-  }
+    // Get saved state FIRST before loading data
+    const savedState = this.service.getPaginationState();
+
+    if (savedState && savedState.pageSize) {
+      // Restore pagination settings BEFORE loading data
+      this.paginationPageSize = savedState.pageSize;
+      this.paginationPageSizeSelector = [
+        savedState.pageSize,
+        savedState.pageSize * 2,
+        savedState.pageSize * 5,
+      ];
+    }
     this.adjustPaginationToScreenSize();
   }
 
@@ -194,10 +204,10 @@ export class ListOemComponent {
   private adjustPaginationToScreenSize() {
     const height = window.innerHeight;
     const savedState = this.service.getPaginationState();
-  if (savedState && savedState.pageSize && !this.gridApi) {
-    // If we have saved state and grid is not ready yet, don't recalculate
-    return;
-  }
+    if (savedState && savedState.pageSize && !this.gridApi) {
+      // If we have saved state and grid is not ready yet, don't recalculate
+      return;
+    }
 
     if (height > 1200) {
       this.paginationPageSize = 25;
@@ -234,8 +244,6 @@ export class ListOemComponent {
     if (!savedState) {
       this.adjustPaginationToScreenSize();
     }
-    
-    
   }
 
   /**
@@ -247,7 +255,7 @@ export class ListOemComponent {
       this.service.deleteOem(data.oemId).subscribe({
         next: (res) => {
           this.rowData = this.rowData.filter(
-            (row: any) => row.oemId !== data.oemId
+            (row: any) => row.oemId !== data.oemId,
           );
           this.rowData = [...this.rowData];
           this._snakebar.open(res.message, '', {
@@ -300,11 +308,11 @@ export class ListOemComponent {
    * @param user The user/OEM to edit.
    */
   userEdit(user: any): void {
-     if (this.gridApi) {
-    const currentPage = this.gridApi.paginationGetCurrentPage();
-    const pageSize = this.gridApi.paginationGetPageSize();
-    this.service.savePaginationState(currentPage, pageSize);
-  }
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     localStorage.setItem('user', JSON.stringify(user));
     this.service.currentUrl = user.userGroupId;
     this.router.navigate(['configure/oem-edit']);
@@ -315,11 +323,11 @@ export class ListOemComponent {
    * No parameters.
    */
   createOem(): void {
-     if (this.gridApi) {
-    const currentPage = this.gridApi.paginationGetCurrentPage();
-    const pageSize = this.gridApi.paginationGetPageSize();
-    this.service.savePaginationState(currentPage, pageSize);
-  }
+    if (this.gridApi) {
+      const currentPage = this.gridApi.paginationGetCurrentPage();
+      const pageSize = this.gridApi.paginationGetPageSize();
+      this.service.savePaginationState(currentPage, pageSize);
+    }
     this.router.navigate(['/configure/create-oem']);
   }
 

@@ -18,7 +18,14 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MaterialModule } from '../../material/material.module';
 import { AgGridAngular } from 'ag-grid-angular';
@@ -651,6 +658,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
   historyInterval: any;
   deviceInterval: any;
   showLoader = false;
+  showHistoryLoader = false;
   noDataFound: string = '';
   isNoDataVisible = false;
   isExeHistoryNoDataVisible = false;
@@ -676,10 +684,10 @@ export class ExecutionComponent implements OnInit, OnDestroy {
     public dialogTDK: MatDialog,
     public deleteDateDialog: MatDialog,
     private executionservice: ExecutionService,
-    private clipboard: Clipboard
+    private clipboard: Clipboard,
   ) {
     this.loggedinUser = JSON.parse(
-      localStorage.getItem('loggedinUser') || '{}'
+      localStorage.getItem('loggedinUser') || '{}',
     );
     this.userCategory = this.loggedinUser.userCategory;
     this.preferedCategory = localStorage.getItem('preferedCategory') || '';
@@ -780,14 +788,15 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    */
   getAllExecutions(): void {
     this.storeSelection();
+    this.showHistoryLoader = true;
     this.isExeHistoryNoDataVisible = false;
-  if (this.selectedCategory === 'ExecutionName' && this.searchValue != '') {
+    if (this.selectedCategory === 'ExecutionName' && this.searchValue != '') {
       this.executionservice
         .getAllExecutionByName(
           this.searchValue.trim(),
           this.selectedDfaultCategory,
           this.currentPage,
-          this.pageSize
+          this.pageSize,
         )
         .subscribe({
           next: (res) => {
@@ -803,11 +812,13 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.totalItems = data.totalItems || this.rowData.length;
             }
             this.isExeHistoryNoDataVisible = this.rowData.length === 0;
+            this.showHistoryLoader = false;
             setTimeout(() => {
               this.reSoreSelection();
             }, 100);
           },
           error: (err) => {
+            this.showHistoryLoader = false;
             this._snakebar.open(err.message, '', {
               duration: 2000,
               panelClass: ['err-msg'],
@@ -825,7 +836,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
           this.searchValue.trim(),
           this.selectedDfaultCategory,
           this.currentPage,
-          this.pageSize
+          this.pageSize,
         )
         .subscribe({
           next: (res) => {
@@ -838,8 +849,10 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.totalItems = data.totalItems;
             }
             this.isExeHistoryNoDataVisible = this.rowData.length === 0;
+            this.showHistoryLoader = false;
           },
           error: (err) => {
+            this.showHistoryLoader = false;
             this._snakebar.open(err.message, '', {
               duration: 2000,
               panelClass: ['err-msg'],
@@ -848,13 +861,13 @@ export class ExecutionComponent implements OnInit, OnDestroy {
             });
           },
         });
-  } else if (this.selectedCategory === 'Device' && this.searchValue != '') {
+    } else if (this.selectedCategory === 'Device' && this.searchValue != '') {
       this.executionservice
         .getAllExecutionByDevice(
           this.searchValue.trim(),
           this.selectedDfaultCategory,
           this.currentPage,
-          this.pageSize
+          this.pageSize,
         )
         .subscribe({
           next: (res) => {
@@ -867,8 +880,10 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.totalItems = data.totalItems;
             }
             this.isExeHistoryNoDataVisible = this.rowData.length === 0;
+            this.showHistoryLoader = false;
           },
           error: (err) => {
+            this.showHistoryLoader = false;
             this._snakebar.open(err.message, '', {
               duration: 2000,
               panelClass: ['err-msg'],
@@ -877,14 +892,14 @@ export class ExecutionComponent implements OnInit, OnDestroy {
             });
           },
         });
-  } else if (this.selectedCategory === 'User') {
+    } else if (this.selectedCategory === 'User') {
       if (this.selectedOption && this.selectedOption.trim() !== '') {
         this.executionservice
           .getAllExecutionByUser(
             this.selectedOption,
             this.selectedDfaultCategory,
             this.currentPage,
-            this.pageSize
+            this.pageSize,
           )
           .subscribe({
             next: (res) => {
@@ -897,8 +912,10 @@ export class ExecutionComponent implements OnInit, OnDestroy {
                 this.totalItems = data.totalItems;
               }
               this.isExeHistoryNoDataVisible = this.rowData.length === 0;
+              this.showHistoryLoader = false;
             },
             error: (err) => {
+              this.showHistoryLoader = false;
               this._snakebar.open(err.message, '', {
                 duration: 2000,
                 panelClass: ['err-msg'],
@@ -912,6 +929,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
         this.rowData = [];
         this.totalItems = 0;
         this.isExeHistoryNoDataVisible = true;
+        this.showHistoryLoader = false;
       }
     } else if (this.selectedCategory === 'Result' && this.searchValue != '') {
       this.executionservice
@@ -919,7 +937,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
           this.searchValue,
           this.selectedDfaultCategory,
           this.currentPage,
-          this.pageSize
+          this.pageSize,
         )
         .subscribe({
           next: (res) => {
@@ -935,8 +953,10 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.totalItems = data.totalItems || this.rowData.length;
             }
             this.isExeHistoryNoDataVisible = this.rowData.length === 0;
+            this.showHistoryLoader = false;
           },
           error: (err) => {
+            this.showHistoryLoader = false;
             this._snakebar.open(err.message, '', {
               duration: 2000,
               panelClass: ['err-msg'],
@@ -950,7 +970,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
         .getAllexecution(
           this.selectedDfaultCategory,
           this.currentPage,
-          this.pageSize
+          this.pageSize,
         )
         .subscribe({
           next: (res) => {
@@ -963,11 +983,13 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               this.totalItems = data.totalItems;
             }
             this.isExeHistoryNoDataVisible = this.rowData.length === 0;
+            this.showHistoryLoader = false;
             setTimeout(() => {
               this.reSoreSelection();
             }, 0);
           },
           error: (err) => {
+            this.showHistoryLoader = false;
             this._snakebar.open(err, '', {
               duration: 2000,
               panelClass: ['err-msg'],
@@ -1115,7 +1137,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
                 this.deviceSearchInput.nativeElement.focus();
                 this.deviceSearchInput.nativeElement.setSelectionRange(
                   this.deviceSearchInput.nativeElement.value.length,
-                  this.deviceSearchInput.nativeElement.value.length
+                  this.deviceSearchInput.nativeElement.value.length,
                 );
               }
             }, 0);
@@ -1163,7 +1185,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
                 this.deviceSearchInput.nativeElement.focus();
                 this.deviceSearchInput.nativeElement.setSelectionRange(
                   this.deviceSearchInput.nativeElement.value.length,
-                  this.deviceSearchInput.nativeElement.value.length
+                  this.deviceSearchInput.nativeElement.value.length,
                 );
               }
             }, 0);
@@ -1363,7 +1385,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
   onFilterTextBoxChanged() {
     this.gridApi.setGridOption(
       'quickFilterText',
-      (document.getElementById('filter-text-box') as HTMLInputElement).value
+      (document.getElementById('filter-text-box') as HTMLInputElement).value,
     );
   }
 
@@ -1413,7 +1435,8 @@ export class ExecutionComponent implements OnInit, OnDestroy {
     }
     if (this.selectedCategory === 'Result') {
       this.currentPage = 0;
-      if (this.paginator && this.paginator.firstPage) this.paginator.firstPage();
+      if (this.paginator && this.paginator.firstPage)
+        this.paginator.firstPage();
       this.getAllExecutions();
     }
     if (this.searchValue === '') {
@@ -1463,7 +1486,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
               maxWidth: '100vw',
               panelClass: 'custom-modalbox',
               data: this.resultDetailsData,
-            }
+            },
           );
           resultDetailsModal.afterClosed().subscribe(() => {
             this.getAllExecutions();
@@ -1541,7 +1564,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
                 panelClass: 'custom-modalbox',
                 data: { params },
                 autoFocus: false,
-              }
+              },
             );
             // Close loading dialog once main dialog is open
             loadingDialog.close();
@@ -1560,7 +1583,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
                 panelClass: ['err-msg'],
                 horizontalPosition: 'end',
                 verticalPosition: 'top',
-              }
+              },
             );
             return;
           }
@@ -1610,24 +1633,24 @@ export class ExecutionComponent implements OnInit, OnDestroy {
     });
     // Short timeout to ensure loader is visible
     setTimeout(() => {
-    // Now open the actual execution dialog
-    const normalExeModal = this.triggerDialog.open(ExecuteDialogComponent, {
-      width: '68%',
-      height: '96vh',
-      maxWidth: '100vw',
-      panelClass: 'custom-modalbox',
-      restoreFocus: false,
-      data: {
-        normalExecutionClick,
-      },
-    });
-     // Close the loader once the main dialog is ready to show
-    loadingDialog.close();
-    normalExeModal.afterClosed().subscribe(() => {
-      setTimeout(() => {
-        this.getAllExecutions();
-      }, 2000);
-    });
+      // Now open the actual execution dialog
+      const normalExeModal = this.triggerDialog.open(ExecuteDialogComponent, {
+        width: '68%',
+        height: '96vh',
+        maxWidth: '100vw',
+        panelClass: 'custom-modalbox',
+        restoreFocus: false,
+        data: {
+          normalExecutionClick,
+        },
+      });
+      // Close the loader once the main dialog is ready to show
+      loadingDialog.close();
+      normalExeModal.afterClosed().subscribe(() => {
+        setTimeout(() => {
+          this.getAllExecutions();
+        }, 2000);
+      });
     }, 300);
   }
 
@@ -1649,34 +1672,39 @@ export class ExecutionComponent implements OnInit, OnDestroy {
         verticalPosition: 'top',
       });
     } else {
-      const deleteDialog = this.deleteDateDialog.open(DeleteConfirmationDialogComponent, {
-        width: '500px',
-        panelClass: 'custom-modalbox',
-        data: {},
-      });
+      const deleteDialog = this.deleteDateDialog.open(
+        DeleteConfirmationDialogComponent,
+        {
+          width: '500px',
+          panelClass: 'custom-modalbox',
+          data: {},
+        },
+      );
 
       deleteDialog.afterClosed().subscribe((result) => {
         if (result && result.confirmed) {
-          this.executionservice.deleteExecutions(executionArr, result.isDataDeletionNeeded).subscribe({
-            next: (res) => {
-              this._snakebar.open(res.message, '', {
-                duration: 3000,
-                panelClass: ['success-msg'],
-                horizontalPosition: 'end',
-                verticalPosition: 'top',
-              });
-              this.getAllExecutions();
-            },
-            error: (err) => {
-              let errmsg = err.message;
-              this._snakebar.open(errmsg, '', {
-                duration: 2000,
-                panelClass: ['err-msg'],
-                horizontalPosition: 'end',
-                verticalPosition: 'top',
-              });
-            },
-          });
+          this.executionservice
+            .deleteExecutions(executionArr, result.isDataDeletionNeeded)
+            .subscribe({
+              next: (res) => {
+                this._snakebar.open(res.message, '', {
+                  duration: 3000,
+                  panelClass: ['success-msg'],
+                  horizontalPosition: 'end',
+                  verticalPosition: 'top',
+                });
+                this.getAllExecutions();
+              },
+              error: (err) => {
+                let errmsg = err.message;
+                this._snakebar.open(errmsg, '', {
+                  duration: 2000,
+                  panelClass: ['err-msg'],
+                  horizontalPosition: 'end',
+                  verticalPosition: 'top',
+                });
+              },
+            });
         }
       });
     }
@@ -1792,7 +1820,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
         this.deviceSearchInput.nativeElement.focus();
         this.deviceSearchInput.nativeElement.setSelectionRange(
           this.deviceSearchInput.nativeElement.value.length,
-          this.deviceSearchInput.nativeElement.value.length
+          this.deviceSearchInput.nativeElement.value.length,
         );
       }
     }, 0);
@@ -1820,7 +1848,7 @@ export class ExecutionComponent implements OnInit, OnDestroy {
           }
           return false;
         });
-      }
+      },
     );
 
     this.filteredDeviceStausArray = [

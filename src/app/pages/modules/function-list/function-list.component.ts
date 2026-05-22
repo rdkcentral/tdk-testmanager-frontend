@@ -135,7 +135,7 @@ export class FunctionListComponent {
     private authservice: AuthService,
     private _snakebar: MatSnackBar,
     private moduleservice: ModulesService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {}
 
   /**
@@ -221,28 +221,35 @@ export class FunctionListComponent {
    */
   functionListByModule(): void {
     this.showLoader = true;
-    this.moduleservice.functionList(this.dynamicModuleName).subscribe((res) => {
-      this.rowData = Array.isArray(res?.data) ? res.data : [];
-      this.isNoDataVisible = this.rowData.length === 0;
-      // After data is loaded, restore pagination state if available
+    this.moduleservice.functionList(this.dynamicModuleName).subscribe({
+      next: (res) => {
+        this.rowData = Array.isArray(res?.data) ? res.data : [];
+        this.isNoDataVisible = this.rowData.length === 0;
+        // After data is loaded, restore pagination state if available
         setTimeout(() => {
-          const savedState = this.moduleservice.getPaginationState("functions");
+          const savedState = this.moduleservice.getPaginationState('functions');
           if (savedState && this.gridApi) {
-           // Set the page size first
+            // Set the page size first
             this.gridApi.setGridOption(
               'paginationPageSize',
-              savedState.pageSize
+              savedState.pageSize,
             );
 
             // Then navigate to the saved page
             setTimeout(() => {
               this.gridApi.paginationGoToPage(savedState.currentPage);
               // Clear the restoration flag after successful restoration
-              this.moduleservice.clearRestorationFlag("functions");
+              this.moduleservice.clearRestorationFlag('functions');
             }, 100);
           }
         }, 100);
-      this.showLoader = false;
+        this.showLoader = false;
+      },
+      error: () => {
+        this.rowData = [];
+        this.isNoDataVisible = true;
+        this.showLoader = false;
+      },
     });
   }
 
@@ -253,7 +260,7 @@ export class FunctionListComponent {
   onGridReady(params: GridReadyEvent<any>) {
     this.gridApi = params.api;
     // Only apply screen-based sizing if no saved state exists
-    const savedState = this.moduleservice.getPaginationState("functions");
+    const savedState = this.moduleservice.getPaginationState('functions');
     if (!savedState) {
       this.adjustPaginationToScreenSize();
     }
@@ -297,7 +304,7 @@ export class FunctionListComponent {
       this.moduleservice.savePaginationState(
         'functions',
         currentPage,
-        pageSize
+        pageSize,
       );
     }
     this.router.navigate(['/configure/function-create']);
@@ -315,7 +322,7 @@ export class FunctionListComponent {
       this.moduleservice.savePaginationState(
         'functions',
         currentPage,
-        pageSize
+        pageSize,
       );
     }
     localStorage.setItem('functions', JSON.stringify(functions));
@@ -333,7 +340,7 @@ export class FunctionListComponent {
         this.moduleservice.deleteFunction(data.id).subscribe({
           next: (res) => {
             this.rowData = this.rowData.filter(
-              (row: any) => row.id !== data.id
+              (row: any) => row.id !== data.id,
             );
             this.rowData = [...this.rowData];
             // Reset pagination state after successful deletion
@@ -372,7 +379,7 @@ export class FunctionListComponent {
       this.moduleservice.savePaginationState(
         'functions',
         currentPage,
-        pageSize
+        pageSize,
       );
     }
     localStorage.setItem('function', JSON.stringify(data));

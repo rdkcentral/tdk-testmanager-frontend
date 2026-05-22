@@ -77,18 +77,18 @@ export class ListDeviceTypeComponent implements OnInit {
       filter: 'agTextColumnFilter',
       flex: 1,
       filterParams: {
-      textMatcher: ({ value, filterText }: any) => {
-        // Trim both the filter text and the value before comparison
-        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
-        const trimmedValue = value?.trim().toLowerCase() || '';
-        
-        if (trimmedFilterText === '') {
-          return true;
-        }
-        
-        return trimmedValue.includes(trimmedFilterText);
-      },
-      debounceMs: 300,
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
       },
     },
     {
@@ -133,7 +133,7 @@ export class ListDeviceTypeComponent implements OnInit {
     private router: Router,
     private authservice: AuthService,
     private service: DevicetypeService,
-    private _snakebar: MatSnackBar
+    private _snakebar: MatSnackBar,
   ) {
     this.preferedCategory = localStorage.getItem('preferedCategory') || '';
   }
@@ -145,27 +145,34 @@ export class ListDeviceTypeComponent implements OnInit {
     this.showLoader = true;
     this.service
       .getfindallbycategory(this.authservice.selectedConfigVal)
-      .subscribe((res) => {
-        this.rowData = Array.isArray(res?.data) ? res.data : [];
-        this.isNoDataVisible = this.rowData.length === 0;
-         setTimeout(() => {
-          const savedState = this.service.getPaginationState();
-          if (savedState && this.gridApi) {
-           // Set the page size first
-            this.gridApi.setGridOption(
-              'paginationPageSize',
-              savedState.pageSize
-            );
+      .subscribe({
+        next: (res) => {
+          this.rowData = Array.isArray(res?.data) ? res.data : [];
+          this.isNoDataVisible = this.rowData.length === 0;
+          setTimeout(() => {
+            const savedState = this.service.getPaginationState();
+            if (savedState && this.gridApi) {
+              // Set the page size first
+              this.gridApi.setGridOption(
+                'paginationPageSize',
+                savedState.pageSize,
+              );
 
-            // Then navigate to the saved page
-            setTimeout(() => {
-              this.gridApi.paginationGoToPage(savedState.currentPage);
-              // Clear the restoration flag after successful restoration
-              this.service.clearRestorationFlag();
-            }, 100);
-          }
-        }, 100);
-        this.showLoader = false;
+              // Then navigate to the saved page
+              setTimeout(() => {
+                this.gridApi.paginationGoToPage(savedState.currentPage);
+                // Clear the restoration flag after successful restoration
+                this.service.clearRestorationFlag();
+              }, 100);
+            }
+          }, 100);
+          this.showLoader = false;
+        },
+        error: () => {
+          this.rowData = [];
+          this.isNoDataVisible = true;
+          this.showLoader = false;
+        },
       });
     this.configureName = this.authservice.selectedConfigVal;
     if (this.configureName === 'RDKB') {
@@ -186,7 +193,6 @@ export class ListDeviceTypeComponent implements OnInit {
         savedState.pageSize * 2,
         savedState.pageSize * 5,
       ];
-     
     }
     this.adjustPaginationToScreenSize();
   }
@@ -271,7 +277,7 @@ export class ListDeviceTypeComponent implements OnInit {
         this.service.deleteDeviceType(data.deviceTypeId).subscribe({
           next: (res) => {
             this.rowData = this.rowData.filter(
-              (row: any) => row.deviceTypeId !== data.deviceTypeId
+              (row: any) => row.deviceTypeId !== data.deviceTypeId,
             );
             this.rowData = [...this.rowData];
             this._snakebar.open(res.message, '', {

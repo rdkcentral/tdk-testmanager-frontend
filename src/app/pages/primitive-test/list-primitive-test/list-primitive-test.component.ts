@@ -134,7 +134,7 @@ export class ListPrimitiveTestComponent {
     private router: Router,
     private authservice: AuthService,
     private _snakebar: MatSnackBar,
-    private service: PrimitiveTestService
+    private service: PrimitiveTestService,
   ) {}
 
   /**
@@ -150,22 +150,30 @@ export class ListPrimitiveTestComponent {
     }
     this.authservice.currentRoute = this.router.url.split('?')[0];
     this.showLoader = true;
-    this.service.getlistofModules(this.configureName).subscribe((res) => {
-      this.moduleNames = Array.isArray(res?.data) ? [...res.data].sort() : [];
-      // Restore selected module if available
-      const storedModule = localStorage.getItem('selectedModule');
-      if (storedModule && this.moduleNames.includes(storedModule)) {
-        this.selectedValue = storedModule;
-      } else {
-        this.selectedValue = this.moduleNames[0];
-      }
-      if (this.moduleNames.length > 0) {
-        this.getParameterDetails(this.selectedValue);
-      } else {
+    this.service.getlistofModules(this.configureName).subscribe({
+      next: (res) => {
+        this.moduleNames = Array.isArray(res?.data) ? [...res.data].sort() : [];
+        // Restore selected module if available
+        const storedModule = localStorage.getItem('selectedModule');
+        if (storedModule && this.moduleNames.includes(storedModule)) {
+          this.selectedValue = storedModule;
+        } else {
+          this.selectedValue = this.moduleNames[0];
+        }
+        if (this.moduleNames.length > 0) {
+          this.getParameterDetails(this.selectedValue);
+        } else {
+          this.rowData = [];
+          this.isNoDataVisible = true;
+        }
+        this.showLoader = false;
+      },
+      error: () => {
+        this.moduleNames = [];
         this.rowData = [];
         this.isNoDataVisible = true;
-      }
-      this.showLoader = false;
+        this.showLoader = false;
+      },
     });
     const savedState = this.service.getPaginationState();
     if (savedState && savedState.pageSize) {
@@ -258,7 +266,7 @@ export class ListPrimitiveTestComponent {
       this.service.deletePrimitiveTest(data.primitiveTestId).subscribe({
         next: (res) => {
           this.rowData = this.rowData.filter(
-            (row: any) => row.primitiveTestId !== data.primitiveTestId
+            (row: any) => row.primitiveTestId !== data.primitiveTestId,
           );
           this.rowData = [...this.rowData];
           this._snakebar.open(res.message, '', {

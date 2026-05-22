@@ -97,18 +97,18 @@ export class ModulesListComponent {
       filter: 'agTextColumnFilter',
       sort: 'asc',
       filterParams: {
-      textMatcher: ({ value, filterText }: any) => {
-        // Trim both the filter text and the value before comparison
-        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
-        const trimmedValue = value?.trim().toLowerCase() || '';
-        
-        if (trimmedFilterText === '') {
-          return true;
-        }
-        
-        return trimmedValue.includes(trimmedFilterText);
-      },
-      debounceMs: 300,
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
       },
     },
     {
@@ -116,18 +116,18 @@ export class ModulesListComponent {
       field: 'testGroup',
       filter: 'agTextColumnFilter',
       filterParams: {
-      textMatcher: ({ value, filterText }: any) => {
-        // Trim both the filter text and the value before comparison
-        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
-        const trimmedValue = value?.trim().toLowerCase() || '';
-        
-        if (trimmedFilterText === '') {
-          return true;
-        }
-        
-        return trimmedValue.includes(trimmedFilterText);
-      },
-      debounceMs: 300,
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
       },
     },
     {
@@ -182,10 +182,10 @@ export class ModulesListComponent {
     private _snakebar: MatSnackBar,
     public dialog: MatDialog,
     private moduleservice: ModulesService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
   ) {
     this.loggedInUser = JSON.parse(
-      localStorage.getItem('loggedinUser') || '{}'
+      localStorage.getItem('loggedinUser') || '{}',
     );
     this.defaultCategory = this.loggedInUser.userCategory;
     this.preferedCategory = localStorage.getItem('preferedCategory') || '';
@@ -206,7 +206,7 @@ export class ModulesListComponent {
 
     // Get saved state FIRST before loading data
     const savedState = this.moduleservice.getPaginationState('modules');
-   
+
     if (savedState && savedState.pageSize) {
       // Restore pagination settings BEFORE loading data
       this.paginationPageSize = savedState.pageSize;
@@ -218,7 +218,6 @@ export class ModulesListComponent {
     } else {
       // Fresh navigation - use screen size
       this.adjustPaginationToScreenSize();
-      
     }
 
     // Load data AFTER pagination settings are restored
@@ -279,32 +278,37 @@ export class ModulesListComponent {
    */
   findallbyCategory(): void {
     this.showLoader = true;
-    this.moduleservice
-      .findallbyCategory(this.configureName)
-      .subscribe((res) => {
+    this.moduleservice.findallbyCategory(this.configureName).subscribe({
+      next: (res) => {
         this.rowData = Array.isArray(res?.data) ? res.data : [];
         this.isNoDataVisible = this.rowData.length === 0;
 
         // After data is loaded, restore pagination state if available
         setTimeout(() => {
-          const savedState = this.moduleservice.getPaginationState("modules");
+          const savedState = this.moduleservice.getPaginationState('modules');
           if (savedState && this.gridApi) {
-           // Set the page size first
+            // Set the page size first
             this.gridApi.setGridOption(
               'paginationPageSize',
-              savedState.pageSize
+              savedState.pageSize,
             );
 
             // Then navigate to the saved page
             setTimeout(() => {
               this.gridApi.paginationGoToPage(savedState.currentPage);
               // Clear the restoration flag after successful restoration
-              this.moduleservice.clearRestorationFlag("modules");
+              this.moduleservice.clearRestorationFlag('modules');
             }, 100);
           }
         }, 100);
         this.showLoader = false;
-      });
+      },
+      error: () => {
+        this.rowData = [];
+        this.isNoDataVisible = true;
+        this.showLoader = false;
+      },
+    });
   }
 
   /**
@@ -319,7 +323,7 @@ export class ModulesListComponent {
     this.gridApi = params.api;
 
     // Only apply screen-based sizing if no saved state exists
-    const savedState = this.moduleservice.getPaginationState("modules");
+    const savedState = this.moduleservice.getPaginationState('modules');
     if (!savedState) {
       this.adjustPaginationToScreenSize();
     }
@@ -391,7 +395,7 @@ export class ModulesListComponent {
         this.moduleservice.deleteModule(data.id).subscribe({
           next: (res) => {
             this.rowData = this.rowData.filter(
-              (row: any) => row.id !== data.id
+              (row: any) => row.id !== data.id,
             );
             this.rowData = [...this.rowData];
             this._snakebar.open(res.message, '', {
