@@ -135,7 +135,6 @@ limitations under the License.
                 id="backupLocation"
                 class="form-control"
                 placeholder="Enter backup location"
-                
               />
             </div>
           </div>
@@ -194,7 +193,7 @@ limitations under the License.
                 <div class="logs-content">
                   <div *ngIf="upgradeInProgress" class="alert alert-info mt-3">
                     <i class="bi bi-hourglass-split me-2"></i>
-                    App upgrade is in progress. Please wait.
+                    Frontend App upgrade is in progress. Please wait.
                   </div>
                   <ng-container *ngIf="upgradationlogs; else noLogs">
                     <pre class="upgradation-logs">{{ upgradationlogs }}</pre>
@@ -204,7 +203,7 @@ limitations under the License.
                       class="alert alert-success mt-3"
                     >
                       <i class="bi bi-check-circle-fill me-2"></i>
-                      App upgrade is complete.
+                      Frontend App upgrade is completed.
                     </div>
 
                     <div class="mt-3" *ngIf="isUpgradeCompleted">
