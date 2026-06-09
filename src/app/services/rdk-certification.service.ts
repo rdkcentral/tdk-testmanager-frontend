@@ -50,7 +50,7 @@ export class RdkService {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        // If the new URL is not an OEM-related page, reset the pagination
+        // If the new URL is not a Certification Suite Configuration-related page, reset the pagination
         if (
           !event.url.includes(
             '/configure/list-certification-suite-configurations',

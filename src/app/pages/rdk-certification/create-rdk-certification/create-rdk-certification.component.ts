@@ -142,8 +142,8 @@ export class CreateRdkCertificationComponent {
   }
 
   /**
-   * Navigates the user back to the list of Certification Suite Configuration.
-   * Uses the Angular Router to navigate to the "configure/list-rdk-certifications" route.
+   * Navigates the user back to the list of Certification Suite Configurations.
+   * Uses the Angular Router to navigate to the "configure/list-certification-suite-configurations" route.
    * @returns void
    */
   goBack(): void {

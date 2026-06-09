@@ -326,11 +326,34 @@ export class ListRdkCertificationComponent {
    * @param event - The file input change event containing the selected file.
    */
   onFileChange(event: any): void {
-    const file: File = event.target.files[0];
+    const file: File | undefined = event.target.files?.[0];
+    if (!file) {
+      this.uploadFileName = undefined;
+      this.uploadConfigurationForm
+        .get('uploadConfig')
+        ?.setValue(null, { emitModelToViewChange: false });
+      return;
+    }
+    if (!file.name.endsWith('.py')) {
+      this._snakebar.open('Please select a valid Python (.py) file.', '', {
+        duration: 3000,
+        panelClass: ['err-msg'],
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
+      this.uploadFileName = undefined;
+      this.uploadConfigurationForm
+        .get('uploadConfig')
+        ?.setValue(null, { emitModelToViewChange: false });
+      // Clear the file input element
+      const fileInput = event.target as HTMLInputElement;
+      fileInput.value = '';
+      return;
+    }
     this.uploadFileName = file;
     this.uploadConfigurationForm
       .get('uploadConfig')
-      ?.setValue(file ? file.name : null, { emitModelToViewChange: false });
+      ?.setValue(file.name, { emitModelToViewChange: false });
   }
 
   /**

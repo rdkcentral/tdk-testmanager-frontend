@@ -160,23 +160,19 @@ export class ButtonComponent implements OnInit {
    * Determines whether the delete button should be shown based on the context or URL.
    * @returns {boolean} - Returns false if in Certification Suite Configuration grid context, otherwise returns the value of deleteShowHide.
    */
-  /**
-   * Determines whether the delete button should be shown based on the context or URL.
-   * @returns {boolean} Returns false if in Certification Suite Configuration grid context, otherwise returns the value of deleteShowHide.
-   */
   shouldShowDeleteButton(): boolean {
     // Hide delete button for Certification Suite Configuration grid based on context or URL
-    const parent = this.params?.context?.componentParent;
-    const isRdkCertGrid =
-      parent &&
-      (parent.constructor?.name === 'ListRdkCertificationComponent' ||
-        parent.categoryName === 'Certification Suite Configurations');
-    const isRdkCertUrl =
+    const context = this.params?.context;
+    const isCertSuiteGrid =
+      context &&
+      (context.constructor?.name === 'ListRdkCertificationComponent' ||
+        context.categoryName === 'Certification Suite Configurations');
+    const isCertSuiteUrl =
       window.location.pathname.includes('certification-suite-configurations') ||
       window.location.pathname.includes(
         'list-certification-suite-configurations',
       );
-    if (isRdkCertGrid || isRdkCertUrl) {
+    if (isCertSuiteGrid || isCertSuiteUrl) {
       return false;
     }
     return this.deleteShowHide;
