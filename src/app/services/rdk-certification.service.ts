@@ -45,16 +45,22 @@ export class RdkService {
     private http: HttpClient,
     private authService: AuthService,
     @Inject('APP_CONFIG') private config: any,
-    private router: Router
+    private router: Router,
   ) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
       .subscribe((event: any) => {
         // If the new URL is not an OEM-related page, reset the pagination
         if (
-          !event.url.includes('/configure/list-rdk-certifications') &&
-          !event.url.includes('/configure/create-rdk-certifications') &&
-          !event.url.includes('/configure/edit-rdk-certifications')
+          !event.url.includes(
+            '/configure/list-certification-suite-configurations',
+          ) &&
+          !event.url.includes(
+            '/configure/create-certification-suite-configurations',
+          ) &&
+          !event.url.includes(
+            '/configure/edit-certification-suite-configurations',
+          )
         ) {
           this.resetPaginationState();
         }
@@ -107,7 +113,7 @@ export class RdkService {
   }
 
   /**
-   * Uploads a config file for RDK certification.
+   * Uploads a config file for Certification Suite Configurations.
    * @param file The config file to upload.
    * @returns Observable with the upload result.
    */
@@ -120,13 +126,13 @@ export class RdkService {
     return this.http.post(
       `${this.config.apiUrl}api/v1/rdkcertification/create`,
       formData,
-      { headers }
+      { headers },
     );
   }
 
   /**
-   * Gets all RDK certifications.
-   * @returns Observable with the list of RDK certifications.
+   * Gets all Certification Suite Configurations.
+   * @returns Observable with the list of Certification Suite Configurations.
    */
   getallRdkCertifications(): Observable<any> {
     const headers = new HttpHeaders({
@@ -134,7 +140,7 @@ export class RdkService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/rdkcertification/getall`,
-      { headers }
+      { headers },
     );
   }
 
@@ -150,12 +156,12 @@ export class RdkService {
     return this.http
       .get(
         `${this.config.apiUrl}api/v1/rdkcertification/download?fileName=${name}`,
-        { headers, responseType: 'blob', observe: 'response' }
+        { headers, responseType: 'blob', observe: 'response' },
       )
       .pipe(
         map((response: HttpResponse<Blob>) => {
           const contentDisposition = response.headers.get(
-            'content-disposition'
+            'content-disposition',
           );
           let filename = 'script.py';
           if (contentDisposition) {
@@ -169,7 +175,7 @@ export class RdkService {
             statusCode: response.status,
           };
           return { filename, content: response.body, status };
-        })
+        }),
       );
   }
 
@@ -184,12 +190,12 @@ export class RdkService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/script/getScriptTemplate?primitiveTestName=${name}`,
-      { headers, responseType: 'text' }
+      { headers, responseType: 'text' },
     );
   }
 
   /**
-   * Creates a new script for RDK certification.
+   * Creates a new script for Certification Suite Configuration.
    * @param scriptFile The script file to create.
    * @returns Observable with the creation result.
    */
@@ -202,12 +208,12 @@ export class RdkService {
     return this.http.post(
       `${this.config.apiUrl}api/v1/rdkcertification/create`,
       formData,
-      { headers }
+      { headers },
     );
   }
 
   /**
-   * Updates a script for RDK certification.
+   * Updates a script for Certification Suite Configuration.
    * @param scriptFile The script file to update.
    * @returns Observable with the update result.
    */
@@ -220,7 +226,7 @@ export class RdkService {
     return this.http.post(
       `${this.config.apiUrl}api/v1/rdkcertification/update`,
       formData,
-      { headers }
+      { headers },
     );
   }
 
@@ -236,7 +242,7 @@ export class RdkService {
     return this.http
       .get(
         `${this.config.apiUrl}api/v1/rdkcertification/getconfigfilecontent?fileName=${fileName}`,
-        { headers, responseType: 'blob', observe: 'response' }
+        { headers, responseType: 'blob', observe: 'response' },
       )
       .pipe(
         map((response: HttpResponse<Blob>) => {
@@ -245,12 +251,12 @@ export class RdkService {
             statusCode: response.status,
           };
           return { content: response.body, status };
-        })
+        }),
       );
   }
 
   /**
-   * Deletes an RDK certification by file name.
+   * Deletes a Certification Suite Configuration by file name.
    * @param name The name of the file to delete.
    * @returns Observable with the deletion result.
    */
@@ -260,7 +266,7 @@ export class RdkService {
     });
     return this.http.delete(
       `${this.config.apiUrl}api/v1/rdkcertification/delete?fileName=${name}`,
-      { headers }
+      { headers },
     );
   }
 }

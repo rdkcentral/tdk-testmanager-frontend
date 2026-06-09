@@ -19,7 +19,14 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { RdkService } from '../../../services/rdk-certification.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -30,20 +37,19 @@ import { MonacoEditorModule } from '@materia-ui/ngx-monaco-editor';
   standalone: true,
   imports: [ReactiveFormsModule, MonacoEditorModule, CommonModule],
   templateUrl: './create-rdk-certification.component.html',
-  styleUrl: './create-rdk-certification.component.css'
+  styleUrl: './create-rdk-certification.component.css',
 })
 /**
- * Component responsible for creating RDK certifications.
- * 
+ * Component responsible for creating Certification Suite Configuration.
+ *
  * This component provides a form for users to input the name of the certification
  * and the Python script content. It validates the form inputs and handles the
  * submission process, including creating a Python script file and sending it to
- * the server. It also provides navigation back to the list of RDK certifications.
- * 
+ * the server. It also provides navigation back to the list of Certification Suite Configurations.
+ *
  * @class
  */
 export class CreateRdkCertificationComponent {
-
   certificationFormGroup!: FormGroup;
   editorOptions = { theme: 'vs-dark', language: 'python' };
   submitted = false;
@@ -55,8 +61,12 @@ export class CreateRdkCertificationComponent {
    * @param _snakebar MatSnackBar instance for showing messages.
    * @param router Router instance for navigation.
    */
-  constructor(private fb: FormBuilder, private service: RdkService, private _snakebar: MatSnackBar, private router: Router) { }
-
+  constructor(
+    private fb: FormBuilder,
+    private service: RdkService,
+    private _snakebar: MatSnackBar,
+    private router: Router,
+  ) {}
 
   /**
    * Initializes the component and sets up the form group with validation.
@@ -67,10 +77,9 @@ export class CreateRdkCertificationComponent {
   ngOnInit(): void {
     this.certificationFormGroup = this.fb.group({
       fileName: ['', Validators.required],
-      pythonEditor: ['', Validators.required]
+      pythonEditor: ['', Validators.required],
     });
   }
-
 
   /**
    * Handles input event for the file name field.
@@ -82,13 +91,14 @@ export class CreateRdkCertificationComponent {
     const inputElement = event.target as HTMLTextAreaElement;
     const value = inputElement.value;
     if (value.startsWith(' ')) {
-      this.certificationFormGroup.get('fileName')?.setValue(value.trimStart(), { emitEvent: false });
+      this.certificationFormGroup
+        .get('fileName')
+        ?.setValue(value.trimStart(), { emitEvent: false });
     }
   }
 
-
   /**
-   * Handles the form submission for creating an RDK certification.
+   * Handles the form submission for creating an Certification Suite Configuration.
    * Sets the `submitted` flag to true, checks if the form is valid,
    * and if valid, creates a Python script file and sends it to the server.
    * Shows success or error messages and navigates as needed.
@@ -101,17 +111,21 @@ export class CreateRdkCertificationComponent {
     } else {
       const pythonContent = this.certificationFormGroup.value.pythonEditor;
       const filename = `${this.certificationFormGroup.value.fileName}.py`;
-      const scriptFile = new File([pythonContent], filename, { type: 'text/x-python' });
+      const scriptFile = new File([pythonContent], filename, {
+        type: 'text/x-python',
+      });
       this.service.createScript(scriptFile).subscribe({
         next: (res) => {
           this._snakebar.open(res.message, '', {
             duration: 2000,
             panelClass: ['success-msg'],
-            verticalPosition: 'top'
+            verticalPosition: 'top',
           });
           this.service.resetPaginationState();
           setTimeout(() => {
-            this.router.navigate(["configure/list-rdk-certifications"]);
+            this.router.navigate([
+              'configure/list-certification-suite-configurations',
+            ]);
           }, 1000);
         },
         error: (err) => {
@@ -120,22 +134,19 @@ export class CreateRdkCertificationComponent {
             duration: 2000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',
-            verticalPosition: 'top'
+            verticalPosition: 'top',
           });
-        }
+        },
       });
     }
-
   }
 
-
   /**
-   * Navigates the user back to the list of RDK certifications.
+   * Navigates the user back to the list of Certification Suite Configuration.
    * Uses the Angular Router to navigate to the "configure/list-rdk-certifications" route.
    * @returns void
    */
   goBack(): void {
-    this.router.navigate(["configure/list-rdk-certifications"]);
+    this.router.navigate(['configure/list-certification-suite-configurations']);
   }
-
 }

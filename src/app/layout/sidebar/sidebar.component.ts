@@ -113,9 +113,10 @@ export class SidebarComponent implements OnInit {
           event.url === '/script/clone-scripts' ||
           event.url === '/script/custom-testsuite' ||
           event.url === '/script/edit-testsuite' ||
-          event.url === '/configure/list-rdk-certifications' ||
-          event.url === '/configure/create-rdk-certifications' ||
-          event.url === '/configure/edit-rdk-certifications' ||
+          event.url === '/configure/list-certification-suite-configurations' ||
+          event.url ===
+            '/configure/create-certification-suite-configurations' ||
+          event.url === '/configure/edit-certification-suite-configurations' ||
           event.url === '/analysis' ||
           event.url === '/prefered-category' ||
           event.url === '/app-upgrade'

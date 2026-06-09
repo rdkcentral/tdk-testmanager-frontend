@@ -13,73 +13,120 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<!-- Main container for the edit RDK certification page -->
+<!-- Main container for the edit Certification Suite Configuration page -->
 <div class="container-fluid mb-3">
-    <!-- Row for header and action buttons -->
-    <div class="row borders-btm">
-        <!-- Left column for spacing -->
-        <div class="col"></div>
-        <!-- Center column for title -->
-        <div class="col">
-          <h1 class="title">Update RDK Certification</h1>
-        </div>
-        <!-- Right column for spacing -->
-        <div class="col"></div>
+  <!-- Row for header and action buttons -->
+  <div class="row borders-btm">
+    <!-- Left column for spacing -->
+    <div class="col"></div>
+    <!-- Center column for title -->
+    <div class="col">
+      <h1 class="title">Update Certification Suite Configuration</h1>
     </div>
-    <!-- Main content row -->
-    <div class="row">
-        <!-- Main column for form and content -->
-        <div class="col">
-            <!-- Parent container for form section -->
-            <div class="parent mt-2">
-                <!-- Container for form box -->
-                <div class="container container-box" id="container-box">
-                    <!-- Form container for RDK certification update -->
-                    <div class="form-container create-group">
-                        <!-- Form for updating RDK certification -->
-                        <form [formGroup]="certificationFormGroup">
-                            <!-- Row for file name input -->
-                            <div class="row mb-4">
-                                <label for="fileName" class="col-md-3 col-form-label offset-1">File Name<span
-                                        style="color:red; margin-left: 0.75em;">*</span></label>
-                                <!-- Column for file name input and validation -->
-                                <div class="col-md-7">
-                                    <input type="text" class="form-control" id="fileName" formControlName="fileName"
-                                        placeholder="Enter file name">
-                                    <div *ngIf="submitted && certificationFormGroup.controls['fileName']?.errors"
-                                        class="text-danger">
-                                        <small
-                                            *ngIf="certificationFormGroup.controls['fileName']?.errors?.['required']">Please
-                                            enter file name.</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Row for monaco editor -->
-                            <div class="row">
-                                <!-- Container for monaco editor -->
-                                <div  class="editor-container">
-                                <div class="editor-loader-container" *ngIf="isEditorLoading">
-                                    <app-loader></app-loader>
-                                </div>
-                                
-                                <ngx-monaco-editor [options]="editorOptions" formControlName="pythonEditor" [ngClass]="{'invisible': isEditorLoading}">
-                                </ngx-monaco-editor>
-                                    <div *ngIf="submitted && certificationFormGroup.controls['pythonEditor']?.errors" class="text-danger">
-                                        <small *ngIf="certificationFormGroup.controls['pythonEditor']?.errors?.['required']">
-                                            Please enter some content in the editor.
-                                        </small>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- Row for back and update buttons -->
-                            <div class="mt-2 text-end">
-                                <button mat-button matStepperPrevious class="reset-btn" (click)="goBack()">Back</button>
-                                <button mat-button type="submit" (click)="onSubmit()" class="reset-btn">Update</button>
-                            </div>
-                        </form>
-                    </div>
+    <!-- Right column for spacing -->
+    <div class="col"></div>
+  </div>
+  <!-- Main content row -->
+  <div class="row">
+    <!-- Main column for form and content -->
+    <div class="col">
+      <!-- Parent container for form section -->
+      <div class="parent mt-2">
+        <!-- Container for form box -->
+        <div class="container container-box" id="container-box">
+          <!-- Form container for Certification Suite Configuration update -->
+          <div class="form-container create-group">
+            <!-- Form for updating Certification Suite Configuration -->
+            <form [formGroup]="certificationFormGroup">
+              <!-- Row for file name input -->
+              <div class="row mb-4">
+                <label for="fileName" class="col-md-3 col-form-label offset-1"
+                  >File Name<span style="color: red; margin-left: 0.75em"
+                    >*</span
+                  ></label
+                >
+                <!-- Column for file name input and validation -->
+                <div class="col-md-7">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="fileName"
+                    formControlName="fileName"
+                    placeholder="Enter file name"
+                  />
+                  <div
+                    *ngIf="
+                      submitted &&
+                      certificationFormGroup.controls['fileName']?.errors
+                    "
+                    class="text-danger"
+                  >
+                    <small
+                      *ngIf="
+                        certificationFormGroup.controls['fileName']?.errors?.[
+                          'required'
+                        ]
+                      "
+                      >Please enter file name.</small
+                    >
+                  </div>
                 </div>
-            </div>
+              </div>
+              <!-- Row for monaco editor -->
+              <div class="row">
+                <!-- Container for monaco editor -->
+                <div class="editor-container">
+                  <div class="editor-loader-container" *ngIf="isEditorLoading">
+                    <app-loader></app-loader>
+                  </div>
+
+                  <ngx-monaco-editor
+                    [options]="editorOptions"
+                    formControlName="pythonEditor"
+                    [ngClass]="{ invisible: isEditorLoading }"
+                  >
+                  </ngx-monaco-editor>
+                  <div
+                    *ngIf="
+                      submitted &&
+                      certificationFormGroup.controls['pythonEditor']?.errors
+                    "
+                    class="text-danger"
+                  >
+                    <small
+                      *ngIf="
+                        certificationFormGroup.controls['pythonEditor']
+                          ?.errors?.['required']
+                      "
+                    >
+                      Please enter some content in the editor.
+                    </small>
+                  </div>
+                </div>
+              </div>
+              <!-- Row for back and update buttons -->
+              <div class="mt-2 text-end">
+                <button
+                  mat-button
+                  matStepperPrevious
+                  class="reset-btn"
+                  (click)="goBack()"
+                >
+                  Back
+                </button>
+                <button
+                  mat-button
+                  type="submit"
+                  (click)="onSubmit()"
+                  class="reset-btn"
+                >
+                  Update
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>

@@ -158,22 +158,24 @@ interface customcellRenderparams extends ICellRendererParams {
 export class ButtonComponent implements OnInit {
   /**
    * Determines whether the delete button should be shown based on the context or URL.
-   * @returns {boolean} - Returns false if in RDK Certification grid context, otherwise returns the value of deleteShowHide.
+   * @returns {boolean} - Returns false if in Certification Suite Configuration grid context, otherwise returns the value of deleteShowHide.
    */
   /**
    * Determines whether the delete button should be shown based on the context or URL.
-   * @returns {boolean} Returns false if in RDK Certification grid context, otherwise returns the value of deleteShowHide.
+   * @returns {boolean} Returns false if in Certification Suite Configuration grid context, otherwise returns the value of deleteShowHide.
    */
   shouldShowDeleteButton(): boolean {
-    // Hide delete button for RDK Certification grid based on context or URL
+    // Hide delete button for Certification Suite Configuration grid based on context or URL
     const parent = this.params?.context?.componentParent;
     const isRdkCertGrid =
       parent &&
       (parent.constructor?.name === 'ListRdkCertificationComponent' ||
-        parent.categoryName === 'RDK Certification');
+        parent.categoryName === 'Certification Suite Configurations');
     const isRdkCertUrl =
-      window.location.pathname.includes('rdk-certification') ||
-      window.location.pathname.includes('list-rdk-certification');
+      window.location.pathname.includes('certification-suite-configurations') ||
+      window.location.pathname.includes(
+        'list-certification-suite-configurations',
+      );
     if (isRdkCertGrid || isRdkCertUrl) {
       return false;
     }
@@ -244,7 +246,10 @@ export class ButtonComponent implements OnInit {
         this.viewShowHide = true;
         this.textforedit = 'Edit/View';
       }
-      if (this.route.snapshot.url[1].path === 'list-rdk-certifications') {
+      if (
+        this.route.snapshot.url[1].path ===
+        'list-certification-suite-configurations'
+      ) {
         this.deleteShowHide = true;
         this.viewShowHide = false;
         this.downloadConfigShow = true;
