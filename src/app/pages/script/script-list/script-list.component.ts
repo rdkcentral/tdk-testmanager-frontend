@@ -171,19 +171,19 @@ export class ScriptListComponent {
       field: 'name',
       filter: 'agTextColumnFilter',
       filterParams: {
-      textMatcher: ({ value, filterText }: any) => {
-        // Trim both the filter text and the value before comparison
-        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
-        const trimmedValue = value?.trim().toLowerCase() || '';
-        
-        if (trimmedFilterText === '') {
-          return true;
-        }
-        
-        return trimmedValue.includes(trimmedFilterText);
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
       },
-      debounceMs: 300,
-    },
       flex: 2,
       sortable: true,
       cellRenderer: (params: any) => {
@@ -199,6 +199,7 @@ export class ScriptListComponent {
       cellRenderer: ButtonComponent,
       cellRendererParams: (params: any) => ({
         onEditClick: this.editScript.bind(this),
+        onCloneClick: this.cloneScript.bind(this),
         onDeleteClick: this.deleteScript.bind(this),
         onDownloadZip: this.downloadScriptZip.bind(this),
         onDownloadTar: this.downloadScriptTar.bind(this),
@@ -220,18 +221,18 @@ export class ScriptListComponent {
       field: 'name',
       filter: 'agTextColumnFilter',
       filterParams: {
-      textMatcher: ({ value, filterText }: any) => {
-        // Trim both the filter text and the value before comparison
-        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
-        const trimmedValue = value?.trim().toLowerCase() || '';
-        
-        if (trimmedFilterText === '') {
-          return true;
-        }
-        
-        return trimmedValue.includes(trimmedFilterText);
-      },
-      debounceMs: 300,
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
       },
       flex: 1,
       sortable: true,
@@ -264,10 +265,10 @@ export class ScriptListComponent {
     private cdRef: ChangeDetectorRef,
     private scriptservice: ScriptsService,
     private renderer: Renderer2,
-    private appRef: ApplicationRef
+    private appRef: ApplicationRef,
   ) {
     this.loggedinUser = JSON.parse(
-      localStorage.getItem('loggedinUser') || '{}'
+      localStorage.getItem('loggedinUser') || '{}',
     );
     this.userCategory = this.loggedinUser.userCategory;
     this.preferedCategory = localStorage.getItem('preferedCategory') || '';
@@ -378,7 +379,7 @@ export class ScriptListComponent {
   initializeBulkDownloadForm() {
     this.bulkDownloadForm = this.fb.group({
       scriptNames: ['', Validators.required],
-      downloadFormat: ['zip', Validators.required]
+      downloadFormat: ['zip', Validators.required],
     });
   }
   /**
@@ -747,7 +748,9 @@ export class ScriptListComponent {
   filterScript() {
     if (this.filterText) {
       this.scriptFilteredData = this.scriptDataArr.filter((parent: any) =>
-        parent.moduleName.toLowerCase().includes(this.filterText.trim().toLowerCase())
+        parent.moduleName
+          .toLowerCase()
+          .includes(this.filterText.trim().toLowerCase()),
       );
     } else {
       this.scriptFilteredData = [...this.scriptDataArr];
@@ -769,7 +772,9 @@ export class ScriptListComponent {
   applyFilterSuite() {
     if (this.filterTextSuite) {
       this.testSuiteFilteredData = this.testSuiteDataArr.filter((parent: any) =>
-        parent.name.toLowerCase().includes(this.filterTextSuite.trim().toLowerCase())
+        parent.name
+          .toLowerCase()
+          .includes(this.filterTextSuite.trim().toLowerCase()),
       );
     } else {
       this.testSuiteFilteredData = [...this.testSuiteDataArr];
@@ -812,17 +817,17 @@ export class ScriptListComponent {
         this.paginatedSuiteData = this.testSuiteDataArr.map(
           (suite: SuiteModule) => {
             const filteredScripts = suite.scripts.filter((script) =>
-              script.name.toLowerCase().includes(searchTerm)
+              script.name.toLowerCase().includes(searchTerm),
             );
             return {
               ...suite,
               scripts: filteredScripts,
               expanded: filteredScripts.length > 0,
             };
-          }
+          },
         );
         this.paginatedSuiteData = this.paginatedSuiteData.filter(
-          (suite) => suite.scripts.length > 0
+          (suite) => suite.scripts.length > 0,
         );
       } else {
         this.paginatedSuiteData = [...this.testSuiteDataArr];
@@ -832,7 +837,7 @@ export class ScriptListComponent {
       if (searchTerm) {
         this.paginatedScriptData = this.scriptDataArr.map((module: Module) => {
           const filteredScripts = module.scripts.filter((script) =>
-            script.name.toLowerCase().includes(searchTerm)
+            script.name.toLowerCase().includes(searchTerm),
           );
           return {
             ...module,
@@ -841,7 +846,7 @@ export class ScriptListComponent {
           };
         });
         this.paginatedScriptData = this.paginatedScriptData.filter(
-          (module) => module.scripts.length > 0
+          (module) => module.scripts.length > 0,
         );
       } else {
         this.paginatedScriptData = [...this.scriptDataArr];
@@ -1083,7 +1088,7 @@ export class ScriptListComponent {
         this.scriptDetails = res.data;
         localStorage.setItem(
           'scriptDetails',
-          JSON.stringify(this.scriptDetails)
+          JSON.stringify(this.scriptDetails),
         );
         this.router.navigate(['script/edit-scripts']);
       },
@@ -1094,6 +1099,47 @@ export class ScriptListComponent {
           horizontalPosition: 'end',
           verticalPosition: 'top',
         });
+      },
+    });
+  }
+
+  /**
+   * Clones a script by fetching its details using the provided clone data.
+   *
+   * This method retrieves the script details from the server based on the
+   * provided `cloneData`'s `id`, stores the script details in local storage,
+   * and navigates to the script cloning page.
+   *
+   * @param cloneData - The data containing the ID of the script to be cloned.
+   */
+  cloneScript(cloneData: any): void {
+    // Save pagination state before navigation
+    if (this.paginator) {
+      const currentPage = this.paginator.pageIndex;
+      const pageSize = this.paginator.pageSize;
+      this.scriptservice.savePaginationState(currentPage, pageSize);
+    }
+
+    this.scriptservice.scriptFindbyId(cloneData.id).subscribe({
+      next: (res) => {
+        this.scriptDetails = res.data;
+        localStorage.setItem(
+          'scriptDetails',
+          JSON.stringify(this.scriptDetails),
+        );
+        this.router.navigate(['script/clone-scripts']);
+      },
+      error: (err) => {
+        this._snakebar.open(
+          err.error?.message || 'Failed to load script for cloning.',
+          '',
+          {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          },
+        );
       },
     });
   }
@@ -1381,7 +1427,7 @@ export class ScriptListComponent {
               verticalPosition: 'top',
             });
             const rowToRemove = this.paginatedSuiteData.find(
-              (row: any) => row.id === params.id
+              (row: any) => row.id === params.id,
             );
             if (rowToRemove) {
               this.cdRef.detectChanges();
@@ -1518,7 +1564,7 @@ export class ScriptListComponent {
             panelClass: ['err-msg'],
             horizontalPosition: 'end',
             verticalPosition: 'top',
-          }
+          },
         );
         this.showLoader = false;
       },
@@ -1592,15 +1638,15 @@ export class ScriptListComponent {
       }
     }
   }
-  
+
   /**
    * Handles the submission of a custom test suite file upload form.
-   * 
+   *
    * Validates the form, uploads the selected file, and handles the response.
    * Shows loading indicators during upload and displays success/error messages
    * via snackbar notifications. Resets the form and closes the modal after
    * completion regardless of success or failure.
-   * 
+   *
    * @returns {void} No return value
    */
   customTestSuiteFileSubmit() {
@@ -1637,7 +1683,7 @@ export class ScriptListComponent {
                   panelClass: ['err-msg'],
                   horizontalPosition: 'end',
                   verticalPosition: 'top',
-                }
+                },
               );
               this.showLoader = false;
               this.uploadCustomTestSuiteForm.reset();
@@ -1723,7 +1769,7 @@ export class ScriptListComponent {
                   panelClass: ['err-msg'],
                   horizontalPosition: 'end',
                   verticalPosition: 'top',
-                }
+                },
               );
               this.showLoader = false;
               this.uploadBulkSriptUploadForm.reset();
@@ -1758,10 +1804,9 @@ export class ScriptListComponent {
    * In case of an error, it parses the error message and displays it using a snackbar notification.
    */
   downloadBulkScripts(scriptNames: string[], format: string) {
-    
     const requestData = {
-      scriptNames: scriptNames, 
-      format: format, 
+      scriptNames: scriptNames,
+      format: format,
     };
     const fileExtension = format === 'zip' ? '.zip' : '.tar.gz';
     const mimeType = format === 'zip' ? 'application/zip' : 'application/gzip';
@@ -1787,7 +1832,7 @@ export class ScriptListComponent {
             panelClass: ['success-msg'],
             horizontalPosition: 'end',
             verticalPosition: 'top',
-          }
+          },
         );
       },
       error: async (err) => {
@@ -1813,17 +1858,16 @@ export class ScriptListComponent {
     });
   }
 
- 
   /**
    * Handles the submission of the bulk script download form.
    * Validates the form, processes script names by splitting and trimming,
    * and initiates the bulk download operation.
-   * 
+   *
    * @remarks
    * This method sets the form submission flag, clears any previous errors,
    * and validates the form before processing. Script names are expected to be
    * comma-separated in the form input.
-   * 
+   *
    * @returns void - No return value, but triggers download operation on success
    */
   bulkScriptDownloadSubmit() {
@@ -1846,10 +1890,9 @@ export class ScriptListComponent {
    * Closes the bulk download modal and resets its state.
    * Initializes the bulk download form, clears submission status, and removes any error messages.
    */
-   closeBulkDownloadModal() {
+  closeBulkDownloadModal() {
     this.initializeBulkDownloadForm();
     this.bulkDownloadFormSubmitted = false;
     this.bulkDownloadError = '';
   }
-
 }
