@@ -405,7 +405,7 @@ export class ListRdkCertificationComponent {
     if (this.uploadConfigurationForm.invalid) {
       return;
     }
-    const file = this.uploadConfigurationForm.get("uploadConfig")?.value;
+    const file = this.uploadFileName;
     if (file) {
       this.service.uploadConfigFile(file).subscribe({
         next: (res) => {
