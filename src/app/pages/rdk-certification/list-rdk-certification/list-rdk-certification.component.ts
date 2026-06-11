@@ -91,6 +91,7 @@ export class ListRdkCertificationComponent {
   uploadFileName: File | undefined;
   configureName!: string;
   showLoader = false;
+  isNoDataVisible = false;
   /**
    * Column definitions for the ag-Grid table in the Certification Suite Configuration List component.
    *
@@ -247,11 +248,12 @@ export class ListRdkCertificationComponent {
       ) {
         this.rowData = certificationNames.map((name: any) => ({ name }));
       }
+      this.isNoDataVisible = !this.rowData || this.rowData.length === 0;
       setTimeout(() => {
         const savedState = this.service.getPaginationState();
         if (savedState && this.gridApi) {
           // Set the page size first
-          this.gridApi.setGridOption('paginationPageSize', savedState.pageSize);
+          this.gridApi.setGridOption("paginationPageSize", savedState.pageSize);
 
           // Then navigate to the saved page
           setTimeout(() => {
@@ -270,6 +272,7 @@ export class ListRdkCertificationComponent {
       }
     });
   }
+  
   /**
    * Event handler for when the grid is ready.
    *
@@ -402,8 +405,9 @@ export class ListRdkCertificationComponent {
     if (this.uploadConfigurationForm.invalid) {
       return;
     }
-    if (this.uploadFileName) {
-      this.service.uploadConfigFile(this.uploadFileName).subscribe({
+    const file = this.uploadFileName;
+    if (file) {
+      this.service.uploadConfigFile(file).subscribe({
         next: (res) => {
           this._snakebar.open(res.message, '', {
             duration: 1000,
