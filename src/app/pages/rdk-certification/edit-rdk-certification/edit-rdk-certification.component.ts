@@ -19,7 +19,12 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { RdkService } from '../../../services/rdk-certification.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
@@ -29,20 +34,24 @@ import { LoaderComponent } from '../../../utility/component/loader/loader.compon
 @Component({
   selector: 'app-edit-rdk-certification',
   standalone: true,
-  imports: [ReactiveFormsModule, MonacoEditorModule, CommonModule ,LoaderComponent],
+  imports: [
+    ReactiveFormsModule,
+    MonacoEditorModule,
+    CommonModule,
+    LoaderComponent,
+  ],
   templateUrl: './edit-rdk-certification.component.html',
   styleUrl: './edit-rdk-certification.component.css',
 })
 /**
- * Component for editing RDK certification.
+ * Component for editing Certification Suite Configuration.
  *
- * This component provides a form to edit the RDK certification details, including the file name and Python script content.
+ * This component provides a form to edit the Certification Suite Configuration details, including the file name and Python script content.
  * It initializes the form with the user's name and retrieves the file content to populate the Python editor.
- * The component also handles form submission to update the certification script and provides navigation back to the list of RDK certifications.
+ * The component also handles form submission to update the certification script and provides navigation back to the list of Certification Suite Configurations.
  *
  */
 export class EditRdkCertificationComponent {
-
   certificationFormGroup!: FormGroup;
   editorOptions = { theme: 'vs-dark', language: 'python' };
   submitted = false;
@@ -60,15 +69,15 @@ export class EditRdkCertificationComponent {
     private fb: FormBuilder,
     private service: RdkService,
     private _snakebar: MatSnackBar,
-    private router: Router
+    private router: Router,
   ) {
     this.user = JSON.parse(localStorage.getItem('user') || '{}');
     if (!this.user) {
-      this.router.navigate(['configure/list-rdk-certifications']);
+      this.router.navigate([
+        'configure/list-certification-suite-configurations',
+      ]);
     }
   }
-
-
 
   /**
    * Initializes the component and sets up the form group for certification.
@@ -109,10 +118,8 @@ export class EditRdkCertificationComponent {
     });
   }
 
-
-
   /**
-   * Handles the form submission for the RDK certification edit form.
+   * Handles the form submission for the Certification Suite Configuration edit form.
    * Retrieves the Python script content from the form, creates a file object,
    * and sends it to the server using the `updateScript` service method.
    * Shows success or error messages and navigates as needed.
@@ -138,7 +145,9 @@ export class EditRdkCertificationComponent {
           });
           this.service.resetPaginationState();
           setTimeout(() => {
-            this.router.navigate(['/configure/list-rdk-certifications']);
+            this.router.navigate([
+              '/configure/list-certification-suite-configurations',
+            ]);
           }, 1000);
         },
         error: (err) => {
@@ -153,14 +162,12 @@ export class EditRdkCertificationComponent {
     }
   }
 
-
   /**
-   * Navigates the user back to the list of RDK certifications.
-   * Uses the Angular Router to navigate to the "configure/list-rdk-certifications" route.
+   * Navigates the user back to the list of Certification Suite Configurations.
+   * Uses the Angular Router to navigate to the "configure/list-certification-suite-configurations" route.
    * @returns void
    */
   goBack(): void {
-    this.router.navigate(['configure/list-rdk-certifications']);
+    this.router.navigate(['configure/list-certification-suite-configurations']);
   }
-
 }
