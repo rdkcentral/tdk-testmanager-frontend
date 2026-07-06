@@ -72,6 +72,7 @@ export class ListSocComponent {
   showUpdateButton = false;
   categoryName!: string;
   showLoader = false;
+  isNoDataVisible = false;
   public columnDefs: ColDef[] = [
     {
       headerName: 'Name',
@@ -79,18 +80,18 @@ export class ListSocComponent {
       filter: 'agTextColumnFilter',
       flex: 1,
       filterParams: {
-      textMatcher: ({ value, filterText }: any) => {
-        // Trim both the filter text and the value before comparison
-        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
-        const trimmedValue = value?.trim().toLowerCase() || '';
-        
-        if (trimmedFilterText === '') {
-          return true;
-        }
-        
-        return trimmedValue.includes(trimmedFilterText);
-      },
-      debounceMs: 300,
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
       },
     },
     {
@@ -125,7 +126,7 @@ export class ListSocComponent {
     private router: Router,
     private service: SocService,
     private authservice: AuthService,
-    private _snakebar: MatSnackBar
+    private _snakebar: MatSnackBar,
   ) {}
 
   /**
@@ -153,29 +154,34 @@ export class ListSocComponent {
 
     this.authservice.currentRoute = this.router.url.split('?')[0];
     this.showLoader = true;
-    this.service.getSoc(this.authservice.selectedConfigVal).subscribe((res) => {
-      this.rowData = res.data;
-      setTimeout(() => {
-        const savedState = this.service.getPaginationState();
-        if (savedState && this.gridApi) {
-          // Set the page size first
-          this.gridApi.setGridOption('paginationPageSize', savedState.pageSize);
-
-          // Then navigate to the saved page
-          setTimeout(() => {
-            this.gridApi.paginationGoToPage(savedState.currentPage);
-            // Clear the restoration flag after successful restoration
-            this.service.clearRestorationFlag();
-          }, 100);
-        }
-      }, 100);
-      if (
-        this.rowData == null ||
-        this.rowData == undefined ||
-        this.rowData.length > 0
-      ) {
+    this.service.getSoc(this.authservice.selectedConfigVal).subscribe({
+      next: (res) => {
+        this.rowData = Array.isArray(res?.data) ? res.data : [];
+        this.isNoDataVisible = this.rowData.length === 0;
         this.showLoader = false;
-      }
+        setTimeout(() => {
+          const savedState = this.service.getPaginationState();
+          if (savedState && this.gridApi) {
+            // Set the page size first
+            this.gridApi.setGridOption(
+              'paginationPageSize',
+              savedState.pageSize,
+            );
+
+            // Then navigate to the saved page
+            setTimeout(() => {
+              this.gridApi.paginationGoToPage(savedState.currentPage);
+              // Clear the restoration flag after successful restoration
+              this.service.clearRestorationFlag();
+            }, 100);
+          }
+        }, 100);
+      },
+      error: () => {
+        this.rowData = [];
+        this.isNoDataVisible = true;
+        this.showLoader = false;
+      },
     });
     this.adjustPaginationToScreenSize();
   }
@@ -247,7 +253,7 @@ export class ListSocComponent {
       this.service.deleteSoc(data.socId).subscribe({
         next: (res) => {
           this.rowData = this.rowData.filter(
-            (row: any) => row.socId !== data.socId
+            (row: any) => row.socId !== data.socId,
           );
           this.rowData = [...this.rowData];
           this._snakebar.open(res.message, '', {

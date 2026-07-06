@@ -66,7 +66,7 @@ import { LoaderComponent } from '../../../utility/component/loader/loader.compon
   styleUrl: './list-rdk-certification.component.css',
 })
 /**
- * Component for listing RDK certifications.
+ * Component for listing Certification Suite Configuration.
  */
 export class ListRdkCertificationComponent {
   @ViewChild('certificateModal', { static: false })
@@ -91,8 +91,9 @@ export class ListRdkCertificationComponent {
   uploadFileName: File | undefined;
   configureName!: string;
   showLoader = false;
+  isNoDataVisible = false;
   /**
-   * Column definitions for the ag-Grid table in the RDK Certification List component.
+   * Column definitions for the ag-Grid table in the Certification Suite Configuration List component.
    *
    * @type {ColDef[]}
    * @property {ColDef} columnDefs[].headerName - The header name of the column.
@@ -123,7 +124,7 @@ export class ListRdkCertificationComponent {
       cellRendererParams: (params: any) => ({
         onEditClick: this.userEdit.bind(this),
         onDownloadClick: this.downloadConfigFile.bind(this),
-        // Hide delete icon for RDK Certification
+        // Hide delete icon for Certification Suite Configuration
         showDelete: false,
         selectedRowCount: () => this.selectedRowCount,
       }),
@@ -140,7 +141,7 @@ export class ListRdkCertificationComponent {
    * @param router Router instance for navigation.
    * @param renderer Renderer2 for DOM manipulation.
    * @param authservice AuthService instance for authentication.
-   * @param service RdkService for RDK certification operations.
+   * @param service RdkService for Certification Suite Configuration operations.
    * @param _snakebar MatSnackBar for notifications.
    */
   constructor(
@@ -149,13 +150,13 @@ export class ListRdkCertificationComponent {
     private renderer: Renderer2,
     private authservice: AuthService,
     private service: RdkService,
-    private _snakebar: MatSnackBar
+    private _snakebar: MatSnackBar,
   ) {}
 
   /**
-   * Initializes the component by fetching all RDK certifications and setting up the form.
+   * Initializes the component by fetching all Certification Suite Configuration and setting up the form.
    *
-   * - Fetches all RDK certifications from the service and maps them to `rowData`.
+   * - Fetches all Certification Suite Configuration from the service and maps them to `rowData`.
    * - Sets the `configureName` and `categoryName` from the authentication service.
    * - Initializes the `uploadConfigurationForm` with a required `uploadConfig` control.
    *
@@ -233,7 +234,7 @@ export class ListRdkCertificationComponent {
   }
 
   /**
-   * Fetches all RDK certifications and updates the row data.
+   * Fetches all Certification Suite Configuration and updates the row data.
    */
   getAllCerificate(): void {
     this.showLoader = true;
@@ -247,23 +248,21 @@ export class ListRdkCertificationComponent {
       ) {
         this.rowData = certificationNames.map((name: any) => ({ name }));
       }
+      this.isNoDataVisible = !this.rowData || this.rowData.length === 0;
       setTimeout(() => {
-          const savedState = this.service.getPaginationState();
-          if (savedState && this.gridApi) {
-           // Set the page size first
-            this.gridApi.setGridOption(
-              'paginationPageSize',
-              savedState.pageSize
-            );
+        const savedState = this.service.getPaginationState();
+        if (savedState && this.gridApi) {
+          // Set the page size first
+          this.gridApi.setGridOption("paginationPageSize", savedState.pageSize);
 
-            // Then navigate to the saved page
-            setTimeout(() => {
-              this.gridApi.paginationGoToPage(savedState.currentPage);
-              // Clear the restoration flag after successful restoration
-              this.service.clearRestorationFlag();
-            }, 100);
-          }
-        }, 100);
+          // Then navigate to the saved page
+          setTimeout(() => {
+            this.gridApi.paginationGoToPage(savedState.currentPage);
+            // Clear the restoration flag after successful restoration
+            this.service.clearRestorationFlag();
+          }, 100);
+        }
+      }, 100);
       if (
         this.rowData == null ||
         this.rowData == undefined ||
@@ -273,6 +272,7 @@ export class ListRdkCertificationComponent {
       }
     });
   }
+  
   /**
    * Event handler for when the grid is ready.
    *
@@ -280,7 +280,7 @@ export class ListRdkCertificationComponent {
    */
   onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
-   // Only apply screen-based sizing if no saved state exists
+    // Only apply screen-based sizing if no saved state exists
     const savedState = this.service.getPaginationState();
     if (!savedState) {
       this.adjustPaginationToScreenSize();
@@ -288,7 +288,7 @@ export class ListRdkCertificationComponent {
   }
 
   /**
-   * Navigates to the edit RDK certifications page after storing the user information in local storage.
+   * Navigates to the edit Certification Suite Configuration page after storing the user information in local storage.
    *
    * @param user - The user object containing information to be stored in local storage.
    * @returns void
@@ -300,12 +300,12 @@ export class ListRdkCertificationComponent {
       this.service.savePaginationState(currentPage, pageSize);
     }
     localStorage.setItem('user', JSON.stringify(user));
-    this.router.navigate(['configure/edit-rdk-certifications']);
+    this.router.navigate(['configure/edit-certification-suite-configurations']);
   }
 
   /**
-   * Navigates to the "create RDK certifications" configuration page.
-   * This method is triggered when the user wants to create a new RDK certification.
+   * Navigates to the "create Certification Suite Configuration" configuration page.
+   * This method is triggered when the user wants to create a new Certification Suite Configuration.
    * It uses the Angular Router to navigate to the specified route.
    */
   createRdkCertification(): void {
@@ -314,7 +314,9 @@ export class ListRdkCertificationComponent {
       const pageSize = this.gridApi.paginationGetPageSize();
       this.service.savePaginationState(currentPage, pageSize);
     }
-    this.router.navigate(['configure/create-rdk-certifications']);
+    this.router.navigate([
+      'configure/create-certification-suite-configurations',
+    ]);
   }
 
   /**
@@ -327,8 +329,34 @@ export class ListRdkCertificationComponent {
    * @param event - The file input change event containing the selected file.
    */
   onFileChange(event: any): void {
-    const file: File = event.target.files[0];
-    this.uploadConfigurationForm.get('uploadConfig')?.setValue(file || null);
+    const file: File | undefined = event.target.files?.[0];
+    if (!file) {
+      this.uploadFileName = undefined;
+      this.uploadConfigurationForm
+        .get('uploadConfig')
+        ?.setValue(null, { emitModelToViewChange: false });
+      return;
+    }
+    if (!file.name.endsWith('.py')) {
+      this._snakebar.open('Please select a valid Python (.py) file.', '', {
+        duration: 3000,
+        panelClass: ['err-msg'],
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
+      this.uploadFileName = undefined;
+      this.uploadConfigurationForm
+        .get('uploadConfig')
+        ?.setValue(null, { emitModelToViewChange: false });
+      // Clear the file input element
+      const fileInput = event.target as HTMLInputElement;
+      fileInput.value = '';
+      return;
+    }
+    this.uploadFileName = file;
+    this.uploadConfigurationForm
+      .get('uploadConfig')
+      ?.setValue(file.name, { emitModelToViewChange: false });
   }
 
   /**
@@ -337,6 +365,7 @@ export class ListRdkCertificationComponent {
   resetUploadForm(): void {
     this.uploadConfigurationForm.reset();
     this.uploadFormSubmitted = false;
+    this.uploadFileName = undefined;
     // Clear the file input element
     const fileInput = document.getElementById('uploadfile') as HTMLInputElement;
     if (fileInput) {
@@ -376,7 +405,7 @@ export class ListRdkCertificationComponent {
     if (this.uploadConfigurationForm.invalid) {
       return;
     }
-    const file = this.uploadConfigurationForm.get('uploadConfig')?.value;
+    const file = this.uploadFileName;
     if (file) {
       this.service.uploadConfigFile(file).subscribe({
         next: (res) => {
@@ -456,15 +485,15 @@ export class ListRdkCertificationComponent {
   }
 
   /**
-   * Deletes an RDK certification after user confirmation.
-   * @param data The data object containing the certification name to delete.
+   * Deletes a Certification Suite Configuration after user confirmation.
+   * @param data The data object containing the configuration name to delete.
    */
   delete(data: any): void {
     if (confirm('Are you sure to delete ?')) {
       this.service.deleteRdkCertification(data.name).subscribe({
         next: (res) => {
           this.rowData = this.rowData.filter(
-            (row: any) => row.name !== data.name
+            (row: any) => row.name !== data.name,
           );
           this.rowData = [...this.rowData];
           this._snakebar.open(res.message, '', {

@@ -271,7 +271,7 @@ limitations under the License.
           
         
         <!-- Message for no scripts found -->
-        <div *ngIf="paginatedScriptData.length == 0  && !showLoader" class="noRecord">
+        <div class="row loader-row" style="top: 45%;left:47%" *ngIf="paginatedScriptData.length == 0  && !showLoader">
           <span>{{noScriptFound}}</span>
         </div>
         </div>
@@ -390,9 +390,9 @@ limitations under the License.
               </div>
             </div>
             <!-- Message for no testsuites found -->
-          <div *ngIf="paginatedSuiteData.length == 0" class="noRecord">
-            <span>{{noScriptFound}}</span>
-          </div>
+            <div class="row loader-row" style="top: 45%;left:47%" *ngIf="paginatedSuiteData.length == 0 && !showLoader">
+              <span>{{noScriptFound}}</span>
+            </div>
           </div>   
           <!-- Paginator for testsuite table -->
           <div class="script-paginator">

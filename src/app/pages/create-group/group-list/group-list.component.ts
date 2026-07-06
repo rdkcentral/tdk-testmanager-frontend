@@ -27,7 +27,7 @@ import {
   GridReadyEvent,
   IMultiFilterParams,
   RowSelectedEvent,
-  SelectionChangedEvent
+  SelectionChangedEvent,
 } from 'ag-grid-community';
 import { Router } from '@angular/router';
 import { ButtonComponent } from '../../../utility/component/ag-grid-buttons/button/button.component';
@@ -40,17 +40,15 @@ import { MaterialModule } from '../../../material/material.module';
 @Component({
   selector: 'app-group-list',
   standalone: true,
-  imports: [MaterialModule,CommonModule, ReactiveFormsModule, AgGridAngular],
+  imports: [MaterialModule, CommonModule, ReactiveFormsModule, AgGridAngular],
   templateUrl: './group-list.component.html',
-  styleUrl: './group-list.component.css'
+  styleUrl: './group-list.component.css',
 })
 export class GroupListComponent implements OnInit {
-
-
   public rowSelection: 'single' | 'multiple' = 'single';
   lastSelectedNodeId: string | undefined;
   rowData: any = [];
-  public themeClass: string = "ag-theme-quartz";
+  public themeClass: string = 'ag-theme-quartz';
   public paginationPageSize = 10;
   public paginationPageSizeSelector: number[] | boolean = [10, 15, 30, 50];
   public tooltipShowDelay = 500;
@@ -62,6 +60,7 @@ export class GroupListComponent implements OnInit {
   selectedRowCount = 0;
   showUpdateButton = false;
   seletecUserGroup: any;
+  isNoDataVisible = false;
 
   public columnDefs: ColDef[] = [
     {
@@ -69,8 +68,7 @@ export class GroupListComponent implements OnInit {
       field: 'userGroupName',
       filter: 'agTextColumnFilter',
       flex: 1,
-      filterParams: {
-      } as IMultiFilterParams,
+      filterParams: {} as IMultiFilterParams,
     },
     {
       headerName: 'Action',
@@ -82,15 +80,15 @@ export class GroupListComponent implements OnInit {
         onDeleteClick: this.delete.bind(this),
         selectedRowCount: () => this.selectedRowCount,
         lastSelectedNodeId: this.lastSelectedNodeId,
-      })
-    }
+      }),
+    },
   ];
   public defaultColDef: ColDef = {
     flex: 1,
     menuTabs: ['filterMenuTab'],
   };
   gridOptions = {
-    rowHeight: 36
+    rowHeight: 36,
   };
 
   /**
@@ -99,112 +97,118 @@ export class GroupListComponent implements OnInit {
    * @param service - UsergroupService instance
    * @param _snakebar - MatSnackBar for notifications
    */
-  constructor(private router: Router, private service: UsergroupService,
-    private _snakebar: MatSnackBar
-  ) { }
-
+  constructor(
+    private router: Router,
+    private service: UsergroupService,
+    private _snakebar: MatSnackBar,
+  ) {}
 
   /**
    * Initializes the component.
    * Retrieves the user group list from the service and assigns it to the rowData property.
    */
   ngOnInit(): void {
-    this.service.getuserGroupList().subscribe((data) => (this.rowData = data));
+    this.service.getuserGroupList().subscribe({
+      next: (data) => {
+        this.rowData = Array.isArray(data) ? data : [];
+        this.isNoDataVisible = this.rowData.length === 0;
+      },
+      error: () => {
+        this.rowData = [];
+        this.isNoDataVisible = true;
+      },
+    });
   }
-
 
   /**
    * Event handler for when the grid is ready.
    * @param params The grid ready event parameters.
-   */  
-  onGridReady(params: GridReadyEvent<any>):void {
+   */
+  onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
   }
-
 
   /**
    * Deletes a user group.
    * @param data The data of the user group to delete.
    */
-  delete(data: any) :void{
-    if (confirm("Are you sure want to delete ? ")) {
+  delete(data: any): void {
+    if (confirm('Are you sure want to delete ? ')) {
       this.service.deleteUserGroup(data.userGroupId).subscribe({
         next: (res) => {
-          this.rowData = this.rowData.filter((row: any) => row.userGroupId !== data.userGroupId);
+          this.rowData = this.rowData.filter(
+            (row: any) => row.userGroupId !== data.userGroupId,
+          );
           this.rowData = [...this.rowData];
           this._snakebar.open(res, '', {
             duration: 3000,
             panelClass: ['success-msg'],
             horizontalPosition: 'end',
-            verticalPosition: 'top'
-          })
+            verticalPosition: 'top',
+          });
           this.ngOnInit();
         },
         error: (err) => {
-          let errmsg = JSON.parse(err.error)
+          let errmsg = JSON.parse(err.error);
           this._snakebar.open(errmsg.message, '', {
             duration: 3000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',
-            verticalPosition: 'top'
-          })
-        }
-      })
+            verticalPosition: 'top',
+          });
+        },
+      });
     }
   }
-
 
   /**
    * Event handler for when a row is selected.
    * @param event The row selected event.
-   */  
-  onRowSelected(event: RowSelectedEvent):void {
+   */
+  onRowSelected(event: RowSelectedEvent): void {
     this.isRowSelected = event.node.isSelected();
-    this.rowIndex = event.rowIndex
+    this.rowIndex = event.rowIndex;
   }
-
 
   /**
    * Event handler for when the selection is changed.
    * @param event The selection changed event.
    */
-  onSelectionChanged(event: SelectionChangedEvent):void {
+  onSelectionChanged(event: SelectionChangedEvent): void {
     this.selectedRowCount = event.api.getSelectedNodes().length;
     const selectedNodes = event.api.getSelectedNodes();
-    this.lastSelectedNodeId = selectedNodes.length > 0 ? selectedNodes[selectedNodes.length - 1].id : '';
+    this.lastSelectedNodeId =
+      selectedNodes.length > 0
+        ? selectedNodes[selectedNodes.length - 1].id
+        : '';
     this.selectedRow = this.isRowSelected ? selectedNodes[0].data : null;
     if (this.gridApi) {
-      this.gridApi.refreshCells({ force: true })
+      this.gridApi.refreshCells({ force: true });
     }
   }
-
 
   /**
    * Edits a user.
    * @param user The user to edit.
    */
   userEdit(user: any): void {
-    localStorage.setItem('user', JSON.stringify(user))
+    localStorage.setItem('user', JSON.stringify(user));
     localStorage.setItem('userGroupId', user.userGroupId);
     this.service.currentUrl = user.userGroupId;
     this.router.navigate(['configure/group-edit/', user.userGroupId]);
   }
 
-
   /**
    * Navigates to the create group page.
-   */  
-  createGroup() :void{
-    this.router.navigate(["configure/group-add"]);
+   */
+  createGroup(): void {
+    this.router.navigate(['configure/group-add']);
   }
 
-  
   /**
    * Navigates back to the previous page.
    */
-  goBack() :void{
-    this.router.navigate(["/configure"]);
+  goBack(): void {
+    this.router.navigate(['/configure']);
   }
-
-
 }
