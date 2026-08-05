@@ -50,7 +50,7 @@ export class DeviceService {
     private http: HttpClient,
     private authService: AuthService,
     @Inject('APP_CONFIG') private config: any,
-    private router: Router
+    private router: Router,
   ) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -122,7 +122,7 @@ export class DeviceService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/boxtype/istheboxtypegateway?boxType=${boxtype}`,
-      { headers, responseType: 'text' }
+      { headers, responseType: 'text' },
     );
   }
 
@@ -137,7 +137,7 @@ export class DeviceService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/device/findAllByCategory?category=${category}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -166,7 +166,7 @@ export class DeviceService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/device/getlistofgatewaydevices?category=${category}`,
-      { headers, responseType: 'text' }
+      { headers, responseType: 'text' },
     );
   }
 
@@ -195,7 +195,7 @@ export class DeviceService {
     });
     return this.http.delete(
       `${this.config.apiUrl}api/v1/device/delete?id=${id}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -210,7 +210,7 @@ export class DeviceService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/device/downloadXML?deviceName=${name}`,
-      { headers, responseType: 'blob' }
+      { headers, responseType: 'blob' },
     );
   }
 
@@ -229,34 +229,36 @@ export class DeviceService {
     return this.http.post(
       `${this.config.apiUrl}api/v1/device/uploadxml`,
       formData,
-      { headers }
+      { headers },
     );
   }
 
   /**
-   * Downloads a device config file by device type and thunder flag.
+   * Downloads a device config file by device type, thunder flag, and category.
    * @param deviceTypeName The name of the device type.
    * @param deviceType The type of the device.
    * @param isThunder Whether thunder is enabled.
+   * @param category The RDK flavor category (RDKV or RDKB).
    * @returns Observable with the config file blob and status.
    */
   downloadDeviceConfigFile(
     deviceTypeName: string,
     deviceType: string,
-    isThunder: boolean
+    isThunder: boolean,
+    category: string,
   ): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: this.authService.getApiToken(),
     });
     return this.http
       .get(
-        `${this.config.apiUrl}api/v1/device/downloadDeviceConfigFile?deviceTypeName=${deviceTypeName}&deviceType=${deviceType}&isThunderEnabled=${isThunder}`,
-        { headers, responseType: 'blob', observe: 'response' }
+        `${this.config.apiUrl}api/v1/device/downloadDeviceConfigFile?deviceTypeName=${deviceTypeName}&deviceType=${deviceType}&isThunderEnabled=${isThunder}&category=${category}`,
+        { headers, responseType: 'blob', observe: 'response' },
       )
       .pipe(
         map((response: HttpResponse<Blob>) => {
           const contentDisposition = response.headers.get(
-            'content-disposition'
+            'content-disposition',
           );
           let filename = 'device.config';
           if (contentDisposition) {
@@ -270,7 +272,7 @@ export class DeviceService {
             statusCode: response.status,
           };
           return { filename, content: response.body, status };
-        })
+        }),
       );
   }
 
@@ -285,7 +287,7 @@ export class DeviceService {
     this.http
       .get(
         `${this.config.apiUrl}api/v1/device/downloadDevicesByCategory?category=${category}`,
-        { headers, responseType: 'blob' }
+        { headers, responseType: 'blob' },
       )
       .subscribe((blob) => {
         saveAs(blob, `device_${category}.zip`);
@@ -296,34 +298,44 @@ export class DeviceService {
    * Uploads a device config file.
    * @param file The config file to upload.
    * @param isThunder Whether thunder is enabled.
+   * @param category The RDK flavor category (RDKV or RDKB).
    * @returns Observable with the upload result.
    */
-  uploadConfigFile(file: File, isThunder: boolean): Observable<any> {
+  uploadConfigFile(
+    file: File,
+    isThunder: boolean,
+    category: string,
+  ): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: this.authService.getApiToken(),
     });
     const formData: FormData = new FormData();
     formData.append('uploadFile', file, file.name);
     return this.http.post(
-      `${this.config.apiUrl}api/v1/device/uploadDeviceConfigFile?isThunderEnabled=${isThunder}`,
+      `${this.config.apiUrl}api/v1/device/uploadDeviceConfigFile?isThunderEnabled=${isThunder}&category=${category}`,
       formData,
-      { headers }
+      { headers },
     );
   }
 
   /**
-   * Deletes a device config file by name and thunder flag.
+   * Deletes a device config file by name, thunder flag, and category.
    * @param deviceConfigFileName The name of the config file to delete.
    * @param isThunder Whether thunder is enabled.
+   * @param category The RDK flavor category (RDKV or RDKB).
    * @returns Observable with the deletion result as text.
    */
-  deleteDeviceConfigFile(deviceConfigFileName: any, isThunder: boolean) {
+  deleteDeviceConfigFile(
+    deviceConfigFileName: any,
+    isThunder: boolean,
+    category: string,
+  ) {
     const headers = new HttpHeaders({
       Authorization: this.authService.getApiToken(),
     });
     return this.http.delete(
-      `${this.config.apiUrl}api/v1/device/deleteDeviceConfigFile?deviceConfigFileName=${deviceConfigFileName}&isThunderEnabled=${isThunder}`,
-      { headers, responseType: 'text' }
+      `${this.config.apiUrl}api/v1/device/deleteDeviceConfigFile?deviceConfigFileName=${deviceConfigFileName}&isThunderEnabled=${isThunder}&category=${category}`,
+      { headers, responseType: 'text' },
     );
   }
 }
