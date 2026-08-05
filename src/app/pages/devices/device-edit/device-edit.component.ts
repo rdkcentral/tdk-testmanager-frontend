@@ -755,15 +755,7 @@ export class DeviceEditComponent {
           this.newFileName = `${boxNameConfig}.config`;
         }
         this.readFileContent(res.content);
-        this.uploadConfigForm.patchValue({
-          editorFilename: this.configFileName,
-          editorContent: this.configData,
-        });
         this.readDeviceFileContent(res.content);
-        this.uploadDeviceConfigForm.patchValue({
-          editorFilename: this.stbNameChange + '.config',
-          editorContent: this.configData,
-        });
       });
   }
 
@@ -824,10 +816,7 @@ export class DeviceEditComponent {
     if (!content) return '';
     // Ensure content is a string and handle line endings
     const textContent = content.toString();
-    // If content is already plain text, just return it
-    if (!textContent.includes('<')) {
-      return textContent;
-    }
+    return textContent;
   }
 
   /**
@@ -864,7 +853,6 @@ export class DeviceEditComponent {
    * No parameters.
    */
   EditDeviceVSubmit() {
-    console.log('Test' + this.editDeviceVForm.value.thunderport);
     this.editDeviceVFormSubmitted = true;
     if (this.editDeviceVForm.invalid) {
       return;
@@ -976,7 +964,7 @@ export class DeviceEditComponent {
     if (this.configFileName === 'sampleDevice.config') {
       let deviceNameConfig = this.editDeviceVForm.value.stbname;
       let deviceTypeConfig = this.editDeviceVForm.value.devicetype;
-      this.fileNameArray.push(deviceNameConfig, deviceTypeConfig);
+      this.fileNameArray = [deviceNameConfig, deviceTypeConfig];
       this.currentIndex = (this.currentIndex + 1) % this.fileNameArray.length;
       this.uploadConfigForm.patchValue({
         editorFilename: `${this.fileNameArray[this.currentIndex]}.config`,
@@ -1575,15 +1563,7 @@ export class DeviceEditComponent {
           this.rdkbNewFileName = `${boxNameConfig}.config`;
         }
         this.readRdkbFileContent(res.content);
-        this.uploadRdkbConfigForm.patchValue({
-          editorFilename: this.rdkbConfigFileName,
-          editorContent: this.rdkbConfigData,
-        });
         this.readRdkbDeviceFileContent(res.content);
-        this.uploadRdkbDeviceConfigForm.patchValue({
-          editorFilename: this.rdkbStbNameChange + '.config',
-          editorContent: this.rdkbConfigData,
-        });
       });
   }
 
@@ -1821,7 +1801,7 @@ export class DeviceEditComponent {
     if (this.rdkbConfigFileName === 'sampleDevice.config') {
       let deviceNameConfig = this.rdkBForm.value.gatewayName;
       let deviceTypeConfig = this.rdkBForm.value.devicetype;
-      this.fileNameArray.push(deviceNameConfig, deviceTypeConfig);
+      this.fileNameArray = [deviceNameConfig, deviceTypeConfig];
       this.currentIndex = (this.currentIndex + 1) % this.fileNameArray.length;
       this.uploadRdkbConfigForm.patchValue({
         editorFilename: `${this.fileNameArray[this.currentIndex]}.config`,

@@ -252,7 +252,7 @@ export class DeviceService {
     });
     return this.http
       .get(
-        `${this.config.apiUrl}api/v1/device/downloadDeviceConfigFile?deviceTypeName=${deviceTypeName}&deviceType=${deviceType}&isThunderEnabled=${isThunder}&category=${category}`,
+        `${this.config.apiUrl}api/v1/device/downloadDeviceConfigFile?deviceTypeName=${encodeURIComponent(deviceTypeName)}&deviceType=${encodeURIComponent(deviceType)}&isThunderEnabled=${isThunder}&category=${encodeURIComponent(category)}`,
         { headers, responseType: 'blob', observe: 'response' },
       )
       .pipe(
@@ -312,7 +312,7 @@ export class DeviceService {
     const formData: FormData = new FormData();
     formData.append('uploadFile', file, file.name);
     return this.http.post(
-      `${this.config.apiUrl}api/v1/device/uploadDeviceConfigFile?isThunderEnabled=${isThunder}&category=${category}`,
+      `${this.config.apiUrl}api/v1/device/uploadDeviceConfigFile?isThunderEnabled=${isThunder}&category=${encodeURIComponent(category)}`,
       formData,
       { headers },
     );
@@ -334,7 +334,7 @@ export class DeviceService {
       Authorization: this.authService.getApiToken(),
     });
     return this.http.delete(
-      `${this.config.apiUrl}api/v1/device/deleteDeviceConfigFile?deviceConfigFileName=${deviceConfigFileName}&isThunderEnabled=${isThunder}&category=${category}`,
+      `${this.config.apiUrl}api/v1/device/deleteDeviceConfigFile?deviceConfigFileName=${encodeURIComponent(deviceConfigFileName)}&isThunderEnabled=${isThunder}&category=${encodeURIComponent(category)}`,
       { headers, responseType: 'text' },
     );
   }

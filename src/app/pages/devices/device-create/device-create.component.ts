@@ -609,14 +609,8 @@ export class DeviceCreateComponent implements OnInit {
           this.readFileContent(res.content);
 
           this.readDeviceFileContent(res.content);
-          this.uploadDeviceConfigForm.patchValue({
-            editorFilename: this.stbNameChange + '.config',
-            editorContent: this.configData,
-          });
         },
-        error(err) {
-          const sts = err.status;
-        },
+        error: () => {},
       });
   }
   /**
@@ -682,10 +676,7 @@ export class DeviceCreateComponent implements OnInit {
     if (!content) return '';
     // Ensure content is a string and handle line endings
     const textContent = content.toString();
-    // If content is already plain text, just return it
-    if (!textContent.includes('<')) {
-      return textContent;
-    }
+    return textContent;
   }
 
   /**
@@ -1522,14 +1513,8 @@ export class DeviceCreateComponent implements OnInit {
           }
           this.readRdkbFileContent(res.content);
           this.readRdkbDeviceFileContent(res.content);
-          this.uploadRdkbDeviceConfigForm.patchValue({
-            editorFilename: this.rdkbStbNameChange + '.config',
-            editorContent: this.rdkbConfigData,
-          });
         },
-        error: (err) => {
-          const sts = err.status;
-        },
+        error: () => {},
       });
   }
 
