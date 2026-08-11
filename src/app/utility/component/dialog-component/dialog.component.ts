@@ -83,7 +83,7 @@ export class DialogDelete implements OnInit{
     let boxNameConfig = this.data.stbName;
     let boxTypeConfig = this.data.boxTypeName; 
     let isThunder = false;
-    this.service.downloadDeviceConfigFile(boxNameConfig,boxTypeConfig, isThunder)
+    this.service.downloadDeviceConfigFile(boxNameConfig,boxTypeConfig, isThunder, 'RDKV')
     .subscribe((res)=>{ 
       this.configFileName = res.filename;
       if(this.configFileName !== `${boxNameConfig}.config` && this.stbNameChange !== undefined && this.stbNameChange !== ""){
