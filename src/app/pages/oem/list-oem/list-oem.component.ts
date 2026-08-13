@@ -18,7 +18,13 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 
-import { Component, HostListener } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import { OemService } from '../../../services/oem.service';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -34,7 +40,12 @@ import { AuthService } from '../../../auth/auth.service';
 import { ButtonComponent } from '../../../utility/component/ag-grid-buttons/button/button.component';
 import { CommonModule } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
-import { ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import { MaterialModule } from '../../../material/material.module';
 import { LoaderComponent } from '../../../utility/component/loader/loader.component';
@@ -72,6 +83,11 @@ export class ListOemComponent {
   configureName!: string;
   showLoader = false;
   isNoDataVisible = false;
+  uploadXMLForm!: FormGroup;
+  uploadFormSubmitted = false;
+  uploadFileName: string = '';
+  uploadFileError: string = '';
+  @ViewChild('uploadOemModal') uploadOemModal!: ElementRef;
   public columnDefs: ColDef[] = [
     {
       headerName: 'Name',
@@ -128,6 +144,8 @@ export class ListOemComponent {
     private authservice: AuthService,
     private service: OemService,
     private _snakebar: MatSnackBar,
+    private fb: FormBuilder,
+    private renderer: Renderer2,
   ) {}
 
   /**
@@ -135,6 +153,9 @@ export class ListOemComponent {
    * No parameters.
    */
   ngOnInit(): void {
+    this.uploadXMLForm = this.fb.group({
+      uploadXml: ['', Validators.required],
+    });
     this.showLoader = true;
     this.service.getOemByList(this.authservice.selectedConfigVal).subscribe({
       next: (res) => {
@@ -339,5 +360,100 @@ export class ListOemComponent {
     this.authservice.selectedConfigVal = 'RDKV';
     this.authservice.showSelectedCategory = 'Video';
     this.router.navigate(['/configure']);
+  }
+
+  /**
+   * Downloads all OEMs as XML.
+   */
+  downloadAllOems(): void {
+    this.service.downloadAllOems(this.authservice.selectedConfigVal);
+  }
+
+  /**
+   * Handles file input change event.
+   * @param event The file input change event.
+   */
+  onFileChange(event: any): void {
+    this.uploadFileError = '';
+    const file = event.target.files[0];
+    if (file) {
+      if (!file.name.toLowerCase().endsWith('.xml')) {
+        this.uploadFileError = 'Please upload a valid XML file.';
+        this.uploadFileName = '';
+      } else {
+        this.uploadFileName = file.name;
+      }
+    }
+  }
+
+  /**
+   * Resets the upload form.
+   */
+  resetUploadForm(): void {
+    this.uploadXMLForm.reset();
+    this.uploadFormSubmitted = false;
+    this.uploadFileName = '';
+    this.uploadFileError = '';
+  }
+
+  /**
+   * Closes the upload modal.
+   */
+  closeModal(): void {
+    const modalElement = this.uploadOemModal.nativeElement;
+    this.renderer.removeClass(modalElement, 'show');
+    this.renderer.setStyle(modalElement, 'display', 'none');
+    document.body.classList.remove('modal-open');
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) {
+      backdrop.remove();
+    }
+    this.resetUploadForm();
+  }
+
+  /**
+   * Submits the upload form.
+   */
+  uploadXMLSubmit(): void {
+    this.uploadFormSubmitted = true;
+    if (this.uploadXMLForm.invalid || this.uploadFileError) {
+      return;
+    }
+    const fileInput = document.getElementById('uploadfile') as HTMLInputElement;
+    const file = fileInput?.files?.[0];
+    if (!file) {
+      this.uploadFileError = 'Please select a file.';
+      return;
+    }
+    this.service.uploadOemXML(file).subscribe({
+      next: (res) => {
+        this.closeModal();
+        this._snakebar.open(res.message || 'OEMs uploaded successfully', '', {
+          duration: 2000,
+          panelClass: ['success-msg'],
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+        });
+        // Reload OEM list
+        this.showLoader = true;
+        this.service
+          .getOemByList(this.authservice.selectedConfigVal)
+          .subscribe({
+            next: (res) => {
+              this.rowData = Array.isArray(res?.data) ? res.data : [];
+              this.isNoDataVisible = this.rowData.length === 0;
+              this.showLoader = false;
+            },
+            error: () => {
+              this.rowData = [];
+              this.isNoDataVisible = true;
+              this.showLoader = false;
+            },
+          });
+      },
+      error: (err) => {
+        this.uploadFileError = err?.error?.message || 'Error uploading file.';
+      },
+    });
   }
 }

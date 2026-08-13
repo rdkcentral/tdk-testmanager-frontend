@@ -104,7 +104,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 }
 
 /* AG Grid overlay no rows center override */
-::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center{
+::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center {
   display: none !important;
 }
 
@@ -135,7 +135,7 @@ http://www.apache.org/licenses/LICENSE-2.0
 }
 
 /* Loader row styling */
-.loader-row{
+.loader-row {
   position: absolute;
   top: 50%;
   z-index: 1;
@@ -159,4 +159,70 @@ http://www.apache.org/licenses/LICENSE-2.0
   -moz-user-select: text !important;
   -ms-user-select: text !important;
   cursor: text;
+}
+
+/* Download/Upload button styling */
+.download-btn {
+  background-color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-right: 10px;
+  box-shadow: 0px 3px 6px #0000005e;
+}
+
+/* Download icon styling */
+.download-icon {
+  color: #00b2dc;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/* Modal styling */
+.custom-modal {
+  max-width: 800px;
+  margin-top: 100px;
+}
+
+.modaltitle {
+  margin: 0 10px 0px 10px;
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0px 0px 4px 0px;
+  padding: 10px 5px 5px 5px;
+}
+
+.custom-title {
+  margin-bottom: 0;
+  font-size: 1rem;
+  color: #06667d;
+}
+
+.modal-btns {
+  background-color: #00b2dc;
+  color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: none;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-right: 15px;
+}
+
+.errorupload {
+  color: #dc3545;
+  font-size: 0.8rem;
 }
