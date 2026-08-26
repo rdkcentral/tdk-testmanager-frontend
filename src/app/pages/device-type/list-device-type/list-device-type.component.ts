@@ -373,12 +373,12 @@ export class ListDeviceTypeComponent implements OnInit {
     const file: File = event.target.files[0];
     if (file) {
       if (file.type === 'text/xml' || file.name.endsWith('.xml')) {
-        this.uploadXMLForm.patchValue({ file: file });
         this.uploadFileName = file;
         this.uploadFileError = null;
       } else {
-        this.uploadXMLForm.patchValue({ file: null });
+        this.uploadFileName = null;
         this.uploadFileError = 'Please upload a valid XML file.';
+        this.uploadXMLForm.get('uploadXml')?.reset();
       }
     }
   }
@@ -398,10 +398,16 @@ export class ListDeviceTypeComponent implements OnInit {
    */
   private closeModal(): void {
     if (this.uploadDeviceTypeModal) {
-      (this.uploadDeviceTypeModal.nativeElement as HTMLElement).style.display =
-        'none';
-      this.renderer.removeStyle(document.body, 'overflow');
-      this.renderer.removeStyle(document.body, 'padding-right');
+      const modalElement = this.uploadDeviceTypeModal.nativeElement;
+      this.renderer.removeClass(modalElement, 'show');
+      this.renderer.setStyle(modalElement, 'display', 'none');
+      document.body.classList.remove('modal-open');
+      document.body.style.removeProperty('overflow');
+      document.body.style.removeProperty('padding-right');
+      const backdrop = document.querySelector('.modal-backdrop');
+      if (backdrop) {
+        backdrop.remove();
+      }
     }
   }
 

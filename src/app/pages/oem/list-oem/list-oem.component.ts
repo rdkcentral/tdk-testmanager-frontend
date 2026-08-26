@@ -380,6 +380,7 @@ export class ListOemComponent {
       if (!file.name.toLowerCase().endsWith('.xml')) {
         this.uploadFileError = 'Please upload a valid XML file.';
         this.uploadFileName = '';
+        this.uploadXMLForm.get('uploadXml')?.reset();
       } else {
         this.uploadFileName = file.name;
       }
@@ -404,6 +405,8 @@ export class ListOemComponent {
     this.renderer.removeClass(modalElement, 'show');
     this.renderer.setStyle(modalElement, 'display', 'none');
     document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('padding-right');
     const backdrop = document.querySelector('.modal-backdrop');
     if (backdrop) {
       backdrop.remove();
