@@ -204,7 +204,7 @@ export class OemService {
       })
       .subscribe({
         next: (res: Blob) => {
-          saveAs(res, 'oems.xml');
+          saveAs(res, `oems_${category}.xml`);
         },
         error: (err) => {
           console.error('Error downloading OEM XML', err);
