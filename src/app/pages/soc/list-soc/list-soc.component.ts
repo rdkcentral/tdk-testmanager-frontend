@@ -411,14 +411,18 @@ export class ListSocComponent {
   private closeModal(): void {
     if (this.uploadSocModal) {
       const modalElement = this.uploadSocModal.nativeElement;
-      this.renderer.removeClass(modalElement, 'show');
-      this.renderer.setStyle(modalElement, 'display', 'none');
-      document.body.classList.remove('modal-open');
-      document.body.style.removeProperty('overflow');
-      document.body.style.removeProperty('padding-right');
-      const backdrop = document.querySelector('.modal-backdrop');
-      if (backdrop) {
-        backdrop.remove();
+      const bsModal = (window as any).bootstrap?.Modal?.getInstance(
+        modalElement,
+      );
+      if (bsModal) {
+        bsModal.hide();
+      } else {
+        const dismissBtn = modalElement.querySelector(
+          '[data-bs-dismiss="modal"]',
+        ) as HTMLElement;
+        if (dismissBtn) {
+          dismissBtn.click();
+        }
       }
     }
   }
