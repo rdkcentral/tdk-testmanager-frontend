@@ -85,8 +85,8 @@ export class ListOemComponent {
   isNoDataVisible = false;
   uploadXMLForm!: FormGroup;
   uploadFormSubmitted = false;
-  uploadFileName: string = '';
-  uploadFileError: string = '';
+  uploadFile: File | null = null;
+  uploadFileError = '';
   @ViewChild('uploadOemModal') uploadOemModal!: ElementRef;
   public columnDefs: ColDef[] = [
     {
