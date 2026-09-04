@@ -60,6 +60,10 @@ export class DeviceCreateComponent implements OnInit {
   dialogTemplate!: TemplateRef<any>;
   @ViewChild('newDeviceTemplate', { static: true })
   newDeviceTemplate!: TemplateRef<any>;
+  @ViewChild('rdkbDialogTemplate', { static: true })
+  rdkbDialogTemplate!: TemplateRef<any>;
+  @ViewChild('rdkbNewDeviceTemplate', { static: true })
+  rdkbNewDeviceTemplate!: TemplateRef<any>;
   deviceForm!: FormGroup;
   rdkBForm!: FormGroup;
   deviceFormSubmitted = false;
@@ -126,7 +130,35 @@ export class DeviceCreateComponent implements OnInit {
   uploadExistConfigHeading!: string;
   dialogRef!: MatDialogRef<any>;
   newDeviceDialogRef!: MatDialogRef<any>;
+  rdkbDialogRef!: MatDialogRef<any>;
+  rdkbNewDeviceDialogRef!: MatDialogRef<any>;
   isThunderPresent = false;
+
+  // RDKB device config properties
+  visibleRdkbDeviceconfigFile = false;
+  rdkbConfigFileName!: string;
+  uploadRdkbConfigForm!: FormGroup;
+  uploadRdkbDeviceConfigForm!: FormGroup;
+  rdkbConfigData: any;
+  rdkbDeviceTypeValue: any;
+  rdkbStbNameChange: any;
+  rdkbExistConfigSubmitted = false;
+  rdkbUploadExistConfigHeading!: string;
+  rdkbUploadExistFileContent!: string;
+  rdkbExistingConfigEditor = true;
+  rdkbUploadExistingConfig = false;
+  rdkbShowExistUploadButton = true;
+  rdkbBackToExistEditorbtn = false;
+  rdkbUploadFileName!: File;
+  rdkbSubmitted = false;
+  rdkbUploadCreateHeading: string = 'Create New Device Config File';
+  rdkbUploadFileNameConfig!: string;
+  rdkbUploadFileContent!: string;
+  rdkbDeviceEditor = true;
+  rdkbUploadConfigSec = false;
+  rdkbBackToEditorbtn = false;
+  rdkbShowUploadButton = true;
+  rdkbNewFileName!: string;
   preferedCategory!: string;
   editorOptions = {
     theme: 'vs-light',
@@ -161,10 +193,10 @@ export class DeviceCreateComponent implements OnInit {
     private service: DeviceService,
     private socService: SocService,
     private deviceTypeService: DevicetypeService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {
     this.loggedinUser = JSON.parse(
-      localStorage.getItem('loggedinUser') || '{}'
+      localStorage.getItem('loggedinUser') || '{}',
     );
     this.frameworkComponents = {
       inputCellRenderer: InputComponent,
@@ -195,7 +227,7 @@ export class DeviceCreateComponent implements OnInit {
       /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/; // IPv4 regex
     let ipv6regexp: RegExp = /^[0-9a-fA-F:]+$/; // IPv6 regex
     let combinedIpRegexp: RegExp = new RegExp(
-      `(${ipregexp.source})|(${ipv6regexp.source})`
+      `(${ipregexp.source})|(${ipv6regexp.source})`,
     ); // Combined regex for IPv4 and IPv6
     let macregexp: RegExp = /^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$/; // MAC address regex
 
@@ -265,6 +297,17 @@ export class DeviceCreateComponent implements OnInit {
       editorContent: ['', [Validators.required]],
       uploadConfigFileModal: ['', Validators.required],
     });
+    // Initialize RDKB device config forms
+    this.uploadRdkbConfigForm = this.fb.group({
+      editorFilename: ['', { disabled: true }],
+      editorContent: ['', [Validators.required]],
+      uploadFileModal: ['', Validators.required],
+    });
+    this.uploadRdkbDeviceConfigForm = this.fb.group({
+      editorFilename: ['', { disabled: true }],
+      editorContent: ['', [Validators.required]],
+      uploadConfigFileModal: ['', Validators.required],
+    });
     this.deviceForm.get('thunderport')?.valueChanges.subscribe((value) => {
       const cleanedValue = value.replace(/^\s+|[^0-9]/g, '');
       if (cleanedValue !== value) {
@@ -324,12 +367,16 @@ export class DeviceCreateComponent implements OnInit {
 
     this.deviceForm.get('devicename')?.valueChanges.subscribe((value) => {
       if (value) {
-        this.deviceForm.get('devicename')?.setValue(value.toUpperCase());
+        this.deviceForm.get('devicename')?.setValue(value.toUpperCase(), {
+          emitEvent: false,
+        });
       }
     });
     this.rdkBForm.get('gatewayName')?.valueChanges.subscribe((value) => {
       if (value) {
-        this.rdkBForm.get('gatewayName')?.setValue(value.toUpperCase());
+        this.rdkBForm.get('gatewayName')?.setValue(value.toUpperCase(), {
+          emitEvent: false,
+        });
       }
     });
     this.uploadDeviceConfigForm
@@ -347,6 +394,26 @@ export class DeviceCreateComponent implements OnInit {
     this.uploadConfigForm.get('uploadFileModal')?.clearValidators();
     this.uploadConfigForm.get('editorContent')?.updateValueAndValidity();
     this.uploadConfigForm.get('uploadFileModal')?.updateValueAndValidity();
+
+    this.uploadRdkbDeviceConfigForm
+      .get('editorContent')
+      ?.setValidators([Validators.required]);
+    this.uploadRdkbDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.clearValidators();
+    this.uploadRdkbDeviceConfigForm
+      .get('editorContent')
+      ?.updateValueAndValidity();
+    this.uploadRdkbDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.updateValueAndValidity();
+
+    this.uploadRdkbConfigForm
+      .get('editorContent')
+      ?.setValidators([Validators.required]);
+    this.uploadRdkbConfigForm.get('uploadFileModal')?.clearValidators();
+    this.uploadRdkbConfigForm.get('editorContent')?.updateValueAndValidity();
+    this.uploadRdkbConfigForm.get('uploadFileModal')?.updateValueAndValidity();
   }
 
   /**
@@ -512,7 +579,8 @@ export class DeviceCreateComponent implements OnInit {
       .downloadDeviceConfigFile(
         boxNameConfig,
         deviceTypeConfig,
-        this.isThunderPresent
+        this.isThunderPresent,
+        'RDKV',
       )
       .subscribe({
         next: (res) => {
@@ -541,14 +609,8 @@ export class DeviceCreateComponent implements OnInit {
           this.readFileContent(res.content);
 
           this.readDeviceFileContent(res.content);
-          this.uploadDeviceConfigForm.patchValue({
-            editorFilename: this.stbNameChange + '.config',
-            editorContent: this.configData,
-          });
         },
-        error(err) {
-          const sts = err.status;
-        },
+        error: () => {},
       });
   }
   /**
@@ -614,10 +676,7 @@ export class DeviceCreateComponent implements OnInit {
     if (!content) return '';
     // Ensure content is a string and handle line endings
     const textContent = content.toString();
-    // If content is already plain text, just return it
-    if (!textContent.includes('<')) {
-      return textContent;
-    }
+    return textContent;
   }
 
   /**
@@ -991,7 +1050,7 @@ export class DeviceCreateComponent implements OnInit {
 
     // Get the file input control and value
     const fileInputControl = this.uploadDeviceConfigForm.get(
-      'uploadConfigFileModal'
+      'uploadConfigFileModal',
     );
     const fileInputValue = fileInputControl?.value;
 
@@ -1038,43 +1097,45 @@ export class DeviceCreateComponent implements OnInit {
    */
   private uploadConfigFileAndHandleResponse(
     file: File,
-    modalType: 'dialog' | 'newDevice'
+    modalType: 'dialog' | 'newDevice',
   ): void {
-    this.service.uploadConfigFile(file, this.isThunderPresent).subscribe({
-      next: (res) => {
-        this._snakebar.open(res.message, '', {
-          duration: 3000,
-          panelClass: ['success-msg'],
-          verticalPosition: 'top',
-        });
-        setTimeout(() => {
+    this.service
+      .uploadConfigFile(file, this.isThunderPresent, 'RDKV')
+      .subscribe({
+        next: (res) => {
+          this._snakebar.open(res.message, '', {
+            duration: 3000,
+            panelClass: ['success-msg'],
+            verticalPosition: 'top',
+          });
+          setTimeout(() => {
+            if (modalType === 'dialog') {
+              this.uploadConfigForm.get('uploadFileModal')?.reset();
+              this.backToExistingEditor();
+              this.closeDialog();
+            } else {
+              this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.reset();
+              this.backToEditor('Create New Device Config File');
+              this.closeNewDeviceDialog();
+            }
+            this.visibilityConfigFile();
+          }, 1000);
+        },
+        error: (err) => {
+          this._snakebar.open(err.message, '', {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+          // Clear the editor content and filename if upload failed
           if (modalType === 'dialog') {
             this.uploadConfigForm.get('uploadFileModal')?.reset();
-            this.backToExistingEditor();
-            this.closeDialog();
           } else {
             this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.reset();
-            this.backToEditor('Create New Device Config File');
-            this.closeNewDeviceDialog();
           }
-          this.visibilityConfigFile();
-        }, 1000);
-      },
-      error: (err) => {
-        this._snakebar.open(err.message, '', {
-          duration: 2000,
-          panelClass: ['err-msg'],
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-        });
-        // Clear the editor content and filename if upload failed
-        if (modalType === 'dialog') {
-          this.uploadConfigForm.get('uploadFileModal')?.reset();
-        } else {
-          this.uploadDeviceConfigForm.get('uploadConfigFileModal')?.reset();
-        }
-      },
-    });
+        },
+      });
   }
 
   /**
@@ -1185,7 +1246,7 @@ export class DeviceCreateComponent implements OnInit {
     if (configFileName) {
       if (confirm('Are you sure to delete ?')) {
         this.service
-          .deleteDeviceConfigFile(configFileName, this.isThunderchecked)
+          .deleteDeviceConfigFile(configFileName, this.isThunderchecked, 'RDKV')
           .subscribe({
             next: (res) => {
               this._snakebar.open(res, '', {
@@ -1288,7 +1349,8 @@ export class DeviceCreateComponent implements OnInit {
       .downloadDeviceConfigFile(
         'sampleDevice',
         this.deviceForm.value.devicetype,
-        this.isThunderPresent
+        this.isThunderPresent,
+        'RDKV',
       )
       .subscribe({
         next: (res) => {
@@ -1312,7 +1374,7 @@ export class DeviceCreateComponent implements OnInit {
                   width: '100vw',
                   height: '90vh',
                   panelClass: 'full-width-dialog',
-                }
+                },
               );
               // Add this to resize editor after dialog opens
               this.dialogOpened = true;
@@ -1372,7 +1434,8 @@ export class DeviceCreateComponent implements OnInit {
       .downloadDeviceConfigFile(
         this.stbNameChange,
         this.deviceTypeValue,
-        this.isThunderPresent
+        this.isThunderPresent,
+        'RDKV',
       )
       .subscribe({
         next: (res) => {
@@ -1392,5 +1455,656 @@ export class DeviceCreateComponent implements OnInit {
           });
         },
       });
+  }
+
+  // ========== RDKB Device Config Methods ==========
+
+  /**
+   * Handles value change for RDKB gateway name input field.
+   * @param event - Input event
+   */
+  rdkbValuechange(event: any): void {
+    this.rdkbStbNameChange = event.target.value;
+    //this.visibilityRdkbConfigFile();
+  }
+
+  /**
+   * Handles RDKB device type change event.
+   * @param event - Input event
+   */
+  rdkbDevicetypeChange(event: any): void {
+    this.visibleRdkbDeviceconfigFile = false;
+    let value = event.target.value;
+    this.rdkbDeviceTypeValue = value;
+    //this.visibilityRdkbConfigFile();
+  }
+
+  /**
+   * Shows the config file or device.config file based on gateway name and devicetype for RDKB.
+   * No parameters.
+   */
+  visibilityRdkbConfigFile(): void {
+    this.visibleRdkbDeviceconfigFile = false;
+    this.rdkbConfigFileName = 'sampleDevice.config';
+    /*
+    let boxNameConfig = this.rdkBForm.value.gatewayName;
+    let boxTypeConfig = this.rdkBForm.value.devicetype;
+    this.service
+      .downloadDeviceConfigFile(boxNameConfig, boxTypeConfig, false, 'RDKB')
+      .subscribe({
+        next: (res) => {
+          this.rdkbConfigFileName = res.filename;
+          if (
+            this.rdkbConfigFileName !== `${boxNameConfig}.config` &&
+            this.rdkbStbNameChange !== undefined &&
+            this.rdkbStbNameChange !== ''
+          ) {
+            this.visibleRdkbDeviceconfigFile = true;
+          } else {
+            this.visibleRdkbDeviceconfigFile = false;
+          }
+          if (this.rdkbConfigFileName === `${boxTypeConfig}.config`) {
+            this.visibleRdkbDeviceconfigFile = true;
+            this.rdkbNewFileName = `${boxTypeConfig}.config`;
+          }
+          if (
+            this.rdkbConfigFileName !== `${boxNameConfig}.config` &&
+            this.rdkbConfigFileName !== `${boxTypeConfig}.config`
+          ) {
+            this.visibleRdkbDeviceconfigFile = false;
+            this.rdkbNewFileName = `${boxNameConfig}.config`;
+          }
+          this.readRdkbFileContent(res.content);
+          this.readRdkbDeviceFileContent(res.content);
+        },
+        error: () => {},
+      });
+      */
+  }
+
+  /**
+   * Reads the RDKB config file content.
+   * @param file - Blob file to read
+   */
+  readRdkbFileContent(file: Blob): void {
+    let boxNameConfig = this.rdkBForm.value.gatewayName;
+    const reader = new FileReader();
+    reader.onload = () => {
+      let content = reader.result as string;
+      this.rdkbConfigData = content;
+      if (this.rdkbConfigData) {
+        this.uploadRdkbConfigForm.patchValue({
+          editorFilename:
+            this.rdkbConfigFileName === `${boxNameConfig}.config`
+              ? this.rdkbConfigFileName
+              : this.rdkbNewFileName,
+          editorContent: this.rdkbConfigData,
+        });
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /**
+   * Reads the RDKB device config file content.
+   * @param file - Blob file to read
+   */
+  readRdkbDeviceFileContent(file: Blob): void {
+    const reader = new FileReader();
+    reader.onload = () => {
+      let content = reader.result as string;
+      this.rdkbConfigData = content;
+      if (this.rdkbConfigData) {
+        this.uploadRdkbDeviceConfigForm.patchValue({
+          editorFilename: this.rdkbStbNameChange + '.config',
+          editorContent: this.rdkbConfigData,
+        });
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /**
+   * Opens the existing RDKB device config modal on button click.
+   * @param fileName - Name of the file to open
+   */
+  rdkbExistDeviceDialog(fileName: any): void {
+    this.isEditorLoading = true;
+    setTimeout(() => {
+      this.isEditorLoading = false;
+    }, 3000);
+    this.rdkbShowExistUploadButton = true;
+    this.rdkbExistingConfigEditor = true;
+    this.rdkbUploadExistingConfig = false;
+    this.rdkbBackToExistEditorbtn = false;
+    if (fileName === 'sampleDevice.config') {
+      this.rdkbShowUploadButton = true;
+      this.rdkbDeviceEditor = true;
+      this.rdkbUploadConfigSec = false;
+      this.rdkbBackToEditorbtn = false;
+      this.rdkbNewDeviceDialogRef = this.dialog.open(
+        this.rdkbNewDeviceTemplate,
+        {
+          width: '100vw',
+          height: '90vh',
+          panelClass: 'full-width-dialog',
+        },
+      );
+      this.dialogOpened = true;
+      setTimeout(() => this.resizeEditor(), 300);
+    } else {
+      this.rdkbDialogRef = this.dialog.open(this.rdkbDialogTemplate, {
+        width: '100vw',
+        height: '90vh',
+        panelClass: 'full-width-dialog',
+      });
+      this.dialogOpened = true;
+      setTimeout(() => this.resizeEditor(), 300);
+    }
+  }
+
+  /*
+  openRdkbNewDeviceDialog(): void {
+    this.isEditorLoading = true;
+    setTimeout(() => {
+      this.isEditorLoading = false;
+    }, 3000);
+    this.rdkbShowUploadButton = true;
+    this.rdkbDeviceEditor = true;
+    this.rdkbUploadConfigSec = false;
+    this.rdkbBackToEditorbtn = false;
+
+    const deviceName = this.rdkBForm.value.gatewayName || '';
+    const deviceType = this.rdkBForm.value.devicetype || '';
+
+    this.service
+      .downloadDeviceConfigFile('sampleDevice', deviceType, false, 'RDKB')
+      .subscribe({
+        next: (res) => {
+          if (res.content instanceof Blob) {
+            const reader = new FileReader();
+            reader.onload = () => {
+              const textContent = reader.result as string;
+              this.uploadRdkbDeviceConfigForm.patchValue({
+                editorFilename: deviceName + '.config',
+                editorContent: this.formatContent(textContent),
+              });
+              this.rdkbUploadCreateHeading = 'Create New Device Config File';
+              this.rdkbNewDeviceDialogRef = this.dialog.open(
+                this.rdkbNewDeviceTemplate,
+                {
+                  width: '100vw',
+                  height: '90vh',
+                  panelClass: 'full-width-dialog',
+                },
+              );
+              this.dialogOpened = true;
+              setTimeout(() => this.resizeEditor(), 300);
+            };
+            reader.readAsText(res.content);
+          } else if (typeof res.content === 'string') {
+            this.uploadRdkbDeviceConfigForm.patchValue({
+              editorFilename: deviceName + '.config',
+              editorContent: this.formatContent(res.content),
+            });
+            this.rdkbUploadCreateHeading = 'Create New Device Config File';
+            this.rdkbNewDeviceDialogRef = this.dialog.open(
+              this.rdkbNewDeviceTemplate,
+              {
+                width: '100vw',
+                height: '90vh',
+                panelClass: 'full-width-dialog',
+              },
+            );
+            this.dialogOpened = true;
+            setTimeout(() => this.resizeEditor(), 300);
+          }
+        },
+        error: (err) => {
+          this._snakebar.open('Failed to load sample config.', '', {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        },
+      });
+  }
+  */
+
+  /**
+   * Closes the RDKB existing device config modal.
+   * No parameters.
+   */
+  closeRdkbDialog(): void {
+    this.rdkbDialogRef.close();
+  }
+
+  /**
+   * Closes the RDKB new device config modal.
+   * No parameters.
+   */
+  closeRdkbNewDeviceDialog(): void {
+    this.rdkbNewDeviceDialogRef.close();
+  }
+
+  /**
+   * Toggles the file name in the RDKB upload config form dialog.
+   * No parameters.
+   */
+  toggleRdkbFileNameDialog(): void {
+    const boxNameConfig = this.rdkBForm.value.gatewayName;
+    const deviceTypeConfig = this.rdkBForm.value.devicetype;
+    const currentName = this.uploadRdkbConfigForm.get('editorFilename')?.value;
+    let newName = '';
+    if (currentName === `${boxNameConfig}.config`) {
+      newName = `${deviceTypeConfig}.config`;
+    } else {
+      newName = `${boxNameConfig}.config`;
+    }
+    this.uploadRdkbConfigForm.patchValue({
+      editorFilename: newName,
+    });
+  }
+
+  /**
+   * Toggles the file name in the RDKB upload device config form.
+   * No parameters.
+   */
+  toggleRdkbFileName(): void {
+    const boxNameConfig = this.rdkBForm.value.gatewayName;
+    const deviceTypeConfig = this.rdkBForm.value.devicetype;
+    const currentName =
+      this.uploadRdkbDeviceConfigForm.get('editorFilename')?.value;
+    let newName = '';
+    if (currentName === `${boxNameConfig}.config`) {
+      newName = `${deviceTypeConfig}.config`;
+    } else {
+      newName = `${boxNameConfig}.config`;
+    }
+    this.uploadRdkbDeviceConfigForm.patchValue({
+      editorFilename: newName,
+    });
+  }
+
+  /**
+   * Toggles the edit icon in RDKB editor modal.
+   * No parameters.
+   */
+  toggleRdkbIsEdit(): void {
+    this.isEditingFile = !this.isEditingFile;
+    if (this.isEditingFile) {
+      this.uploadRdkbDeviceConfigForm.get('editorFilename')?.enable();
+    } else {
+      this.uploadRdkbDeviceConfigForm.get('editorFilename')?.disable();
+    }
+  }
+
+  /**
+   * Handles change event for RDKB existing config file input.
+   * @param event - Input event
+   */
+  onRdkbExistConfigChange(event: Event): void {
+    let fileInput = event.target as HTMLInputElement;
+    if (fileInput && fileInput.files) {
+      const file = fileInput.files[0];
+      this.rdkbUploadFileName = file;
+      this.uploadRdkbExistConfigContent(file);
+      this.uploadRdkbConfigForm.get('uploadFileModal')?.setValue(file);
+    } else {
+      this.uploadRdkbConfigForm.get('uploadFileModal')?.setValue('');
+    }
+  }
+
+  /**
+   * Uploads the content of the RDKB existing config file.
+   * @param file - File to upload
+   */
+  uploadRdkbExistConfigContent(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const content = e.target?.result as string;
+      this.rdkbUploadExistFileContent = content;
+      let filename = file.name.endsWith('.config')
+        ? this.rdkBForm.value.gatewayName + '.config'
+        : file.name;
+      if (file.name.endsWith('.config')) {
+        this.uploadRdkbConfigForm.patchValue({
+          editorFilename: filename,
+          editorContent: content,
+        });
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /**
+   * Uploads the RDKB config file from editor modal.
+   * No parameters.
+   */
+  rdkbConfigFileUpload(): void {
+    this.rdkbExistConfigSubmitted = true;
+    if (this.uploadRdkbConfigForm.invalid) {
+      return;
+    }
+
+    const fileInputControl = this.uploadRdkbConfigForm.get('uploadFileModal');
+    const fileInputValue = fileInputControl?.value;
+
+    if (fileInputValue && fileInputValue instanceof File) {
+      const file: File = fileInputValue;
+      if (file.name.endsWith('.config')) {
+        const editorFilename =
+          this.uploadRdkbConfigForm.get('editorFilename')!.value;
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const content = e.target?.result as string;
+          const contentBlob = new Blob([content], { type: 'text/plain' });
+          const contentFile = new File([contentBlob], editorFilename);
+          this.uploadRdkbConfigFileAndHandleResponse(contentFile, 'dialog');
+        };
+        reader.readAsText(file);
+        return;
+      } else {
+        this.uploadRdkbConfigFileAndHandleResponse(file, 'dialog');
+        return;
+      }
+    }
+
+    const editorFilename =
+      this.uploadRdkbConfigForm.get('editorFilename')!.value;
+    const content = this.uploadRdkbConfigForm.get('editorContent')!.value;
+    const contentBlob = new Blob([content], { type: 'text/plain' });
+    const contentFile = new File([contentBlob], editorFilename);
+    this.uploadRdkbConfigFileAndHandleResponse(contentFile, 'dialog');
+  }
+
+  /**
+   * Handles change event for RDKB modal file input.
+   * @param event - Input event
+   */
+  onRdkbModalFileChange(event: Event): void {
+    let fileInput = event.target as HTMLInputElement;
+    if (fileInput && fileInput.files && fileInput.files.length > 0) {
+      const file = fileInput.files[0];
+      this.rdkbUploadFileNameConfig = file.name;
+      this.uploadRdkbReadFileContent(file);
+      this.uploadRdkbDeviceConfigForm
+        .get('uploadConfigFileModal')
+        ?.setValue(file);
+    } else {
+      this.uploadRdkbDeviceConfigForm
+        .get('uploadConfigFileModal')
+        ?.setValue('');
+    }
+  }
+
+  /**
+   * Uploads and reads the content of the file for RDKB device config.
+   * @param file - File to upload and read
+   */
+  uploadRdkbReadFileContent(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      const content = e.target?.result as string;
+      this.rdkbUploadFileContent = content;
+      let filename = file.name.endsWith('.config')
+        ? this.rdkBForm.value.gatewayName + '.config'
+        : file.name;
+      if (file.name.endsWith('.config')) {
+        this.uploadRdkbDeviceConfigForm.patchValue({
+          editorFilename: filename,
+          editorContent: content,
+        });
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  /**
+   * Uploads the RDKB default device config file from editor modal.
+   * No parameters.
+   */
+  rdkbConfigDeviceFileUpload(): void {
+    this.rdkbSubmitted = true;
+    if (this.uploadRdkbDeviceConfigForm.invalid) {
+      return;
+    }
+
+    const fileInputControl = this.uploadRdkbDeviceConfigForm.get(
+      'uploadConfigFileModal',
+    );
+    const fileInputValue = fileInputControl?.value;
+
+    if (fileInputValue && fileInputValue instanceof File) {
+      const file: File = fileInputValue;
+      if (file.name.endsWith('.config')) {
+        const editorFilename =
+          this.uploadRdkbDeviceConfigForm.get('editorFilename')!.value;
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          const content = e.target?.result as string;
+          const contentBlob = new Blob([content], { type: 'text/plain' });
+          const contentFile = new File([contentBlob], editorFilename);
+          this.uploadRdkbConfigFileAndHandleResponse(contentFile, 'newDevice');
+        };
+        reader.readAsText(file);
+        return;
+      } else {
+        this.uploadRdkbConfigFileAndHandleResponse(file, 'newDevice');
+        return;
+      }
+    }
+
+    const editorFilename =
+      this.uploadRdkbDeviceConfigForm.get('editorFilename')!.value;
+    const content = this.uploadRdkbDeviceConfigForm.get('editorContent')!.value;
+    const contentBlob = new Blob([content], { type: 'text/plain' });
+    const contentFile = new File([contentBlob], editorFilename);
+    this.uploadRdkbConfigFileAndHandleResponse(contentFile, 'newDevice');
+  }
+
+  /**
+   * Helper function for RDKB upload and response handling.
+   * @param file - File to upload
+   * @param modalType - Type of modal ('dialog' or 'newDevice')
+   */
+  private uploadRdkbConfigFileAndHandleResponse(
+    file: File,
+    modalType: 'dialog' | 'newDevice',
+  ): void {
+    /*
+    this.service.uploadConfigFile(file, false, 'RDKB').subscribe({
+      next: (res) => {
+        this._snakebar.open(res.message, '', {
+          duration: 3000,
+          panelClass: ['success-msg'],
+          verticalPosition: 'top',
+        });
+        setTimeout(() => {
+          if (modalType === 'dialog') {
+            this.uploadRdkbConfigForm.get('uploadFileModal')?.reset();
+            this.backToRdkbExistingEditor();
+            this.closeRdkbDialog();
+          } else {
+            this.uploadRdkbDeviceConfigForm
+              .get('uploadConfigFileModal')
+              ?.reset();
+            this.backToRdkbEditor('Create New Device Config File');
+            this.closeRdkbNewDeviceDialog();
+          }
+          this.visibilityRdkbConfigFile();
+        }, 1000);
+      },
+      error: (err) => {
+        this._snakebar.open(err.message, '', {
+          duration: 2000,
+          panelClass: ['err-msg'],
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+        });
+        if (modalType === 'dialog') {
+          this.uploadRdkbConfigForm.get('uploadFileModal')?.reset();
+        } else {
+          this.uploadRdkbDeviceConfigForm.get('uploadConfigFileModal')?.reset();
+        }
+      },
+    });
+    */
+  }
+
+  /**
+   * Opens the RDKB upload file section.
+   * @param value - Heading value for upload section
+   */
+  openRdkbUploadFile(value: string): void {
+    this.rdkbSubmitted = false;
+    this.uploadRdkbDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.setValidators([Validators.required]);
+    this.uploadRdkbDeviceConfigForm.get('editorContent')?.clearValidators();
+    this.uploadRdkbDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.updateValueAndValidity();
+    this.uploadRdkbDeviceConfigForm
+      .get('editorContent')
+      ?.updateValueAndValidity();
+    this.rdkbDeviceEditor = false;
+    this.rdkbUploadConfigSec = true;
+    this.rdkbBackToEditorbtn = true;
+    this.rdkbShowUploadButton = false;
+    this.rdkbUploadCreateHeading = value;
+  }
+
+  /**
+   * Navigates back to the RDKB device editor.
+   * @param value - Heading value for editor section
+   */
+  backToRdkbEditor(value: string): void {
+    this.rdkbSubmitted = false;
+    this.uploadRdkbDeviceConfigForm
+      .get('editorContent')
+      ?.setValidators([Validators.required]);
+    this.uploadRdkbDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.clearValidators();
+    this.uploadRdkbDeviceConfigForm
+      .get('editorContent')
+      ?.updateValueAndValidity();
+    this.uploadRdkbDeviceConfigForm
+      .get('uploadConfigFileModal')
+      ?.updateValueAndValidity();
+    this.rdkbDeviceEditor = true;
+    this.rdkbUploadConfigSec = false;
+    this.rdkbBackToEditorbtn = false;
+    this.rdkbShowUploadButton = true;
+    this.rdkbUploadCreateHeading = value;
+  }
+
+  /**
+   * Opens the RDKB existing modal.
+   * @param val - Value to be passed to modal
+   */
+  openRdkbExistingModal(val: string): void {
+    this.rdkbExistConfigSubmitted = false;
+    this.uploadRdkbConfigForm
+      .get('uploadFileModal')
+      ?.setValidators([Validators.required]);
+    this.uploadRdkbConfigForm.get('editorContent')?.clearValidators();
+    this.uploadRdkbConfigForm.get('uploadFileModal')?.updateValueAndValidity();
+    this.uploadRdkbConfigForm.get('editorContent')?.updateValueAndValidity();
+    this.rdkbExistingConfigEditor = false;
+    this.rdkbUploadExistingConfig = true;
+    this.rdkbShowExistUploadButton = false;
+    this.rdkbBackToExistEditorbtn = true;
+    this.rdkbUploadExistConfigHeading = val;
+  }
+
+  /**
+   * Navigates back to the RDKB existing config editor.
+   * No parameters.
+   */
+  backToRdkbExistingEditor(): void {
+    this.rdkbExistConfigSubmitted = false;
+    this.uploadRdkbConfigForm
+      .get('editorContent')
+      ?.setValidators([Validators.required]);
+    this.uploadRdkbConfigForm.get('uploadFileModal')?.clearValidators();
+    this.uploadRdkbConfigForm.get('editorContent')?.updateValueAndValidity();
+    this.uploadRdkbConfigForm.get('uploadFileModal')?.updateValueAndValidity();
+    this.rdkbExistingConfigEditor = true;
+    this.rdkbUploadExistingConfig = false;
+    this.rdkbShowExistUploadButton = true;
+    this.rdkbBackToExistEditorbtn = false;
+    this.rdkbUploadExistConfigHeading = '';
+  }
+
+  /**
+   * Deletes a RDKB device configuration file.
+   * @param configFileName - Name of the configuration file to delete
+   */
+  deleteRdkbDeviceConfigFile(configFileName: any): void {
+    if (configFileName) {
+      if (confirm('Are you sure to delete ?')) {
+        this.service
+          .deleteDeviceConfigFile(configFileName, false, 'RDKB')
+          .subscribe({
+            next: (res) => {
+              this._snakebar.open(res, '', {
+                duration: 1000,
+                panelClass: ['success-msg'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top',
+              });
+              this.rdkbDialogRef.close();
+              this.visibilityRdkbConfigFile();
+              this.backToRdkbEditor('Create New Device Config File');
+            },
+            error: (err) => {
+              let errmsg = JSON.parse(err.error);
+              this._snakebar.open(errmsg.message, '', {
+                duration: 2000,
+                panelClass: ['err-msg'],
+                horizontalPosition: 'end',
+                verticalPosition: 'top',
+              });
+            },
+          });
+      }
+    }
+  }
+
+  /**
+   * Downloads the RDKB configuration file.
+   * No parameters.
+   */
+  downloadRdkbConfigFile(): void {
+    /*
+    this.service
+      .downloadDeviceConfigFile(
+        this.rdkbStbNameChange,
+        this.rdkbDeviceTypeValue,
+        false,
+        'RDKB',
+      )
+      .subscribe({
+        next: (res) => {
+          const filename = res.filename;
+          const blob = new Blob([res.content], {
+            type: res.content.type || 'application/json',
+          });
+          saveAs(blob, filename);
+        },
+        error: (err) => {
+          let errmsg = err.error;
+          this._snakebar.open(errmsg, '', {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        },
+      });
+      */
   }
 }
