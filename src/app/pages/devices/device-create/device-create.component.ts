@@ -1465,7 +1465,7 @@ export class DeviceCreateComponent implements OnInit {
    */
   rdkbValuechange(event: any): void {
     this.rdkbStbNameChange = event.target.value;
-    this.visibilityRdkbConfigFile();
+    //this.visibilityRdkbConfigFile();
   }
 
   /**
@@ -1476,7 +1476,7 @@ export class DeviceCreateComponent implements OnInit {
     this.visibleRdkbDeviceconfigFile = false;
     let value = event.target.value;
     this.rdkbDeviceTypeValue = value;
-    this.visibilityRdkbConfigFile();
+    //this.visibilityRdkbConfigFile();
   }
 
   /**
@@ -1484,6 +1484,9 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   visibilityRdkbConfigFile(): void {
+    this.visibleRdkbDeviceconfigFile = false;
+    this.rdkbConfigFileName = 'sampleDevice.config';
+    /*
     let boxNameConfig = this.rdkBForm.value.gatewayName;
     let boxTypeConfig = this.rdkBForm.value.devicetype;
     this.service
@@ -1516,6 +1519,7 @@ export class DeviceCreateComponent implements OnInit {
         },
         error: () => {},
       });
+      */
   }
 
   /**
@@ -1599,10 +1603,7 @@ export class DeviceCreateComponent implements OnInit {
     }
   }
 
-  /**
-   * Opens the RDKB new device config modal on button click.
-   * No parameters.
-   */
+  /*
   openRdkbNewDeviceDialog(): void {
     this.isEditorLoading = true;
     setTimeout(() => {
@@ -1669,6 +1670,7 @@ export class DeviceCreateComponent implements OnInit {
         },
       });
   }
+  */
 
   /**
    * Closes the RDKB existing device config modal.
@@ -1911,6 +1913,7 @@ export class DeviceCreateComponent implements OnInit {
     file: File,
     modalType: 'dialog' | 'newDevice',
   ): void {
+    /*
     this.service.uploadConfigFile(file, false, 'RDKB').subscribe({
       next: (res) => {
         this._snakebar.open(res.message, '', {
@@ -1947,6 +1950,7 @@ export class DeviceCreateComponent implements OnInit {
         }
       },
     });
+    */
   }
 
   /**
@@ -2075,6 +2079,7 @@ export class DeviceCreateComponent implements OnInit {
    * No parameters.
    */
   downloadRdkbConfigFile(): void {
+    /*
     this.service
       .downloadDeviceConfigFile(
         this.rdkbStbNameChange,
@@ -2100,5 +2105,6 @@ export class DeviceCreateComponent implements OnInit {
           });
         },
       });
+      */
   }
 }

@@ -348,7 +348,7 @@ export class DeviceEditComponent {
     if (this.configureName === 'RDKB') {
       this.rdkbDeviceTypeValue = this.user.deviceTypeName;
       this.rdkbStbNameChange = this.user.deviceName;
-      this.visibilityRdkbConfigFile();
+      //this.visibilityRdkbConfigFile();
     }
     this.editDeviceVForm.get('thunderport')?.valueChanges.subscribe((value) => {
       const cleanedValue = value.replace(/^\s+|[^0-9]/g, '');
@@ -1536,6 +1536,9 @@ export class DeviceEditComponent {
    * No parameters.
    */
   visibilityRdkbConfigFile(): void {
+    this.visibleRdkbDeviceconfigFile = false;
+    this.rdkbConfigFileName = 'sampleDevice.config';
+    /*
     let boxNameConfig = this.rdkBForm.value.gatewayName;
     let boxTypeConfig = this.rdkBForm.value.devicetype;
     this.service
@@ -1565,6 +1568,7 @@ export class DeviceEditComponent {
         this.readRdkbFileContent(res.content);
         this.readRdkbDeviceFileContent(res.content);
       });
+      */
   }
 
   /**
@@ -1617,7 +1621,7 @@ export class DeviceEditComponent {
     this.visibleRdkbDeviceconfigFile = false;
     let value = event.target.value;
     this.rdkbDeviceTypeValue = value;
-    this.visibilityRdkbConfigFile();
+    //this.visibilityRdkbConfigFile();
   }
 
   /**
@@ -1626,7 +1630,7 @@ export class DeviceEditComponent {
    */
   rdkbValuechange(event: any): void {
     this.rdkbStbNameChange = event.target.value;
-    this.visibilityRdkbConfigFile();
+    //this.visibilityRdkbConfigFile();
   }
 
   /**
@@ -1673,10 +1677,7 @@ export class DeviceEditComponent {
     }
   }
 
-  /**
-   * Opens the RDKB new device config modal on button click.
-   * No parameters.
-   */
+  /*
   openRdkbNewDeviceDialog(): void {
     this.isEditorLoading = true;
     setTimeout(() => {
@@ -1730,7 +1731,7 @@ export class DeviceEditComponent {
           setTimeout(() => this.resizeEditor(), 300);
         }
       });
-  }
+  }*/
 
   /**
    * Closes the RDKB existing device config modal.
@@ -1904,6 +1905,7 @@ export class DeviceEditComponent {
     file: File,
     modalType: 'dialog' | 'newDevice',
   ): void {
+    /*
     this.service.uploadConfigFile(file, false, 'RDKB').subscribe({
       next: (res) => {
         this._snakebar.open(res.message, '', {
@@ -1942,6 +1944,7 @@ export class DeviceEditComponent {
         }
       },
     });
+    */
   }
 
   /**
@@ -2154,6 +2157,7 @@ export class DeviceEditComponent {
    * @param configFileName - Name of the config file to download
    */
   downloadRdkbConfigFile(configFileName: any): void {
+    /*
     const cleanFileName = configFileName.endsWith('.config')
       ? configFileName.substring(0, configFileName.length - 7)
       : configFileName;
@@ -2182,5 +2186,6 @@ export class DeviceEditComponent {
           });
         },
       });
+      */
   }
 }
