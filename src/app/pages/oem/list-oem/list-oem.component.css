@@ -103,13 +103,13 @@ http://www.apache.org/licenses/LICENSE-2.0
 /*
  * Hides the no-rows overlay in ag-theme-quartz grid.
  */
-::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center{
+::ng-deep .ag-theme-quartz .ag-overlay-no-rows-center {
   display: none !important;
 }
 /*
  * Positions the loader row absolutely in the center.
  */
-.loader-row{
+.loader-row {
   position: absolute;
   top: 50%;
   z-index: 1;
@@ -135,4 +135,75 @@ http://www.apache.org/licenses/LICENSE-2.0
   -moz-user-select: text !important;
   -ms-user-select: text !important;
   cursor: text;
+}
+
+/*
+ * Styles the download button.
+ */
+.download-btn {
+  background-color: #fff;
+  font-size: 0.8rem;
+  padding: 5px 15px;
+  border: none;
+  box-shadow: 0px 3px 6px #0000005e;
+  border-radius: 6px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+/*
+ * Styles the download icon.
+ */
+.download-icon {
+  color: #00b2dc;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+/*
+ * Styles the custom modal dialog.
+ */
+.custom-modal {
+  margin-top: 10%;
+}
+
+/*
+ * Styles the modal title area.
+ */
+.modaltitle {
+  background-color: #00b2dc;
+  color: #fff;
+}
+
+/*
+ * Styles the custom title text.
+ */
+.custom-title {
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+/*
+ * Styles the modal buttons.
+ */
+.modal-btns {
+  background-color: #00b2dc;
+  color: #fff;
+  border: none;
+  padding: 5px 15px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+/*
+ * Styles the upload error message.
+ */
+.errorupload {
+  color: red;
+  font-size: 0.75rem;
 }

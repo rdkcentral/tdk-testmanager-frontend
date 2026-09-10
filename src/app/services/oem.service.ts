@@ -23,6 +23,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { saveAs } from 'file-saver';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +46,7 @@ export class OemService {
     private http: HttpClient,
     private authService: AuthService,
     @Inject('APP_CONFIG') private config: any,
-    private router: Router
+    private router: Router,
   ) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -113,7 +114,7 @@ export class OemService {
   private options = {
     headers: new HttpHeaders().set(
       'Authorization',
-      this.authService.getApiToken()
+      this.authService.getApiToken(),
     ),
   };
 
@@ -124,7 +125,7 @@ export class OemService {
   getOemList(): Observable<any> {
     return this.http.get(
       `${this.config.apiUrl}api/v1/boxmanufacturer/findall`,
-      this.options
+      this.options,
     );
   }
 
@@ -139,7 +140,7 @@ export class OemService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/oem/findallbycategory?category=${category}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -186,5 +187,46 @@ export class OemService {
     return this.http.put(`${this.config.apiUrl}api/v1/oem/update`, data, {
       headers,
     });
+  }
+
+  /**
+   * Downloads all OEMs as an XML file.
+   * @param category The category to filter OEMs by.
+   */
+  downloadAllOems(category: string): void {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    this.http
+      .get(`${this.config.apiUrl}api/v1/oem/downloadXML?category=${category}`, {
+        headers,
+        responseType: 'blob',
+      })
+      .subscribe({
+        next: (res: Blob) => {
+          saveAs(res, `oems_${category}.xml`);
+        },
+        error: (err) => {
+          console.error('Error downloading OEM XML', err);
+        },
+      });
+  }
+
+  /**
+   * Uploads an OEM XML file.
+   * @param file The XML file to upload.
+   * @returns Observable with the upload result.
+   */
+  uploadOemXML(file: File): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    const formData = new FormData();
+    formData.append('file', file);
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/oem/uploadxml`,
+      formData,
+      { headers },
+    );
   }
 }

@@ -23,6 +23,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { AuthService } from '../auth/auth.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { saveAs } from 'file-saver';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +46,7 @@ export class DevicetypeService {
     private http: HttpClient,
     private authService: AuthService,
     @Inject('APP_CONFIG') private config: any,
-    private router: Router
+    private router: Router,
   ) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -119,7 +120,7 @@ export class DevicetypeService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/devicetype/getlistbycategory?category=${category}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -134,7 +135,7 @@ export class DevicetypeService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/devicetype/findallbycategory?category=${category}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -152,7 +153,7 @@ export class DevicetypeService {
     return this.http.post(
       `${this.config.apiUrl}api/v1/devicetype/create`,
       data,
-      { headers }
+      { headers },
     );
   }
 
@@ -167,7 +168,7 @@ export class DevicetypeService {
     });
     return this.http.delete(
       `${this.config.apiUrl}api/v1/devicetype/delete?id=${id}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -184,7 +185,43 @@ export class DevicetypeService {
     return this.http.put(
       `${this.config.apiUrl}api/v1/devicetype/update`,
       data,
-      { headers }
+      { headers },
+    );
+  }
+
+  /**
+   * Downloads all device types by category as a single XML file.
+   * @param category The category to download device types for.
+   */
+  downloadAllDeviceTypes(category: string): void {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    this.http
+      .get(
+        `${this.config.apiUrl}api/v1/devicetype/downloadXML?category=${category}`,
+        { headers, responseType: 'blob' },
+      )
+      .subscribe((blob) => {
+        saveAs(blob, `device_types_${category}.xml`);
+      });
+  }
+
+  /**
+   * Uploads a device type XML file for bulk import.
+   * @param file The XML file to upload.
+   * @returns Observable with the upload result.
+   */
+  uploadDeviceTypeXML(file: File): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    const formData: FormData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/devicetype/uploadxml`,
+      formData,
+      { headers },
     );
   }
 }
