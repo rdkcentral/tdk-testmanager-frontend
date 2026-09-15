@@ -26,49 +26,49 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar);
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      let errorMessage = 'An unknown error occurred.';
+      let errorObject: any = error.error || {};
+      let message = 'An unknown error occurred.';
 
       if (error instanceof HttpErrorResponse) {
         if (error.status == 0) {
-          errorMessage =
-            'Network error: Please check your internet connection.';
-        }
-        if (error.status == 404) {
-          errorMessage = extractMessage(error.error);
-        }
-        if (error.status == 401) {
-          errorMessage = extractMessage(error.error);
-        }
-        if (error.status == 400) {
-          errorMessage = extractMessage(error.error);
-        }
-        if (error.status == 409) {
-          errorMessage = extractMessage(error.error);
-        }
-
-        if (error.status == 500) {
-          errorMessage = extractMessage(error.error);
-        }
-        if (error.status == 503) {
-          errorMessage = extractMessage(error.error);
+          message = 'Network error: Please check your internet connection.';
+        } else if (error.status == 404) {
+          message = extractMessage(error.error);
+        } else if (error.status == 401) {
+          message = extractMessage(error.error);
+        } else if (error.status == 400) {
+          message = extractMessage(error.error);
+        } else if (error.status == 409) {
+          message = extractMessage(error.error);
+        } else if (error.status == 500) {
+          message = extractMessage(error.error);
+        } else if (error.status == 503) {
+          message = extractMessage(error.error);
         }
       } else if (isProgressEventError(error)) {
-        errorMessage =
+        message =
           'Network error: Please check your internet connection or the backend server may be down.';
       } else if (isObject(error) && 'error' in error) {
-        errorMessage = extractMessage(error);
+        message = extractMessage(error);
       } else if (isObject(error) && 'message' in error) {
-        errorMessage = extractMessage(error);
+        message = extractMessage(error);
       } else {
         console.error('Unknown Error:', error);
       }
-      // snackBar.open(errorMessage || 'An error occurred', 'Close', {
+
+      // Ensure error object has normalized message property
+      if (!isObject(errorObject)) {
+        errorObject = {};
+      }
+      errorObject.message = message;
+
+      // snackBar.open(message || 'An error occurred', 'Close', {
       //   duration: 2500,
       //   panelClass: ['err-msg'],
       //   horizontalPosition: 'end',
       //   verticalPosition: 'top'
       // });
-      return throwError(() => errorMessage);
+      return throwError(() => errorObject);
     }),
   );
 };

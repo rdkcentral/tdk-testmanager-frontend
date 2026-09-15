@@ -414,10 +414,7 @@ export class LoginComponent implements OnInit {
           this.location.replaceState('/execution');
         },
         error: (err: any) => {
-          this.errorMessage =
-            typeof err === 'string'
-              ? err
-              : err?.message || 'An unknown error occurred.';
+          this.errorMessage = err?.message || 'An unknown error occurred.';
           if (this.errorMessage) {
             this.showhideErr = true;
             setTimeout(() => {
@@ -465,10 +462,7 @@ export class LoginComponent implements OnInit {
         },
         error: (err: any) => {
           //Check for the errors that are already parsed
-          let errorMessage =
-            typeof err === 'string'
-              ? err
-              : err?.message || 'An unknown error occurred.';
+          let errorMessage = err?.message || 'An unknown error occurred.';
           this.backendErrors = this.parseBackendErrors(errorMessage);
           setTimeout(() => {
             this.backendErrors = {};
