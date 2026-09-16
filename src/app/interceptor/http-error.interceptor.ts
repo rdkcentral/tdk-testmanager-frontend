@@ -55,10 +55,16 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         console.error('Unknown Error:', error);
       }
 
-      // Preserve original error fields while adding normalized message
-      const errorObject: any = isObject(error.error)
-        ? { ...error.error, message: message } // Spread backend properties, add normalized message
-        : { error: error.error, message: message }; // If error.error is string/primitive, wrap it
+      // Preserve original HTTP response metadata and backend properties while adding normalized message
+      const errorObject: any = {
+        ...(isObject(error.error) ? error.error : {}), // Spread backend properties (data.logs, etc.)
+        status: error.status, // HTTP status code
+        statusText: error.statusText, // HTTP status text
+        headers: error.headers, // HTTP headers
+        url: error.url, // Request URL
+        error: error.error, // Original backend response (for JSON.parse)
+        message: message, // Normalized message (for display)
+      };
 
       // snackBar.open(message || 'An error occurred', 'Close', {
       //   duration: 2500,
@@ -75,11 +81,13 @@ function extractMessage(error: any): string {
   if (typeof error === 'string') {
     return error;
   } else if (typeof error === 'object' && error !== null) {
-    if ('error' in error) {
-      return extractMessage(error.error);
-    }
+    // Prefer message property first (most useful for user feedback)
     if ('message' in error && typeof error.message === 'string') {
       return error.message;
+    }
+    // Fall back to recursively unwrapping error property
+    if ('error' in error) {
+      return extractMessage(error.error);
     }
     if ('statusText' in error && typeof error.statusText === 'string') {
       return error.statusText;
