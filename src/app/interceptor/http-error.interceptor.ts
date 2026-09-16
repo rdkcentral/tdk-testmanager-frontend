@@ -79,7 +79,14 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
 
 function extractMessage(error: any): string {
   if (typeof error === 'string') {
-    return error;
+    // Try to parse as JSON first (handle serialized error objects)
+    try {
+      const parsed = JSON.parse(error);
+      return extractMessage(parsed); // Recurse with parsed object
+    } catch {
+      // If not valid JSON, return the string as-is
+      return error;
+    }
   } else if (typeof error === 'object' && error !== null) {
     // Prefer message property first (most useful for user feedback)
     if ('message' in error && typeof error.message === 'string') {

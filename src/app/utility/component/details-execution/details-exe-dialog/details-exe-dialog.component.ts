@@ -18,16 +18,46 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Inject, ViewChild, ViewEncapsulation } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  Inject,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
+import {
+  MAT_DIALOG_DATA,
+  MatDialog,
+  MatDialogRef,
+} from '@angular/material/dialog';
 import { MaterialModule } from '../../../../material/material.module';
-import { ApexChart, ApexDataLabels, ApexFill, ApexPlotOptions, ApexResponsive, ApexTitleSubtitle, ApexXAxis, ApexYAxis, ChartComponent, NgApexchartsModule } from 'ng-apexcharts';
+import {
+  ApexChart,
+  ApexDataLabels,
+  ApexFill,
+  ApexPlotOptions,
+  ApexResponsive,
+  ApexTitleSubtitle,
+  ApexXAxis,
+  ApexYAxis,
+  ChartComponent,
+  NgApexchartsModule,
+} from 'ng-apexcharts';
 import { FormsModule } from '@angular/forms';
 import { LivelogDialogComponent } from '../livelog-dialog/livelog-dialog.component';
 import { LogfileDialogComponent } from '../logfile-dialog/logfile-dialog.component';
 import { ExecutionService } from '../../../../services/execution.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { firstValueFrom, interval, startWith, Subject, switchMap, takeUntil } from 'rxjs';
+import {
+  firstValueFrom,
+  interval,
+  startWith,
+  Subject,
+  switchMap,
+  takeUntil,
+} from 'rxjs';
 import { AnalyzeDialogComponent } from '../../analyze-dialog/analyze-dialog.component';
 import { CrashlogfileDialogComponent } from '../crashlogfile-dialog/crashlogfile-dialog.component';
 import { saveAs } from 'file-saver';
@@ -42,9 +72,9 @@ export type ChartOptions = {
   chart: ApexChart;
   dataLabels: ApexDataLabels;
   responsive: ApexResponsive[];
-  legend: any | "";
-  labels: any | "";
-  colors: any | "";
+  legend: any | '';
+  labels: any | '';
+  colors: any | '';
   plotOptions: ApexPlotOptions;
   yaxis: ApexYAxis;
   xaxis: ApexXAxis;
@@ -134,7 +164,7 @@ export class DetailsExeDialogComponent {
     public analyzeDialog: MatDialog,
     private changeDetectorRef: ChangeDetectorRef,
     private sanitizer: DomSanitizer,
-    @Inject('APP_CONFIG') private config: any
+    @Inject('APP_CONFIG') private config: any,
   ) {
     this.executionIdLocalStroge = localStorage.getItem('executionId');
   }
@@ -148,7 +178,7 @@ export class DetailsExeDialogComponent {
    */
   ngOnInit(): void {
     this.loggedinUser = JSON.parse(
-      localStorage.getItem('loggedinUser') || '{}'
+      localStorage.getItem('loggedinUser') || '{}',
     );
     this.resultDetails();
     this.isAnalysisLoading = true;
@@ -164,7 +194,7 @@ export class DetailsExeDialogComponent {
     this.execName = this.data.executionName;
     this.getDeviceByCategory(
       this.data.category,
-      this.data.deviceThunderEnabled
+      this.data.deviceThunderEnabled,
     );
 
     this.dropdownSettings = {
@@ -188,7 +218,7 @@ export class DetailsExeDialogComponent {
   onDeviceSelect(item: any): void {
     if (
       !this.deviceListArray.some(
-        (selectedItem) => selectedItem.deviceName === item.deviceName
+        (selectedItem) => selectedItem.deviceName === item.deviceName,
       )
     ) {
       this.deviceListArray.push(item.deviceName);
@@ -204,7 +234,7 @@ export class DetailsExeDialogComponent {
    */
   onDeviceDeSelect(item: any): void {
     let filterDevice = this.deviceListArray.filter(
-      (name) => name != item.deviceName
+      (name) => name != item.deviceName,
     );
     this.deviceListArray = filterDevice;
   }
@@ -219,7 +249,7 @@ export class DetailsExeDialogComponent {
   onSelectAll(items: any[]): void {
     let devices = this.deviceList.filter(
       (item: any) =>
-        !this.deviceListArray.find((selected) => selected.id === item.id)
+        !this.deviceListArray.find((selected) => selected.id === item.id),
     );
     this.deviceListArray = devices.map((item: any) => item.deviceName);
   }
@@ -460,7 +490,7 @@ export class DetailsExeDialogComponent {
   toggleAll(event: Event): void {
     this.allChecked = (event.target as HTMLInputElement).checked;
     this.executionResultData.forEach(
-      (item: any) => (item.checked = this.allChecked)
+      (item: any) => (item.checked = this.allChecked),
     );
     this.updateSelectedDetails();
     this.updateFilteredData();
@@ -482,7 +512,7 @@ export class DetailsExeDialogComponent {
       event.target as HTMLInputElement
     ).checked;
     this.allChecked = this.executionResultData.every(
-      (item: any) => item.checked
+      (item: any) => item.checked,
     );
     this.updateSelectedDetails();
     this.updateScriptNames();
@@ -520,7 +550,7 @@ export class DetailsExeDialogComponent {
       this.filteredData = [...this.executionResultData];
     } else {
       this.filteredData = this.executionResultData.filter(
-        (item: any) => item.status === this.filterStatus
+        (item: any) => item.status === this.filterStatus,
       );
     }
     this.allChecked = this.filteredData.every((item) => item.checked);
@@ -543,7 +573,7 @@ export class DetailsExeDialogComponent {
    */
   updateSelectedDetails(): void {
     this.selectedDetails = this.executionResultData.filter(
-      (item: any) => item.checked
+      (item: any) => item.checked,
     );
   }
   /**
@@ -1020,7 +1050,7 @@ export class DetailsExeDialogComponent {
         },
         error: (err) => {
           // let errmsg = err.error;
-          this._snakebar.open(err, '', {
+          this._snakebar.open(err.message, '', {
             duration: 2000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',
@@ -1059,7 +1089,7 @@ export class DetailsExeDialogComponent {
       <td>${key.timeout}</td>
       <td class="passvalue">${key.successPercentage}</td>
     </tr>
-  `
+  `,
       )
       .join('');
 
@@ -1069,7 +1099,7 @@ export class DetailsExeDialogComponent {
         const scriptDetails = this.htmlDetails?.find(
           (detail: any) =>
             detail.executionResultID === script.executionResultID ||
-            detail.executionScriptName === script.name
+            detail.executionScriptName === script.name,
         );
 
         const executionLogs =
@@ -1089,8 +1119,8 @@ export class DetailsExeDialogComponent {
           <div><a href="${
             this.config.apiUrl
           }execution/getExecutionLogs?executionResultID=${
-          script.executionResultID
-        }" target="_blank" rel="noopener noreferrer" class="log-link">View Full Log</a></div>
+            script.executionResultID
+          }" target="_blank" rel="noopener noreferrer" class="log-link">View Full Log</a></div>
         </th>
         <td><div class="log-content">${executionLogs}</div></td>
       </tr>
@@ -1599,8 +1629,8 @@ export class DetailsExeDialogComponent {
                 <tr>
                   <th>🎯 Overall Result</th>
                   <td class="status-${this.data.result.toLowerCase()}">${
-      this.data.result
-    }</td>
+                    this.data.result
+                  }</td>
                 </tr>
               </tbody>
             </table>
@@ -1735,7 +1765,7 @@ export class DetailsExeDialogComponent {
           this.selectedDevices = [];
           this.getDeviceByCategory(
             this.data.category,
-            this.data.deviceThunderEnabled
+            this.data.deviceThunderEnabled,
           );
           this.changeDetectorRef.detectChanges();
           this._snakebar.open('Execution triggered', '', {

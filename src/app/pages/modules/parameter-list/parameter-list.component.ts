@@ -66,19 +66,19 @@ export class ParameterListComponent {
       field: 'parameterName',
       filter: 'agTextColumnFilter',
       sort: 'asc',
-       filterParams: {
-      textMatcher: ({ value, filterText }: any) => {
-        // Trim both the filter text and the value before comparison
-        const trimmedFilterText = filterText?.trim().toLowerCase() || '';
-        const trimmedValue = value?.trim().toLowerCase() || '';
-        
-        if (trimmedFilterText === '') {
-          return true;
-        }
-        
-        return trimmedValue.includes(trimmedFilterText);
-      },
-      debounceMs: 300,
+      filterParams: {
+        textMatcher: ({ value, filterText }: any) => {
+          // Trim both the filter text and the value before comparison
+          const trimmedFilterText = filterText?.trim().toLowerCase() || '';
+          const trimmedValue = value?.trim().toLowerCase() || '';
+
+          if (trimmedFilterText === '') {
+            return true;
+          }
+
+          return trimmedValue.includes(trimmedFilterText);
+        },
+        debounceMs: 300,
       },
     },
     {
@@ -142,7 +142,7 @@ export class ParameterListComponent {
     private authservice: AuthService,
     private _snakebar: MatSnackBar,
     private moduleservice: ModulesService,
-    public dialog: MatDialog
+    public dialog: MatDialog,
   ) {}
 
   /**
@@ -234,28 +234,29 @@ export class ParameterListComponent {
           this.rowData = Array.isArray(data?.data) ? data.data : [];
           this.isNoDataVisible = this.rowData.length === 0;
           // After data is loaded, restore pagination state if available
-        setTimeout(() => {
-          const savedState = this.moduleservice.getPaginationState("parameters");
-          if (savedState && this.gridApi) {
-           // Set the page size first
-            this.gridApi.setGridOption(
-              'paginationPageSize',
-              savedState.pageSize
-            );
+          setTimeout(() => {
+            const savedState =
+              this.moduleservice.getPaginationState('parameters');
+            if (savedState && this.gridApi) {
+              // Set the page size first
+              this.gridApi.setGridOption(
+                'paginationPageSize',
+                savedState.pageSize,
+              );
 
-            // Then navigate to the saved page
-            setTimeout(() => {
-              this.gridApi.paginationGoToPage(savedState.currentPage);
-              // Clear the restoration flag after successful restoration
-              this.moduleservice.clearRestorationFlag("parameters");
-            }, 100);
-          }
-        }, 100);
+              // Then navigate to the saved page
+              setTimeout(() => {
+                this.gridApi.paginationGoToPage(savedState.currentPage);
+                // Clear the restoration flag after successful restoration
+                this.moduleservice.clearRestorationFlag('parameters');
+              }, 100);
+            }
+          }, 100);
           this.showLoader = false;
         },
         error: (err) => {
           this.showLoader = false;
-          this._snakebar.open(err, '', {
+          this._snakebar.open(err.message, '', {
             duration: 2000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',
@@ -272,7 +273,7 @@ export class ParameterListComponent {
   onGridReady(params: GridReadyEvent<any>): void {
     this.gridApi = params.api;
     // Only apply screen-based sizing if no saved state exists
-    const savedState = this.moduleservice.getPaginationState("parameters");
+    const savedState = this.moduleservice.getPaginationState('parameters');
     if (!savedState) {
       this.adjustPaginationToScreenSize();
     }
@@ -315,7 +316,7 @@ export class ParameterListComponent {
       this.moduleservice.savePaginationState(
         'parameters',
         currentPage,
-        pageSize
+        pageSize,
       );
     }
     this.router.navigate(['/configure/parameter-create']);
@@ -332,7 +333,7 @@ export class ParameterListComponent {
       this.moduleservice.savePaginationState(
         'parameters',
         currentPage,
-        pageSize
+        pageSize,
       );
     }
     localStorage.setItem('parameters', JSON.stringify(parameter));
@@ -349,7 +350,7 @@ export class ParameterListComponent {
         this.moduleservice.deleteParameter(data.id).subscribe({
           next: (res) => {
             this.rowData = this.rowData.filter(
-              (row: any) => row.id !== data.id
+              (row: any) => row.id !== data.id,
             );
             this.rowData = [...this.rowData];
             this._snakebar.open(res.message, '', {
