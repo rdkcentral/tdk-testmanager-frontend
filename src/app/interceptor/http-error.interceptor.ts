@@ -56,10 +56,11 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       // Preserve original HTTP response metadata and backend properties while adding normalized message
-      // Special case: return Blobs as-is to preserve instanceof check for consumers
+      // Special case: return Blobs as-is to preserve instanceof check for consumers,
+      // but attach the normalized message so consumers can read err.message
       const errorObject: any =
         error.error instanceof Blob
-          ? error.error
+          ? Object.assign(error.error, { message: message }) // Add message property to Blob while preserving instanceof
           : {
               ...(isObject(error.error) ? error.error : { error: error.error }), // Spread backend properties (includes nested error field); wrap non-objects
               status: error.status, // HTTP status code
