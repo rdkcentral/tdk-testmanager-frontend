@@ -56,15 +56,18 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       // Preserve original HTTP response metadata and backend properties while adding normalized message
-      const errorObject: any = {
-        ...(isObject(error.error) ? error.error : {}), // Spread backend properties (data.logs, etc.)
-        status: error.status, // HTTP status code
-        statusText: error.statusText, // HTTP status text
-        headers: error.headers, // HTTP headers
-        url: error.url, // Request URL
-        error: error.error, // Original backend response (for JSON.parse)
-        message: message, // Normalized message (for display)
-      };
+      // Special case: return Blobs as-is to preserve instanceof check for consumers
+      const errorObject: any =
+        error.error instanceof Blob
+          ? error.error
+          : {
+              ...(isObject(error.error) ? error.error : { error: error.error }), // Spread backend properties (includes nested error field); wrap non-objects
+              status: error.status, // HTTP status code
+              statusText: error.statusText, // HTTP status text
+              headers: error.headers, // HTTP headers
+              url: error.url, // Request URL
+              message: message, // Normalized message (for display)
+            };
 
       // snackBar.open(message || 'An error occurred', 'Close', {
       //   duration: 2500,
