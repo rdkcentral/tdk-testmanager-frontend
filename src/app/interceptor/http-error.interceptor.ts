@@ -31,17 +31,7 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       if (error instanceof HttpErrorResponse) {
         if (error.status == 0) {
           message = 'Network error: Please check your internet connection.';
-        } else if (error.status == 404) {
-          message = extractMessage(error.error);
-        } else if (error.status == 401) {
-          message = extractMessage(error.error);
-        } else if (error.status == 400) {
-          message = extractMessage(error.error);
-        } else if (error.status == 409) {
-          message = extractMessage(error.error);
-        } else if (error.status == 500) {
-          message = extractMessage(error.error);
-        } else if (error.status == 503) {
+        } else {
           message = extractMessage(error.error);
         }
       } else if (isProgressEventError(error)) {
@@ -55,20 +45,25 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         console.error('Unknown Error:', error);
       }
 
-      // Preserve original HTTP response metadata and backend properties while adding normalized message
-      // Special case: return Blobs as-is to preserve instanceof check for consumers,
-      // but attach the normalized message so consumers can read err.message
-      const errorObject: any =
-        error.error instanceof Blob
-          ? Object.assign(error.error, { message: message }) // Add message property to Blob while preserving instanceof
-          : {
-              ...(isObject(error.error) ? error.error : { error: error.error }), // Spread backend properties (includes nested error field); wrap non-objects
-              status: error.status, // HTTP status code
-              statusText: error.statusText, // HTTP status text
-              headers: error.headers, // HTTP headers
-              url: error.url, // Request URL
-              message: message, // Normalized message (for display)
-            };
+      // Preserve original HTTP response metadata and normalized message for all response types
+      // Set error property to the response body (Blob, object, or string) so consumers can access err.error
+      const errorObject: any = {
+        error: error.error, // The raw response body (Blob for binary, object for JSON, string otherwise)
+        status: error.status, // HTTP status code
+        statusText: error.statusText, // HTTP status text
+        headers: error.headers, // HTTP headers
+        url: error.url, // Request URL
+        message: message, // Normalized message (for display)
+      };
+
+      // For non-Blob object responses, merge in backend properties to preserve nested field access
+      if (isObject(error.error) && !(error.error instanceof Blob)) {
+        for (const key in error.error) {
+          if (!(key in errorObject)) {
+            errorObject[key] = (error.error as any)[key];
+          }
+        }
+      }
 
       // snackBar.open(message || 'An error occurred', 'Close', {
       //   duration: 2500,

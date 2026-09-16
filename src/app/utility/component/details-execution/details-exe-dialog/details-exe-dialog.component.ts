@@ -1052,14 +1052,11 @@ export class DetailsExeDialogComponent {
           let errorMessage = 'Failed to download script';
 
           // Decode blob errors (for failed blob downloads)
-          if (err instanceof Blob) {
-            // First, try to use the normalized message attached by the interceptor
-            if ((err as any).message) {
-              errorMessage = (err as any).message;
-            } else {
-              // If no normalized message, try to decode the blob body
+          if (err.error instanceof Blob) {
+            // First, try to decode the blob body to get the actual backend error
+            try {
+              const text = await err.error.text();
               try {
-                const text = await err.text();
                 const errorObj = JSON.parse(text);
                 // Use message if present, or recurse into error field
                 errorMessage =
@@ -1068,7 +1065,13 @@ export class DetailsExeDialogComponent {
                     ? errorObj.error
                     : errorMessage);
               } catch {
-                // If parsing fails, keep the fallback
+                // JSON parsing failed; use the decoded text as-is if available
+                errorMessage = text || errorMessage;
+              }
+            } catch {
+              // Blob decode failed; use normalized message if it's not generic
+              if (err.message && err.message !== 'An unknown error occurred.') {
+                errorMessage = err.message;
               }
             }
           } else if (err.message) {
