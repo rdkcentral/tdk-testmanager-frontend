@@ -1048,9 +1048,24 @@ export class DetailsExeDialogComponent {
           });
           saveAs(blob, filename);
         },
-        error: (err) => {
-          // let errmsg = err.error;
-          this._snakebar.open(err.message, '', {
+        error: async (err) => {
+          let errorMessage = 'Failed to download script';
+
+          // Decode blob errors (for failed blob downloads)
+          if (err instanceof Blob) {
+            try {
+              const text = await err.text();
+              const errorObj = JSON.parse(text);
+              errorMessage = errorObj.message || errorMessage;
+            } catch {
+              // If parsing fails, fall back to property read
+              errorMessage = (err as any).message || errorMessage;
+            }
+          } else if (err.message) {
+            errorMessage = err.message;
+          }
+
+          this._snakebar.open(errorMessage, '', {
             duration: 2000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',
