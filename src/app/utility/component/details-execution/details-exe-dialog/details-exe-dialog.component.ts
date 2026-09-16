@@ -1053,13 +1053,23 @@ export class DetailsExeDialogComponent {
 
           // Decode blob errors (for failed blob downloads)
           if (err instanceof Blob) {
-            try {
-              const text = await err.text();
-              const errorObj = JSON.parse(text);
-              errorMessage = errorObj.message || errorMessage;
-            } catch {
-              // If parsing fails, fall back to property read
-              errorMessage = (err as any).message || errorMessage;
+            // First, try to use the normalized message attached by the interceptor
+            if ((err as any).message) {
+              errorMessage = (err as any).message;
+            } else {
+              // If no normalized message, try to decode the blob body
+              try {
+                const text = await err.text();
+                const errorObj = JSON.parse(text);
+                // Use message if present, or recurse into error field
+                errorMessage =
+                  errorObj.message ||
+                  (typeof errorObj.error === 'string'
+                    ? errorObj.error
+                    : errorMessage);
+              } catch {
+                // If parsing fails, keep the fallback
+              }
             }
           } else if (err.message) {
             errorMessage = err.message;
