@@ -26,7 +26,6 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar);
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      let errorObject: any = error.error || {};
       let message = 'An unknown error occurred.';
 
       if (error instanceof HttpErrorResponse) {
@@ -56,11 +55,10 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
         console.error('Unknown Error:', error);
       }
 
-      // Ensure error object has normalized message property
-      if (!isObject(errorObject)) {
-        errorObject = {};
-      }
-      errorObject.message = message;
+      // Preserve original error fields while adding normalized message
+      const errorObject: any = isObject(error.error)
+        ? { ...error.error, message: message } // Spread backend properties, add normalized message
+        : { error: error.error, message: message }; // If error.error is string/primitive, wrap it
 
       // snackBar.open(message || 'An error occurred', 'Close', {
       //   duration: 2500,
