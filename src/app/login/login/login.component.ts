@@ -19,7 +19,14 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 import { CommonModule, Location } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FooterComponent } from '../../layout/footer/footer.component';
 import { RegisterService } from '../../services/register.service';
@@ -31,12 +38,18 @@ import { AuthService } from '../../auth/auth.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterLink, FooterComponent, HttpClientModule, MaterialModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    RouterLink,
+    FooterComponent,
+    HttpClientModule,
+    MaterialModule,
+  ],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrl: './login.component.css',
 })
 export class LoginComponent implements OnInit {
-
   /**
    * Represents the isSigninVisible of the application.
    */
@@ -117,22 +130,22 @@ export class LoginComponent implements OnInit {
    * Represents the allGroupName of the application.
    */
   allGroupName: any = [];
-  categorySelect!:string;
+  categorySelect!: string;
   backendErrors: { [key: string]: string } = {};
-/**
+  /**
    * Represents the showNewPassword of the application.
    */
-public showPasswordOnPress: boolean = true;
- 
-/**
- * Represents the showViewPasswordOnPress of the application.
- */
-public showViewPasswordOnPress: boolean = true;
+  public showPasswordOnPress: boolean = true;
 
-/**
- * Represents the showConfirmPasswordOnPress of the application.
- */
-public showConfirmPasswordOnPress: boolean = true;
+  /**
+   * Represents the showViewPasswordOnPress of the application.
+   */
+  public showViewPasswordOnPress: boolean = true;
+
+  /**
+   * Represents the showConfirmPasswordOnPress of the application.
+   */
+  public showConfirmPasswordOnPress: boolean = true;
 
   /**
    * Constructor for LoginComponent.
@@ -144,40 +157,50 @@ public showConfirmPasswordOnPress: boolean = true;
    * @param location Location service for navigation state.
    * @param _snakebar MatSnackBar instance for notifications.
    */
-  constructor(private fb: FormBuilder, private router: Router,
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
     private registerservice: RegisterService,
     private loginservice: LoginService,
     private authservice: AuthService,
-    private location : Location,
+    private location: Location,
     private _snakebar: MatSnackBar,
-  ) { }
+  ) {}
 
   /**
    * Initializes the component and sets up forms and event listeners.
    */
   ngOnInit(): void {
-
     this.signinForm = this.fb.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required]]
-    })
+      password: ['', [Validators.required]],
+    });
 
     this.ldapForm = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(4)]],
-      password: ['', [Validators.required, Validators.minLength(4)]]
-    })
+      password: ['', [Validators.required, Validators.minLength(4)]],
+    });
 
-    let emailregex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    this.registerForm = this.fb.group({
-      regusername: ['', [Validators.required, Validators.minLength(3)]],
-      regemail: ['', [Validators.pattern(emailregex)]],
-      displayname: ['', [Validators.required, this.noSpacesValidator]],
-      regpassword: ['', [Validators.required, Validators.minLength(6)]],
-      retypepassword: ['', Validators.required],
-      preferCategoty:['', [Validators.required]]
-    }, { validators: this.passwordMatchValidator('regpassword', 'retypepassword') })
+    let emailregex: RegExp =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    this.registerForm = this.fb.group(
+      {
+        regusername: ['', [Validators.required, Validators.minLength(3)]],
+        regemail: ['', [Validators.pattern(emailregex)]],
+        displayname: ['', [Validators.required, this.noSpacesValidator]],
+        regpassword: ['', [Validators.required, Validators.minLength(6)]],
+        retypepassword: ['', Validators.required],
+        preferCategoty: ['', [Validators.required]],
+      },
+      {
+        validators: this.passwordMatchValidator(
+          'regpassword',
+          'retypepassword',
+        ),
+      },
+    );
 
-    this.loginservice.getuserGroup().subscribe(res => {
+    this.loginservice.getuserGroup().subscribe((res) => {
       this.allGroupName = res.data;
     });
     this.registerForm.get('regusername')?.valueChanges.subscribe((value) => {
@@ -207,10 +230,12 @@ public showConfirmPasswordOnPress: boolean = true;
     this.registerForm.get('regemail')?.valueChanges.subscribe((value) => {
       const trimmedValue = value?.trim();
       if (value && value !== trimmedValue) {
-        this.registerForm.get('regemail')?.setValue(trimmedValue, { emitEvent: false });
+        this.registerForm
+          .get('regemail')
+          ?.setValue(trimmedValue, { emitEvent: false });
       }
     });
-    this.displayname.valueChanges.subscribe(value => {
+    this.displayname.valueChanges.subscribe((value) => {
       if (value && value.startsWith(' ')) {
         this.displayname.setValue(value.trimStart(), { emitEvent: false });
       }
@@ -231,15 +256,15 @@ public showConfirmPasswordOnPress: boolean = true;
         });
       }
     });
-    if(this.authservice.isLoggednIn() && this.router.url === '/login'){
-      this.router.navigate(["/execution"]);
+    if (this.authservice.isLoggednIn() && this.router.url === '/login') {
+      this.router.navigate(['/execution']);
     }
-    
-    window.addEventListener('storage',(event)=>{
-      if(event.key === 'logout'){
-        this.router.navigate(["/login"]);
+
+    window.addEventListener('storage', (event) => {
+      if (event.key === 'logout') {
+        this.router.navigate(['/login']);
       }
-    })
+    });
   }
 
   /**
@@ -266,30 +291,36 @@ public showConfirmPasswordOnPress: boolean = true;
   passwordMatchValidator(regpassword: any, retypepassword: any) {
     return (formGroup: FormGroup) => {
       let password = formGroup['controls'][regpassword] as AbstractControl;
-      let confirmPassword = formGroup['controls'][retypepassword] as AbstractControl;
-      if (confirmPassword.errors && !confirmPassword.errors['passwordMatchValidator']) {
-        return
+      let confirmPassword = formGroup['controls'][
+        retypepassword
+      ] as AbstractControl;
+      if (
+        confirmPassword.errors &&
+        !confirmPassword.errors['passwordMatchValidator']
+      ) {
+        return;
       }
       if (password.value !== confirmPassword.value) {
-        confirmPassword.setErrors({ passwordMatchValidator: true })
+        confirmPassword.setErrors({ passwordMatchValidator: true });
       } else {
-        confirmPassword.setErrors(null)
+        confirmPassword.setErrors(null);
       }
-    }
+    };
   }
 
   /**
    * Get the controls of the register form.
    * @returns The controls of the register form.
    */
-  get f() { return this.registerForm.controls; }
-
+  get f() {
+    return this.registerForm.controls;
+  }
 
   /**
    * Signs in the user.
    */
-  signIn():void {
-    this.isSigninVisible = false
+  signIn(): void {
+    this.isSigninVisible = false;
     this.registerVisible = false;
     this.signinVisible = true;
   }
@@ -298,8 +329,8 @@ public showConfirmPasswordOnPress: boolean = true;
    * Registers the user.
    * Sets the visibility of the signin and register components accordingly.
    */
-  register() :void{
-    this.isSigninVisible = true
+  register(): void {
+    this.isSigninVisible = true;
     this.registerVisible = true;
     this.signinVisible = false;
   }
@@ -307,7 +338,7 @@ public showConfirmPasswordOnPress: boolean = true;
   /**
    * Change the category click on radio button.
    */
-  changeCategory(event:any):void{
+  changeCategory(event: any): void {
     let val = event.target.value;
     this.categorySelect = val;
   }
@@ -336,30 +367,27 @@ public showConfirmPasswordOnPress: boolean = true;
     }
   }
 
-
   /**
    * Handles the event when the user is checked.
    * @param e - The event object.
    */
-  isUserchecked(e: any) :void{
+  isUserchecked(e: any): void {
     if (e.target.checked) {
       this.signinVisible = false;
       this.ldapScreenVisible = true;
     }
   }
 
-
   /**
    * Handles the event when the LDAP checkbox is checked.
    * @param e - The event object.
    */
-  isldapChecked(e: any) :void{
+  isldapChecked(e: any): void {
     if (e.target.checked) {
       this.signinVisible = true;
       this.ldapScreenVisible = false;
     }
   }
-
 
   /**
    * Handles the form submission when the user clicks the submit button.
@@ -370,36 +398,56 @@ public showConfirmPasswordOnPress: boolean = true;
   onSubmit(): void {
     this.submitted = true;
     if (this.signinForm.invalid) {
-      return
+      return;
     } else {
       let credential = {
         username: this.signinForm.value.username,
-        password: this.signinForm.value.password
-      }
+        password: this.signinForm.value.password,
+      };
       this.loginservice.userlogin(credential).subscribe({
         next: (res: any) => {
           let loggedinUser = res.data;
           this.authservice.sendToken(loggedinUser.token);
-          this.authservice.setPrivileges(loggedinUser.userRoleName)
-          localStorage.setItem("loggedinUser", JSON.stringify(loggedinUser));
-          this.router.navigate(["/execution"]);
+          this.authservice.setPrivileges(loggedinUser.userRoleName);
+          localStorage.setItem('loggedinUser', JSON.stringify(loggedinUser));
+          this.router.navigate(['/execution']);
           this.location.replaceState('/execution');
         },
         error: (err) => {
-          this.errorMessage = err.message;
+          let errorMsg = 'An error occurred';
+          // Try direct property on error object first
+          if (err.message) {
+            errorMsg = err.message;
+          }
+          // Try error.error.message
+          else if (err.error?.message) {
+            errorMsg = err.error.message;
+          }
+          // Try error.error (if it's a string with the message)
+          else if (typeof err.error === 'string') {
+            try {
+              const parsed = JSON.parse(err.error);
+              errorMsg = parsed.message || parsed.error || err.error;
+            } catch (parseErr) {
+              errorMsg = err.error;
+            }
+          }
+          // Try statusText as fallback
+          else if (err.statusText) {
+            errorMsg = err.statusText;
+          }
+
+          this.errorMessage = errorMsg;
           if (this.errorMessage) {
             this.showhideErr = true;
             setTimeout(() => {
               this.showhideErr = false;
             }, 3500);
           }
-        }
-
-      })
+        },
+      });
     }
-
   }
-
 
   /**
    * Handles the submission of the LDAP form.
@@ -412,14 +460,13 @@ public showConfirmPasswordOnPress: boolean = true;
     }
   }
 
-
   /**
    * Handles the registration process when the user clicks on the register button.
    */
   onRegister(): void {
     this.regSubmitted = true;
     if (this.registerForm.invalid) {
-      return
+      return;
     } else {
       let signUpData = {
         userName: this.registerForm.value.regusername,
@@ -427,8 +474,8 @@ public showConfirmPasswordOnPress: boolean = true;
         userDisplayName: this.registerForm.value.displayname,
         password: this.registerForm.value.regpassword,
         userGroupName: this.registerForm.value.usergroup,
-        userCategory:this.categorySelect
-      }
+        userCategory: this.categorySelect,
+      };
       this.registerservice.registerUser(signUpData).subscribe({
         next: (res: any) => {
           this.registerSuccess = res.message;
@@ -438,56 +485,52 @@ public showConfirmPasswordOnPress: boolean = true;
         },
         error: (err) => {
           //Check for the errors that are already parsed
-          let errorMessage = err.message;
-          this.backendErrors = this.parseBackendErrors(errorMessage);      
+          let errorMessage = err;
+          this.backendErrors = this.parseBackendErrors(errorMessage);
           setTimeout(() => {
             this.backendErrors = {};
           }, 2000);
-        }
-      })
+        },
+      });
     }
   }
 
   /**
    * Handles backend error for username and email is already exist.
-   */  
+   */
   parseBackendErrors(message: string): { [key: string]: string } {
     const errors: { [key: string]: string } = {};
-    if (message.includes("User Name")) {
+    if (message.includes('User Name')) {
       errors['regusername'] = message;
     }
 
-    if (message.includes("Email")) {
+    if (message.includes('Email')) {
       errors['regemail'] = message;
     }
     return errors;
   }
 
-
-/**
+  /**
    * Method to view the password.
    */
 
-viewPassword(): void {
-  this.showPasswordOnPress = !this.showPasswordOnPress;
-}
+  viewPassword(): void {
+    this.showPasswordOnPress = !this.showPasswordOnPress;
+  }
 
+  /**
+   * Method to view the password.
+   */
 
-/**
- * Method to view the password.
- */
+  viewRegisterPassword(): void {
+    this.showViewPasswordOnPress = !this.showViewPasswordOnPress;
+  }
 
-viewRegisterPassword(): void {
-  this.showViewPasswordOnPress = !this.showViewPasswordOnPress;
-}
+  /**
+   * Method to view the password.
+   */
 
-
-/**
- * Method to view the password.
- */
-
-viewConfirmPassword(): void{
-  this.showConfirmPasswordOnPress = !this.showConfirmPasswordOnPress;
-}
-
+  viewConfirmPassword(): void {
+    this.showConfirmPasswordOnPress = !this.showConfirmPasswordOnPress;
+  }
 }
