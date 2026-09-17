@@ -1609,22 +1609,12 @@ export class ScriptListComponent {
         error: async (err) => {
           let errorMessage = `Failed to download custom test suite ${format.toUpperCase()} file`;
 
-          if (err.error instanceof Blob) {
-            try {
-              const text = await err.error.text();
-              try {
-                const errorObj = JSON.parse(text);
-                errorMessage = errorObj.message || errorMessage;
-              } catch {
-                // JSON parsing failed; use the decoded text as-is if available
-                errorMessage = text || errorMessage;
-              }
-            } catch {
-              // Blob decode failed; use normalized message if it's not generic
-              if (err.message && err.message !== 'An unknown error occurred.') {
-                errorMessage = err.message;
-              }
-            }
+          if (err instanceof Blob) {
+            const text = await err.text();
+            const errorObj = JSON.parse(text);
+            errorMessage = errorObj.message || errorMessage;
+          } else if (err.message) {
+            errorMessage = err.message;
           } else if (err.message) {
             errorMessage = err.message;
           }
@@ -1857,22 +1847,12 @@ export class ScriptListComponent {
       error: async (err) => {
         let errorMessage = `Failed to download scripts of ${format.toUpperCase()} file`;
 
-        if (err.error instanceof Blob) {
-          try {
-            const text = await err.error.text();
-            try {
-              const errorObj = JSON.parse(text);
-              errorMessage = errorObj.message || errorMessage;
-            } catch {
-              // JSON parsing failed; use the decoded text as-is if available
-              errorMessage = text || errorMessage;
-            }
-          } catch {
-            // Blob decode failed; use normalized message if it's not generic
-            if (err.message && err.message !== 'An unknown error occurred.') {
-              errorMessage = err.message;
-            }
-          }
+        if (err instanceof Blob) {
+          const text = await err.text();
+          const errorObj = JSON.parse(text);
+          errorMessage = errorObj.message || errorMessage;
+        } else if (err.message) {
+          errorMessage = err.message;
         } else if (err.message) {
           errorMessage = err.message;
         }

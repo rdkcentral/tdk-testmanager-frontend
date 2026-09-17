@@ -1048,37 +1048,9 @@ export class DetailsExeDialogComponent {
           });
           saveAs(blob, filename);
         },
-        error: async (err) => {
-          let errorMessage = 'Failed to download script';
-
-          // Decode blob errors (for failed blob downloads)
-          if (err.error instanceof Blob) {
-            // First, try to decode the blob body to get the actual backend error
-            try {
-              const text = await err.error.text();
-              try {
-                const errorObj = JSON.parse(text);
-                // Use message if present, or recurse into error field
-                errorMessage =
-                  errorObj.message ||
-                  (typeof errorObj.error === 'string'
-                    ? errorObj.error
-                    : errorMessage);
-              } catch {
-                // JSON parsing failed; use the decoded text as-is if available
-                errorMessage = text || errorMessage;
-              }
-            } catch {
-              // Blob decode failed; use normalized message if it's not generic
-              if (err.message && err.message !== 'An unknown error occurred.') {
-                errorMessage = err.message;
-              }
-            }
-          } else if (err.message) {
-            errorMessage = err.message;
-          }
-
-          this._snakebar.open(errorMessage, '', {
+        error: (err) => {
+          // let errmsg = err.error;
+          this._snakebar.open(err, '', {
             duration: 2000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',

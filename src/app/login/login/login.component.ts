@@ -413,8 +413,10 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/execution']);
           this.location.replaceState('/execution');
         },
-        error: (err: any) => {
-          this.errorMessage = err?.message || 'An unknown error occurred.';
+        error: (err) => {
+          // Extract message from the error response body
+          this.errorMessage =
+            err.error?.message || err.statusText || 'An error occurred';
           if (this.errorMessage) {
             this.showhideErr = true;
             setTimeout(() => {
@@ -460,9 +462,9 @@ export class LoginComponent implements OnInit {
           this.showHideRegForm = false;
           this.regSubmitted = false;
         },
-        error: (err: any) => {
+        error: (err) => {
           //Check for the errors that are already parsed
-          let errorMessage = err?.message || 'An unknown error occurred.';
+          let errorMessage = err;
           this.backendErrors = this.parseBackendErrors(errorMessage);
           setTimeout(() => {
             this.backendErrors = {};
@@ -477,10 +479,6 @@ export class LoginComponent implements OnInit {
    */
   parseBackendErrors(message: string): { [key: string]: string } {
     const errors: { [key: string]: string } = {};
-    if (!message) {
-      return errors;
-    }
-
     if (message.includes('User Name')) {
       errors['regusername'] = message;
     }
