@@ -414,9 +414,30 @@ export class LoginComponent implements OnInit {
           this.location.replaceState('/execution');
         },
         error: (err) => {
-          // Extract message from the error response body
-          this.errorMessage =
-            err.error?.message || err.statusText || 'An error occurred';
+          let errorMsg = 'An error occurred';
+          // Try direct property on error object first
+          if (err.message) {
+            errorMsg = err.message;
+          }
+          // Try error.error.message
+          else if (err.error?.message) {
+            errorMsg = err.error.message;
+          }
+          // Try error.error (if it's a string with the message)
+          else if (typeof err.error === 'string') {
+            try {
+              const parsed = JSON.parse(err.error);
+              errorMsg = parsed.message || parsed.error || err.error;
+            } catch (parseErr) {
+              errorMsg = err.error;
+            }
+          }
+          // Try statusText as fallback
+          else if (err.statusText) {
+            errorMsg = err.statusText;
+          }
+
+          this.errorMessage = errorMsg;
           if (this.errorMessage) {
             this.showhideErr = true;
             setTimeout(() => {
