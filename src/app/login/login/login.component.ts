@@ -485,7 +485,7 @@ export class LoginComponent implements OnInit {
         },
         error: (err) => {
           //Check for the errors that are already parsed
-          let errorMessage = err;
+          let errorMessage = err.message;
           this.backendErrors = this.parseBackendErrors(errorMessage);
           setTimeout(() => {
             this.backendErrors = {};
