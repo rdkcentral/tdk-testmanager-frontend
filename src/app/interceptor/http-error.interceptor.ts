@@ -26,39 +26,44 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const snackBar = inject(MatSnackBar);
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+
       let errorMessage = 'An unknown error occurred.';
 
       if (error instanceof HttpErrorResponse) {
-        if (error.status == 0) {
-          errorMessage =
-            'Network error: Please check your internet connection.';
+        if(error.status == 0){
+          errorMessage = 'Network error: Please check your internet connection.';
         }
-        if (error.status == 404) {
-          errorMessage = error.error;
+        if(error.status == 404){
+          errorMessage = error.error
         }
-        if (error.status == 401) {
-          errorMessage = error.error;
+        if(error.status == 401){          
+          errorMessage =error.error
         }
-        if (error.status == 400) {
-          errorMessage = error.error;
+        if(error.status == 400){
+          errorMessage =error.error
         }
-        if (error.status == 409) {
-          errorMessage = error.error;
+        if(error.status == 409){
+          errorMessage =error.error
         }
 
-        if (error.status == 500) {
-          errorMessage = error.error;
+        if(error.status == 500){
+          errorMessage = error.error   
+
         }
-        if (error.status == 503) {
-          errorMessage = error.error;
+       if(error.status == 503){
+          errorMessage = error.error   
+
         }
+
       } else if (isProgressEventError(error)) {
-        errorMessage =
-          'Network error: Please check your internet connection or the backend server may be down.';
+        errorMessage = 'Network error: Please check your internet connection or the backend server may be down.';
+
       } else if (isObject(error) && 'error' in error) {
         errorMessage = extractMessage(error);
+
       } else if (isObject(error) && 'message' in error) {
         errorMessage = extractMessage(error);
+
       } else {
         console.error('Unknown Error:', error);
       }
@@ -68,8 +73,8 @@ export const httpErrorInterceptor: HttpInterceptorFn = (req, next) => {
       //   horizontalPosition: 'end',
       //   verticalPosition: 'top'
       // });
-      return throwError(() => errorMessage);
-    }),
+      return throwError(() =>errorMessage);
+    })
   );
 };
 
@@ -83,17 +88,13 @@ function extractMessage(error: any): string {
   }
   return 'An unknown error occurred.';
 }
+ 
 
-function isProgressEventError(
-  error: unknown,
-): error is { error: ProgressEvent } {
-  return (
-    isObject(error) &&
-    'error' in error &&
-    error['error'] instanceof ProgressEvent
-  );
+ 
+function isProgressEventError(error: unknown): error is { error: ProgressEvent } {
+  return isObject(error) && 'error' in error && error['error'] instanceof ProgressEvent;
 }
-
+ 
 function isObject(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
