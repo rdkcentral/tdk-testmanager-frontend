@@ -64,17 +64,22 @@ export class PackageManagerService {
   }
 
   /**
-   * Installs a package on a specified device.
+   * Starts an asynchronous package installation job on a specified device.
+   * The backend responds immediately (HTTP 202) with a `jobId` that must be
+   * polled via `getInstallStatus` to track progress and retrieve the result.
    * @param type The type of the package to be installed.
    * @param device The target device where the package will be installed.
    * @param packageName The name of the package to be installed.
-   * @returns Observable that emits the response of the installation request.
+   * @returns Observable that emits the job creation response `{ jobId, phase, status, result }`.
    */
   installPackages(type:string,device:string,packageName:string): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-    return this.http.post(`${this.config.apiUrl}/api/v1/packagemanager/installPackage?type=${type}&device=${device}&packageName=${packageName }`,{}, { headers });
+     const body = new URLSearchParams({ type, device, packageName });
+    return this.http.post(`${this.config.apiUrl}api/v1/packagemanager/installPackage`, body.toString(), {
+      headers: headers.set('Content-Type', 'application/x-www-form-urlencoded'),
+    });
   }
 
   /**
@@ -91,7 +96,11 @@ export class PackageManagerService {
     const formData: FormData = new FormData();
     formData.append('uploadFile', uploadFile, uploadFile.name);
 
-    return this.http.post(`${this.config.apiUrl}/api/v1/packagemanager/uploadPackage?type=${type}&device=${device}`,formData, { headers });
+      return this.http.post(`${this.config.apiUrl}api/v1/packagemanager/uploadPackage?type=${type}&device=${device}`,formData, {
+      headers,
+      reportProgress: true,
+      observe: 'events',
+    });
   }
 
   /**
@@ -108,7 +117,42 @@ export class PackageManagerService {
     const formData: FormData = new FormData();
     formData.append('uploadFile', uploadFile, uploadFile.name);
 
-    return this.http.post(`${this.config.apiUrl}/api/v1/packagemanager/uploadGenericPackage?type=${type}&device=${device}`,formData, { headers });
+     return this.http.post(`${this.config.apiUrl}api/v1/packagemanager/uploadGenericPackage?type=${type}&device=${device}`,formData, {
+      headers,
+      reportProgress: true,
+      observe: 'events',
+    });
+  }
+
+  /**
+   * Checks whether a Generic Package is already present on the server for the
+   * given package type and device.
+   * @param type The type of the package (e.g. TDK / VTS).
+   * @param device The device for which the check is performed.
+   * @returns Observable emitting the backend response. The service consumer
+   *          should read the boolean flag (typically `res.data` or
+   *          `res.isPresent`) from the response.
+   */
+  isGenericPackagePresent(type: string, device: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': this.authService.getApiToken()
+    });
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/packagemanager/isGenericPackagePresent?type=${type}&device=${device}`,
+      { headers }
+    );
+  }
+
+  /**
+   * Polls the status of an in-progress or completed package installation job.
+   * @param jobId The job identifier returned by `installPackages`.
+   * @returns Observable that emits the job status response `{ jobId, phase, status, result }`.
+   */
+  getInstallStatus(jobId: string): Observable<any> {
+    const headers = new HttpHeaders({
+      'Authorization': this.authService.getApiToken()
+    });
+    return this.http.get(`${this.config.apiUrl}api/v1/packagemanager/installPackage/status?jobId=${jobId}`, { headers });
   }
 
 }

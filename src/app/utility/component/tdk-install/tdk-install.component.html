@@ -14,304 +14,356 @@ limitations under the License.
 -->
 
 <!-- Container for the package manager UI -->
-<div class="container">
+<div class="container  pm-container">
   <!-- Row for main content -->
   <div class="row mt-2">
     <!-- Main column for content -->
     <div class="col-md-12">
-      <h1 class="view-title">Package Manager</h1>
+      <!-- Header row: centered title and device name -->
+      <div class="pm-header">
+        <h1 class="view-title pm-title">Package Manager</h1>
+        <span class="device-chip" *ngIf="deviceName">{{ deviceName }}</span>
+      </div>
       <!-- Section for ticket and tab group -->
       <div class="ticket-sec mt-2">
-        <mat-tab-group
-          animationDuration="0ms"
-          mat-align-tabs="start"
-          (selectedTabChange)="onTabClick($event)"
-        >
+        <mat-tab-group animationDuration="0ms" mat-align-tabs="start" (selectedTabChange)="onTabClick($event)">
           <mat-tab label="TDK">
-            <!-- Column for TDK tab content -->
-            <div class="col-md-12 mt-3">
-              <span class="package-title">
-                <span class="sub-titel">{{ selectedPackage }}</span> Package
-                installation for <span class="sub-titel">{{ data }}</span>
-              </span>
-
-              <!-- Section for execution drop buttons -->
-              <div class="execution-drop mt-3">
-                <button
-                  type="button"
-                  class="download-btn execution-select"
-                  (click)="onCreatePackage()"
-                  matTooltip="Create Package File"
-                >
-                  Create Package
-                </button>
-
-                <button
-                  type="button"
-                  class="download-btn execution-select dropdown-toggle"
-                  id="uploadDropdown"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  matTooltip="Upload Package File"
-                >
-                  Upload Package
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="uploadDropdown">
-                  <li>
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      (click)="openUploadModal('generic', $event)"
-                      data-bs-dismiss="dropdown"
-                    >
-                      Upload Generic Package
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      (click)="openUploadModal('package', $event)"
-                      data-bs-dismiss="dropdown"
-                    >
-                      Upload Package
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <!-- Title section shown when no package is selected -->
-              <div class="title-sec mt-2" *ngIf="!selectedPackageName">
-                <span class="sub-titel" style="margin: 8px; color: #06667d;">
-                  Select the
-                  <span class="sub-titel">{{ selectedPackage }}</span> package
-                  for installation</span
-                >
-              </div>
-              <!-- Display the selected package name -->
-              <!-- Title section shown when a package is selected -->
-              <div class="title-sec mt-2" *ngIf="selectedPackageName">
-                <span class="sub-titel" style="margin: 8px; color: #06667d;">
-                  Selected package name:
-                  <span class="sub-titel">{{ selectedPackageName }}</span></span
-                >
-              </div>
-              <!-- Section for execution result and package selection -->
-              <div class="execution-result mt-2">
-                <!-- Display message if present -->
-                <div *ngIf="dispMessage" class="display-message">
-                  {{ dispMessage }}
-                </div>
-                <!-- Loader row shown while loading packages -->
-                <div *ngIf="loadPackage" class="row loader-row">
-                  <app-loader></app-loader>
-                </div>
-                <!-- Package selection radio buttons -->
-                <div *ngIf="!loadPackage">
-                  <!-- Individual package radio button -->
-                  <div
-                    *ngFor="let package of packageNames; let i = index"
-                    class="check-sec"
-                  >
-                    <input
-                      type="radio"
-                      [id]="'chk' + i"
-                      [value]="package"
-                      name="packageSelection"
-                      (change)="onPackageSelect(package)"
-                    />
-                    <!-- [(ngModel)]="selectedPackages[package]"
-                          (change)="onCheckboxChange(package, $event)"> -->
-                    <label [for]="'chk' + i" class="label-check">{{
-                      package
-                    }}</label>
-                  </div>
-                </div>
-                <!-- <ul>
-                        <li *ngFor="let name of selectedList">{{ name }}</li>
-                      </ul> -->
-              </div>
-
-            <!-- Button group for install and close -->
-            <div class="button-grp">
-              <button type="button" class="close-btn install-btn" (click)="onInstallPackage()"
-                [disabled]="isLoading || !selectedPackageName"
-                [matTooltip]="(!selectedPackageName && !isLoading) ? 'Select a package for installation' : 'Install Package File'">
-                Install
-              </button>
-              <button class="close-btn" type="button" (click)="close()">
-                Close
-              </button>
-            </div>
-
-              <!-- Section for logs title -->
-              <div class="logsection">
-                <span class="sub-titel" style="color: #06667d;"
-                  >Package Creation/Installation logs</span
-                >
-              </div>
-              <!-- Section for execution logs and loader -->
-              <div class="execution-result mb-3">
-                <!-- Loading message while installing -->
-                <div *ngIf="isLoading" class="loading-message">
-                  {{ loadingMessage }}
-                </div>
-                <!-- Loader row shown during log loading -->
-                <div class="row loader-row" *ngIf="showLoader">
-                  <app-loader></app-loader>
-                </div>
-                <!-- Logs content container -->
-                <div class="logs-content">
-                <ng-container *ngFor="let line of coloredLogLines">
-                <span [ngClass]="{'log-success': line.isSuccess}">{{ line.text }}</span>
-                </ng-container>
-                </div>
-              </div>
-            </div>
+            <ng-container *ngTemplateOutlet="packageTabBody"></ng-container>
           </mat-tab>
-          <mat-tab label="VTS">
-            <!-- Column for VTS tab content -->
-            <div class="col-md-12 mt-3">
-              <span class="package-title">
-                <span class="sub-titel">{{ selectedPackage }}</span> Package
-                installation for <span class="sub-titel">{{ data }}</span>
-              </span>
-              <!-- Section for execution drop buttons -->
-              <div class="execution-drop mt-3">
-                <button
-                  type="button"
-                  class="download-btn execution-select"
-                  (click)="onCreatePackage()"
-                  matTooltip="Create Package File"
-                >
-                  Create Package
-                </button>
-
-                <button
-                  type="button"
-                  class="download-btn execution-select dropdown-toggle"
-                  id="uploadDropdown"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                  matTooltip="Upload Package File"
-                >
-                  Upload Package
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="uploadDropdown">
-                  <li>
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      (click)="openUploadModal('generic', $event)"
-                      data-bs-dismiss="dropdown"
-                    >
-                      Upload Generic Package
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      class="dropdown-item"
-                      href="#"
-                      (click)="openUploadModal('package', $event)"
-                      data-bs-dismiss="dropdown"
-                    >
-                      Upload Package
-                    </a>
-                  </li>
-                </ul>
-              </div>
-              <!-- Title section shown when no package is selected -->
-              <div class="title-sec mt-2" *ngIf="!selectedPackageName">
-                <span class="sub-titel" style="margin: 8px; color: #06667d;"
-                  >Select the
-                  <span class="sub-titel">{{ selectedPackage }}</span> package
-                  for installation</span
-                >
-              </div>
-              <!-- Display the selected package name -->
-              <!-- Title section shown when a package is selected -->
-              <div class="title-sec mt-2" *ngIf="selectedPackageName">
-                <span class="sub-titel" style="margin: 8px; color: #06667d;"
-                  >Selected package name:
-                  <span class="sub-titel">{{ selectedPackageName }}</span></span
-                >
-              </div>
-              <!-- Section for execution result and package selection -->
-              <div class="execution-result mt-2">
-                <!-- Display message if present -->
-                <div *ngIf="dispMessage" class="display-message">
-                  {{ dispMessage }}
-                </div>
-
-                <!-- Show loader while loading packages -->
-                <!-- Loader row shown while loading packages -->
-                <div *ngIf="loadPackage" class="row loader-row">
-                  <app-loader></app-loader>
-                </div>
-                <!-- Package selection radio buttons -->
-                <div *ngIf="!loadPackage">
-                  <!-- Individual package radio button -->
-                  <div
-                    *ngFor="let package of packageNames; let i = index"
-                    class="check-sec"
-                  >
-                    <input
-                      type="radio"
-                      [id]="'chk' + i"
-                      [value]="package"
-                      name="packageSelection"
-                      (change)="onPackageSelect(package)"
-                    />
-                    <!-- (change)="onCheckboxChange(package, $event)"> -->
-                    <label [for]="'chk' + i" class="label-check">{{
-                      package
-                    }}</label>
-                  </div>
-                </div>
-                <!-- <ul>
-                        <li *ngFor="let name of selectedList">{{ name }}</li>
-                      </ul> -->
-              </div>
-              <!-- Button group for install and close -->
-              <div class="button-grp">
-                <button type="button" class="close-btn install-btn" (click)="onInstallPackage()"
-                  [disabled]="isLoading || !selectedPackageName"
-                  [matTooltip]="(!selectedPackageName && !isLoading) ? 'Select a package for installation' : 'Install Package File'">
-                  Install
-                </button>
-                <button class="close-btn" type="button" (click)="close()">
-                  Close
-                </button>
-              </div>
-              <!-- Section for logs title -->
-              <div class="logsection">
-                <span class="sub-titel" style=" color: #06667d;"
-                  >Package Creation/Installation logs</span
-                >
-              </div>
-              <!-- Section for execution logs and loader -->
-              <div class="execution-result mb-3">
-                <!-- Loading message while installing -->
-                <div *ngIf="isLoading" class="loading-message">
-                  {{ loadingMessage }}
-                </div>
-                <!-- Loader row shown during log loading -->
-                <div class="row loader-row" *ngIf="showLoader">
-                  <app-loader></app-loader>
-                </div>
-                <!-- Logs content container -->
-                <div class="logs-content">
-                <ng-container *ngFor="let line of coloredLogLines">
-                <span [ngClass]="{'log-success': line.isSuccess}">{{ line.text }}</span>
-                </ng-container>
-                </div>
-              </div>
-            </div>
+          <mat-tab label="VTS" *ngIf="!isBroadband">
+            <ng-container *ngTemplateOutlet="packageTabBody"></ng-container>
           </mat-tab>
         </mat-tab-group>
       </div>
     </div>
   </div>
 </div>
+
+<ng-template #packageTabBody>
+  <div class="col-md-12 mt-3 pm-tab-body">
+    <!-- Sub-title -->
+    <div class="pm-subtitle">
+      {{ selectedPackage }} Package Installation For
+      <span class="pm-subtitle-strong">{{ deviceName }}</span>
+    </div>
+
+    <!-- Row of three top actions -->
+    <div class="pm-actions">
+      <button
+        type="button"
+        class="pm-action-btn"
+        (click)="openUploadModal('generic', $event)"
+        [disabled]="!isSocReady || isLoading || isInstalling"
+        [matTooltip]="
+          !isSocReady
+            ? 'Update the SoC name first'
+            : isGenericPresent
+              ? 'Replace the existing Generic Package'
+              : 'Upload the Generic Package'
+        "
+      >
+        <span class="pm-action-icon" aria-hidden="true">&#8682;</span>
+        {{ isGenericPresent ? 'Replace Generic Package' : 'Upload Generic Package' }}
+      </button>
+
+      <!-- Green "Present" badge shown only when the generic package exists -->
+      <span
+        *ngIf="isGenericPresent && !isCheckingGeneric"
+        matTooltip="Generic package is available on the server"
+      >
+        <span class="badge-check">&#10003;</span> Present
+      </span>
+
+      <button
+        type="button"
+        class="pm-action-btn pm-action-primary"
+        (click)="onCreatePackage()"
+        [disabled]="!isSocReady || !isGenericPresent || isLoading || isInstalling"
+        [matTooltip]="
+          !isSocReady
+            ? 'Update the SoC name first'
+            : !isGenericPresent
+              ? 'Upload the Generic Package first'
+              : 'Create the platform package from the generic package'
+        "
+      >
+        <svg
+          class="pm-action-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <path d="M12 3.5l1.2 1.9 2.2-.2.9 2 2.1.8-.2 2.2 1.6 1.5-1.6 1.5.2 2.2-2.1.8-.9 2-2.2-.2L12 20.5l-1.2-1.9-2.2.2-.9-2-2.1-.8.2-2.2L4.2 12l1.6-1.5-.2-2.2 2.1-.8.9-2 2.2.2L12 3.5z" />
+          <circle cx="12" cy="12" r="2.5" />
+        </svg>
+        Create Platform Package
+      </button>
+
+      <button
+        type="button"
+        class="pm-action-btn"
+        (click)="openUploadModal('package', $event)"
+        [disabled]="!isSocReady || isLoading || isInstalling"
+        [matTooltip]="
+          !isSocReady
+            ? 'Update the SoC name first'
+            : 'Upload a pre-built platform package'
+        "
+      >
+        <span class="pm-action-icon" aria-hidden="true">&#8682;</span>
+        Upload Platform Package
+      </button>
+    </div>
+
+    <!-- Available platform packages card -->
+    <div class="pm-card mt-3">
+      <div class="pm-card-header">
+        <div class="pm-card-title pm-section-title">
+          Available Platform Packages
+          <span class="pm-count">{{ packageNames.length }} packages</span>
+        </div>
+        <div class="pm-card-header-right">
+          <input
+            type="text"
+            class="pm-search"
+            placeholder="Search packages..."
+            [(ngModel)]="packageSearch"
+            [ngModelOptions]="{ standalone: true }"
+          />
+          <button
+            type="button"
+            class="pm-icon-btn"
+            (click)="refreshPackageList()"
+            matTooltip="Refresh package list"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M21 12a9 9 0 1 1-3-6.7" />
+              <path d="M21 4v5h-5" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="pm-card-body pm-packages">
+        <div *ngIf="dispMessage" class="display-message">
+          {{ dispMessage }}
+        </div>
+
+        <div *ngIf="loadPackage" class="row loader-row">
+          <app-loader></app-loader>
+        </div>
+
+        <div
+          *ngIf="!loadPackage && filteredPackageNames.length === 0 && !dispMessage"
+          class="pm-empty"
+        >
+          No packages found.
+        </div>
+
+        <div *ngIf="!loadPackage">
+          <div
+            *ngFor="let package of filteredPackageNames; let i = index"
+            class="pm-package-row"
+            [class.selected]="selectedPackageName === package"
+            (click)="onPackageSelect(package)"
+          >
+            <input
+              type="radio"
+              [id]="'chk-' + selectedPackage + '-' + i"
+              [value]="package"
+              name="packageSelection"
+              [checked]="selectedPackageName === package"
+              (change)="onPackageSelect(package)"
+            />
+            <label
+              [for]="'chk-' + selectedPackage + '-' + i"
+              class="pm-package-label"
+              >{{ package }}</label
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Package creation / installation logs card -->
+    <div class="pm-card mt-3">
+      <div class="pm-card-header">
+        <div class="pm-card-title pm-section-title">Package Creation / Installation Logs</div>
+        <div class="pm-card-header-right">
+          <label class="pm-autoscroll">
+            <input type="checkbox" [(ngModel)]="autoScroll"
+              [ngModelOptions]="{ standalone: true }" />
+            Auto-scroll
+          </label>
+          <button
+            type="button"
+            class="pm-icon-btn"
+            (click)="clearLogs()"
+            matTooltip="Clear logs"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M6 6l12 12M18 6L6 18" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="pm-icon-btn"
+            (click)="copyLogs()"
+            [disabled]="!createlogs"
+            matTooltip="Copy logs"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="9" y="9" width="11" height="11" rx="1" />
+              <path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="pm-card-body pm-logs" #logsContainer>
+        <div *ngIf="isLoading && !isInstalling" class="install-progress create-progress">
+          <div class="install-progress-header">
+            <span class="install-spinner" aria-hidden="true"></span>
+            <span class="install-progress-message">Creating platform package</span>
+          </div>
+        </div>
+
+        <!-- Installation progress: phase message, spinner and stepper -->
+        <div *ngIf="isInstalling || installStatus" class="install-progress">
+          <div class="install-progress-header">
+            <span class="install-spinner" *ngIf="isInstalling" aria-hidden="true"></span>
+            <span class="install-progress-message" *ngIf="isInstalling">{{
+              installPhaseLabel
+            }}</span>
+            <span
+              class="install-progress-message install-success"
+              *ngIf="installStatus === 'SUCCESS'"
+              >Installation completed successfully.</span
+            >
+            <span
+              class="install-progress-message install-failed"
+              *ngIf="installStatus === 'FAILED'"
+              >Installation failed.</span
+            >
+          </div>
+          <div class="install-progress-context" *ngIf="installStatus">
+            {{ selectedPackageName }} on {{ deviceName }}
+          </div>
+
+          <div class="install-stepper" *ngIf="isInstalling || installStatus" aria-label="Installation progress">
+            <div
+              class="install-step"
+              *ngFor="let phase of phaseOrder"
+              [class.completed]="isPhaseCompleted(phase)"
+              [class.active]="isPhaseActive(phase)"
+              [class.failed]="isPhaseFailed(phase)"
+              [attr.aria-current]="isPhaseActive(phase) || isPhaseFailed(phase) ? 'step' : null"
+              [attr.aria-label]="phaseLabels[phase]"
+              [matTooltip]="phaseLabels[phase]"
+              matTooltipPosition="above"
+              matTooltipShowDelay="300"
+              tabindex="0"
+            >
+              <span class="install-step-marker">
+                <span class="install-step-dot"></span>
+              </span>
+              <span class="install-step-label">{{ phaseShortLabels[phase] }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="installErrorMessage" class="pm-install-error">
+          {{ installErrorMessage }}
+        </div>
+
+        <div
+          *ngIf="!createlogs && !isLoading && !showLoader && !isInstalling"
+          class="pm-logs-placeholder"
+        >
+          Logs will appear here after a Create, Upload or Install action.
+        </div>
+        <div class="install-log-divider" *ngIf="installStatus && createlogs">
+          Installation logs
+        </div>
+        <div class="logs-content" *ngIf="createlogs">
+          <ng-container *ngFor="let line of coloredLogLines">
+            <span [ngClass]="{ 'log-success': line.isSuccess }">{{
+              line.text
+            }}</span>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sticky install bar -->
+    <div class="pm-install-bar mt-3">
+      <div class="pm-install-info">
+        <div class="pm-install-title">Install Platform Package</div>
+        <div class="pm-install-sub" *ngIf="!selectedPackageName && !isInstalling">
+          Select a package above to continue.
+        </div>
+        <div class="pm-install-sub" *ngIf="selectedPackageName && !isInstalling">
+          Selected package:
+          <span class="pm-install-selected">{{ selectedPackageName }}</span>
+        </div>
+      </div>
+      <div class="pm-install-actions">
+        <button
+          type="button"
+          class="close-btn install-btn"
+          (click)="onInstallPackage()"
+          [disabled]="isLoading || isInstalling || !selectedPackageName"
+          [matTooltip]="
+            !selectedPackageName && !isLoading && !isInstalling
+              ? 'Select a package for installation'
+              : isInstalling
+                ? 'Installation in progress'
+                : 'Install Package File'
+          "
+        >
+          <span *ngIf="isInstalling" class="install-btn-spinner" aria-hidden="true"></span>
+          {{ isInstalling ? 'Installing...' : 'Install' }}
+        </button>
+        <button class="close-btn pm-close-btn" type="button" (click)="close()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
 
 <!-- Modal Start-->
 <!-- Modal for package upload -->
@@ -328,7 +380,11 @@ limitations under the License.
   <!-- Modal dialog container -->
   <div class="modal-dialog custom-modal">
     <!-- Modal content container -->
-    <div class="modal-content">
+    <div
+      class="modal-content rdktheme-modal"
+      [class.rdktheme-dark]="currentTheme === 'DARK'"
+      [class.rdktheme-light]="currentTheme !== 'DARK'"
+    >
       <form [formGroup]="uploadPackageForm" (ngSubmit)="uploadPackageSubmit()">
         <!-- Modal header section -->
         <div class="modal-header modaltitle">
@@ -342,6 +398,7 @@ limitations under the License.
             aria-label="Close"
           ></button>
         </div>
+        <div class="rdk-theme-stripe" aria-hidden="true"></div>
         <!-- Modal body section -->
         <div class="modal-body">
           <!-- Container for file upload form -->
@@ -382,22 +439,35 @@ limitations under the License.
         </div>
         <!-- Modal footer section -->
         <div class="modal-footer">
-          <!-- Upload loading message -->
-          <div *ngIf="isUploadLoading" class="upload-message">
-            Package upload is in progress, Please wait...
-            <app-loader></app-loader>
-          </div>
+          <div
+            *ngIf="isUploadLoading || uploadComplete"
+            class="upload-progress-section"
+            role="status"
+            aria-live="polite"
+          >
+            <span class="upload-progress-text">
+              {{ uploadComplete ? 'Upload complete' : 'Uploading package...' }}
+            </span>
+            <mat-progress-bar
+              mode="determinate"
+              [value]="uploadProgress"
+              aria-label="Package upload progress"
+            ></mat-progress-bar>
+            <span class="upload-progress-percent">{{ uploadProgress }}%</span>
+            </div>
+          
           <button
             type="button"
             class="download-btn modal-btns"
             data-bs-dismiss="modal"
+            [disabled]="isUploadLoading"
           >
             Close
           </button>
           <button
             type="submit"
             class="download-btn modal-btns"
-            [disabled]="isLoading"
+            [disabled]="isUploadLoading"
           >
             Upload
           </button>
