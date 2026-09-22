@@ -1916,12 +1916,12 @@ export class ExecutionComponent implements OnInit, OnDestroy {
    */
   installTDKModal(deviceName: string) {
     const dialogModal = this.dialogTDK.open(TdkInstallComponent, {
-      width: '68%',
+     width: 'min(1100px, 92vw)',
       height: '96vh',
       maxWidth: '100vw',
       panelClass: 'custom-modalbox',
       restoreFocus: false,
-      data: deviceName,
+      data: { deviceName, category: this.selectedDfaultCategory },
     });
     dialogModal.afterClosed().subscribe(() => {});
   }

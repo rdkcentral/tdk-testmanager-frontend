@@ -18,7 +18,8 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { CommonModule } from '@angular/common';
-import { Component, Inject, ViewChild, ElementRef } from '@angular/core';
+import { Component, Inject, ViewChild, ElementRef, AfterViewChecked, OnDestroy } from '@angular/core';
+import { HttpEventType } from '@angular/common/http';
 import { MaterialModule } from '../../../material/material.module';
 import {
   FormsModule,
@@ -29,6 +30,7 @@ import {
 } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { PackageManagerService } from '../../../services/package-manager.service';
+import { ThemeService } from '../../../services/theme.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { LoaderComponent } from '../../../utility/component/loader/loader.component';
 
@@ -57,8 +59,9 @@ declare var bootstrap: any;
  * @decorator `@Component`
  *
  */
-export class TdkInstallComponent {
+export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef;
+  @ViewChild('logsContainer') logsContainer!: ElementRef<HTMLDivElement>;
 
   selectedPackage = 'TDK';
   packageNames: string[] = [];
@@ -68,6 +71,9 @@ export class TdkInstallComponent {
   installLogs: string = '';
   isLoading: boolean = false;
   isUploadLoading: boolean = false;
+  uploadProgress = 0;
+  uploadComplete = false;
+  currentTheme = 'LIGHT';
   dispMessage: string = '';
   selectedPackageName: any = null;
   showLoader: boolean = false; // Flag to control loader visibility
@@ -79,6 +85,50 @@ export class TdkInstallComponent {
   uploadFileName!: File | null;
   uploadFileError: string | null = null;
   type: string = '';
+   deviceName: string = '';
+  category: string = '';
+  isBroadband: boolean = false;
+
+  // Whether the Generic Package is already present on the server for the
+  // current type + device. Controls the "Upload Generic" vs "Replace Generic"
+  // button label and the "Present" indicator badge.
+  isGenericPresent: boolean = false;
+  isCheckingGeneric: boolean = false;
+  isSocReady: boolean = false;
+
+  // Search text used to filter the available platform packages list.
+  packageSearch: string = '';
+
+  // Auto-scroll the logs panel as new log lines arrive.
+  autoScroll: boolean = true;
+  private lastLogsLength: number = 0;
+
+  // --- Asynchronous installation job state ---
+  isInstalling: boolean = false;
+  installJobId: string | null = null;
+  installPhase: string | null = null;
+  installStatus: string | null = null; // 'RUNNING' | 'SUCCESS' | 'FAILED'
+  installResult: { statusCode: number; logs: string } | null = null;
+  installErrorMessage: string | null = null;
+  private pollingTimer: ReturnType<typeof setInterval> | null = null;
+  private readonly POLL_INTERVAL_MS = 1500;
+
+  // User-friendly labels and display order for installation phases.
+  readonly phaseLabels: Record<string, string> = {
+    QUEUED: 'Waiting to start',
+    COPYING_PACKAGE: 'Copying package to device',
+    COPYING_SCRIPT: 'Copying installation script',
+    INSTALLING: 'Installing package',
+    VERIFYING: 'Verifying installation',
+  };
+  readonly phaseShortLabels: Record<string, string> = {
+    QUEUED: 'Waiting to start',
+    COPYING_PACKAGE: 'Copying package',
+    COPYING_SCRIPT: 'Copying script',
+    INSTALLING: 'Installing',
+    VERIFYING: 'Verifying',
+  };
+  readonly phaseOrder: string[] = Object.keys(this.phaseLabels);
 
   /**
    * Constructs an instance of the TdkInstallComponent.
@@ -92,7 +142,8 @@ export class TdkInstallComponent {
     public dialogRef: MatDialogRef<TdkInstallComponent>,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private packagemanagerservice: PackageManagerService,
-    private _snakebar: MatSnackBar
+    private _snakebar: MatSnackBar ,
+    private themeService: ThemeService
   ) {}
 
   /**
@@ -102,10 +153,134 @@ export class TdkInstallComponent {
    * - Sets up the `uploadPackageForm` with a `file` form control that is required.
    */
   ngOnInit(): void {
+    this.themeService.currentTheme.subscribe((theme) => {
+      this.currentTheme = theme;
+    });
+
+    if (this.data && typeof this.data === 'object') {
+      this.deviceName = this.data.deviceName;
+      this.category = this.data.category;
+    } else {
+      this.deviceName = this.data;
+    }
+    this.isBroadband = this.category === 'RDKB';
+    if (this.isBroadband) {
+      this.selectedPackage = 'TDK'; // RDKB devices only support TDK installation
+    }
     this.fetchPackageNames(); // Fetch package names on component initialization
+    this.checkGenericPackagePresence();
     this.uploadPackageForm = new FormGroup({
       file: new FormControl(null, Validators.required), // Add 'file' control
     });
+  }
+
+  /**
+   * Auto-scrolls the logs container to the bottom whenever new log content
+   * arrives, if the user has left the "Auto-scroll" checkbox enabled.
+   */
+  ngAfterViewChecked(): void {
+    if (!this.autoScroll || !this.logsContainer) {
+      return;
+    }
+    const currentLength = (this.createlogs || '').length;
+    if (currentLength !== this.lastLogsLength) {
+      this.lastLogsLength = currentLength;
+      const el = this.logsContainer.nativeElement;
+      el.scrollTop = el.scrollHeight;
+    }
+  }
+
+  /**
+   * Clears the polling timer when the component is destroyed so no stray
+   * status requests are made after the dialog has closed.
+   */
+  ngOnDestroy(): void {
+    this.clearPollingTimer();
+  }
+
+  /**
+   * Calls the `isGenericPackagePresent` backend endpoint to determine whether
+   * a generic package already exists for the currently selected package type
+   * and device. The boolean is used to toggle the top-row button between
+   * "Upload Generic Package" and "Replace Generic Package", and to show the
+   * green "Present" indicator badge.
+   */
+  checkGenericPackagePresence(): void {
+    if (!this.deviceName || !this.selectedPackage) {
+      return;
+    }
+    this.isCheckingGeneric = true;
+    this.packagemanagerservice
+      .isGenericPackagePresent(this.selectedPackage, this.deviceName)
+      .subscribe({
+        next: (res: any) => {
+          this.isCheckingGeneric = false;
+          // Support both `{ data: true }` and `{ isPresent: true }` shapes,
+          // as well as a plain boolean body.
+          const flag =
+            typeof res === 'boolean'
+              ? res
+              : res?.data ?? res?.isPresent ?? res?.present ?? false;
+          this.isGenericPresent = !!flag;
+        },
+        error: (err) => {
+          this.isCheckingGeneric = false;
+          this.isGenericPresent = false;
+          console.error('isGenericPackagePresent failed:', err);
+        },
+      });
+  }
+
+  /**
+   * Returns the platform package list filtered by the search box text.
+   */
+  get filteredPackageNames(): string[] {
+    const q = (this.packageSearch || '').trim().toLowerCase();
+    if (!q) {
+      return this.packageNames;
+    }
+    return this.packageNames.filter((p) => p.toLowerCase().includes(q));
+  }
+
+  /**
+   * Clears the current logs displayed in the log panel.
+   */
+  clearLogs(): void {
+    this.createlogs = '';
+    this.lastLogsLength = 0;
+    this.clearInstallationProgress();
+  }
+
+  private clearInstallationProgress(): void {
+    this.clearPollingTimer();
+    this.isInstalling = false;
+    this.installJobId = null;
+    this.installPhase = null;
+    this.installStatus = null;
+    this.installResult = null;
+    this.installErrorMessage = null;
+  }
+
+  /** Copies the current package creation or installation logs to the clipboard. */
+  async copyLogs(): Promise<void> {
+    if (!this.createlogs) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(this.createlogs);
+      this._snakebar.open('Logs copied to clipboard', '', { duration: 2000 });
+    } catch {
+      this._snakebar.open('Unable to copy logs', '', { duration: 2000 });
+    }
+  }
+
+  /**
+   * Refreshes both the available platform packages and the generic-package
+   * presence state. Bound to the small refresh icon next to the search box.
+   */
+  refreshPackageList(): void {
+    this.fetchPackageNames();
+    this.checkGenericPackagePresence();
   }
 
   /**
@@ -121,10 +296,11 @@ export class TdkInstallComponent {
    * @returns void
    */
   onCreatePackage() {
+    this.clearInstallationProgress();
     this.createlogs = '';
     let createPackageObj = {
       type: this.selectedPackage,
-      device: this.data,
+      device: this.deviceName,
     };
     this.loadingMessage = 'Package creation is in progress!';
     this.isLoading = true;
@@ -210,27 +386,38 @@ export class TdkInstallComponent {
     }
   }
 
-  /**
-   * Initiates the installation of a package by invoking the package manager service.
-   * Displays a loading message and loader during the process.
-   * Handles success and error responses by updating the UI and showing appropriate messages.
+   /**
+   * Starts an asynchronous package installation job and begins polling its
+   * status. The request is submitted only once per click; the install button
+   * is disabled via `isInstalling` while a job is in flight to prevent
+   * duplicate submissions.
    *
    * @remarks
-   * - On success, logs are updated, and a success message is displayed.
-   * - On error, an error message is displayed.
+   * - On job creation, the returned `jobId` is stored and status polling begins.
+   * - On success or failure, polling stops and the final logs/result are shown.
+   * - HTTP 400/500 from the start endpoint surface as an error state.
    *
    * @returns {void}
    */
-  onInstallPackage() {
+  onInstallPackage(): void {
+    if (this.isInstalling || !this.selectedPackageName) {
+      return;
+    }
+
     this.createlogs = '';
-    this.loadingMessage = 'Package installation is in progress. Please wait...';
-    this.isLoading = true;
-    this.showLoader = true; // Show the loader
-    let installPackageObj = {
+    this.installResult = null;
+    this.installErrorMessage = null;
+    this.installStatus = null;
+    this.installPhase = null;
+    this.installJobId = null;
+    this.isInstalling = true;
+
+    const installPackageObj = {
       type: this.selectedPackage,
-      device: this.data,
+      device: this.deviceName,
       packageName: this.selectedPackageName,
     };
+
     this.packagemanagerservice
       .installPackages(
         installPackageObj.type,
@@ -238,21 +425,27 @@ export class TdkInstallComponent {
         installPackageObj.packageName
       )
       .subscribe({
-        next: (res) => {
-          this.showLoader = false;
-          this.isLoading = false;
-          this.createlogs = res.data.logs;
-          this._snakebar.open(res.message, '', {
-            duration: 3000,
-            panelClass: ['success-msg'],
-            verticalPosition: 'top',
-          });
+        next: (job) => {
+          const data = job?.data ?? job; // API now nests the job under `data`
+          this.installJobId = data?.jobId ?? null;
+          this.installPhase = data?.phase ?? null;
+          this.installStatus = data?.status ?? 'RUNNING';
+
+          if (!this.installJobId) {
+            this.isInstalling = false;
+            this.installErrorMessage =
+              'Installation could not be started: missing job id.';
+            return;
+          }
+          this.startPollingInstallStatus(this.installJobId);
         },
         error: (err) => {
-          this.isLoading = false;
-          this.showLoader = false;
-          this.createlogs = err.data.logs;
-          this._snakebar.open(err.message, '', {
+          this.isInstalling = false;
+          const response = err?.error ?? err;
+          const message: string =
+            response?.message || err?.message || 'Failed to start package installation.';
+          this.installErrorMessage = message;
+          this._snakebar.open(message, '', {
             duration: 3000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',
@@ -260,6 +453,111 @@ export class TdkInstallComponent {
           });
         },
       });
+  }
+
+  /**
+   * Polls `getInstallStatus` for the given job every `POLL_INTERVAL_MS` and
+   * updates the displayed phase until the job reaches SUCCESS or FAILED.
+   */
+  private startPollingInstallStatus(jobId: string): void {
+    this.clearPollingTimer();
+    this.pollingTimer = setInterval(() => {
+      this.packagemanagerservice.getInstallStatus(jobId).subscribe({
+        next: (job) => this.handleInstallStatusUpdate(job),
+        error: (err) => this.handleInstallStatusError(err),
+      });
+    }, this.POLL_INTERVAL_MS);
+  }
+
+  /** Applies a status poll response, stopping polling once the job finishes. */
+  private handleInstallStatusUpdate(job: any): void {
+    const data = job?.data ?? job; // API now nests the job under `data`
+    this.installPhase = data?.phase ?? this.installPhase;
+    this.installStatus = data?.status ?? this.installStatus;
+
+    if (this.installStatus !== 'SUCCESS' && this.installStatus !== 'FAILED') {
+      return;
+    }
+
+    this.clearPollingTimer();
+    this.isInstalling = false;
+    this.installResult = data?.result ?? null;
+    this.createlogs = this.installResult?.logs ?? '';
+
+    if (this.installStatus === 'SUCCESS') {
+      this._snakebar.open('Package installed successfully.', '', {
+        duration: 3000,
+        panelClass: ['success-msg'],
+        verticalPosition: 'top',
+      });
+    } else {
+      const message = 'Package installation failed.';
+      this.installErrorMessage = message;
+      this._snakebar.open(message, '', {
+        duration: 3000,
+        panelClass: ['err-msg'],
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
+    }
+  }
+
+  /** Handles transport-level failures while polling, including expired jobs (404). */
+  private handleInstallStatusError(err: any): void {
+    this.clearPollingTimer();
+    this.isInstalling = false;
+
+    let message: string;
+    if (err?.status === 404) {
+      message = 'Installation job not found or has expired.';
+    } else {
+      const response = err?.error ?? err;
+      message = response?.message || err?.message || 'Failed to fetch installation status.';
+    }
+    this.installErrorMessage = message;
+    this._snakebar.open(message, '', {
+      duration: 3000,
+      panelClass: ['err-msg'],
+      horizontalPosition: 'end',
+      verticalPosition: 'top',
+    });
+  }
+
+  private clearPollingTimer(): void {
+    if (this.pollingTimer) {
+      clearInterval(this.pollingTimer);
+      this.pollingTimer = null;
+    }
+  }
+
+  /** Returns the user-friendly label for the current installation phase. */
+  get installPhaseLabel(): string {
+    if (!this.installPhase) {
+      return '';
+    }
+    return this.phaseLabels[this.installPhase] ?? this.installPhase;
+  }
+
+  /** True once the given phase has been passed in the current install job. */
+  isPhaseCompleted(phase: string): boolean {
+    if (this.installStatus === 'SUCCESS') {
+      return true;
+    }
+    if (!this.installPhase) {
+      return false;
+    }
+    const currentIndex = this.phaseOrder.indexOf(this.installPhase);
+    const phaseIndex = this.phaseOrder.indexOf(phase);
+    return currentIndex > -1 && phaseIndex > -1 && phaseIndex < currentIndex;
+  }
+
+  /** True when the given phase is the currently running phase. */
+  isPhaseActive(phase: string): boolean {
+    return this.installPhase === phase && this.installStatus === 'RUNNING';
+  }
+
+  isPhaseFailed(phase: string): boolean {
+    return this.installPhase === phase && this.installStatus === 'FAILED';
   }
 
   get coloredLogLines(): { text: string; isSuccess: boolean }[] {
@@ -294,13 +592,15 @@ export class TdkInstallComponent {
   fetchPackageNames() {
     this.dispMessage = '';
     this.selectedPackageName = '';
+    this.isSocReady = false;
     this.loadPackage = true; // Show the loader while fetching package names
     this.packagemanagerservice
-      .getPackageList(this.selectedPackage, this.data)
+      .getPackageList(this.selectedPackage, this.deviceName)
       .subscribe({
         next: (res) => {
           console.log(res);
           this.loadPackage = false;
+          this.isSocReady = true;
           this.packageNames = (res.data || []).sort((a: string, b: string) =>
             b.localeCompare(a)
           );
@@ -310,6 +610,23 @@ export class TdkInstallComponent {
         },
         error: (err) => {
           console.log(err);
+          this.loadPackage = false;
+          this.packageNames = [];
+          this.isSocReady = false;
+
+          const response = err?.error ?? err;
+          const statusCode = response?.statusCode ?? err?.status;
+          const message = response?.message ?? err?.message ?? '';
+
+          if (
+            statusCode === 400 &&
+            message.toLowerCase().includes('soc name not found')
+          ) {
+            this.dispMessage =
+              'Please update the SoC name for this device before installation.';
+          } else {
+            this.dispMessage = message || 'Unable to load available packages.';
+          }
         },
       });
   }
@@ -343,14 +660,28 @@ export class TdkInstallComponent {
       // Determine which API to call based on the type
       const uploadFile = this.uploadFileName as File;
       this.isUploadLoading = true;
+      this.uploadProgress = 0;
+      this.uploadComplete = false;
       if (this.type === 'generic') {
         this.packagemanagerservice
-          .uploadGenericPackage(this.selectedPackage, this.data, uploadFile)
+          .uploadGenericPackage(this.selectedPackage, this.deviceName, uploadFile)
           .subscribe({
-            next: (res) => {
+            next: (event) => {
+              if (event.type === HttpEventType.UploadProgress) {
+                this.uploadProgress = event.total
+                  ? Math.round((event.loaded / event.total) * 100)
+                  : 0;
+                return;
+              }
+              if (event.type !== HttpEventType.Response) {
+                return;
+              }
               this.fetchPackageNames();
+              this.checkGenericPackagePresence();
+              this.uploadProgress = 100;
+              this.uploadComplete = true;
               this.isUploadLoading = false;
-              this._snakebar.open(res.message, '', {
+              this._snakebar.open(event.body?.message || 'Package uploaded successfully.', '', {
                 duration: 3000,
                 panelClass: ['success-msg'],
                 verticalPosition: 'top',
@@ -360,6 +691,8 @@ export class TdkInstallComponent {
             },
             error: (err) => {
               this.isUploadLoading = false;
+              this.uploadProgress = 0;
+              this.uploadComplete = false;
               this._snakebar.open(err.message, '', {
                 duration: 2000,
                 panelClass: ['err-msg'],
@@ -370,12 +703,23 @@ export class TdkInstallComponent {
           });
       } else {
         this.packagemanagerservice
-          .uploadPackage(this.selectedPackage, this.data, uploadFile)
+          .uploadPackage(this.selectedPackage, this.deviceName, uploadFile)
           .subscribe({
-            next: (res) => {
+            next: (event) => {
+              if (event.type === HttpEventType.UploadProgress) {
+                this.uploadProgress = event.total
+                  ? Math.round((event.loaded / event.total) * 100)
+                  : 0;
+                return;
+              }
+              if (event.type !== HttpEventType.Response) {
+                return;
+              }
               this.isUploadLoading = false;
               this.fetchPackageNames(); // Fetch package names again after upload
-              this._snakebar.open(res.message, '', {
+              this.uploadProgress = 100;
+              this.uploadComplete = true;
+              this._snakebar.open(event.body?.message || 'Package uploaded successfully.', '', {
                 duration: 3000,
                 panelClass: ['success-msg'],
                 verticalPosition: 'top',
@@ -385,6 +729,8 @@ export class TdkInstallComponent {
             },
             error: (err) => {
               this.isUploadLoading = false;
+              this.uploadProgress = 0;
+              this.uploadComplete = false;
               this._snakebar.open(err.message, '', {
                 duration: 2000,
                 panelClass: ['err-msg'],
@@ -413,7 +759,8 @@ export class TdkInstallComponent {
     this.uploadFileName = null; // Clear the selected file
     this.uploadFileError = null; // Clear any error messages
     this.uploadFormSubmitted = false; // Reset the form submission flag
-
+     this.uploadProgress = 0;
+    this.uploadComplete = false;
     if (this.fileInput) {
       this.fileInput.nativeElement.value = ''; // Clear the file input
     }
@@ -434,10 +781,11 @@ export class TdkInstallComponent {
   onTabClick(event: any) {
     let label = event.tab.textLabel;
     this.selectedPackage = label;
-    this.createlogs = '';
+    this.clearLogs();
     this.packageNames = []; // Clear old list
     this.loadPackage = true;
     this.fetchPackageNames();
+    this.checkGenericPackagePresence();
   }
 
   packageChange(value: string) {
@@ -479,11 +827,13 @@ export class TdkInstallComponent {
     event.preventDefault();
     this.resetForm();
     this.type = type;
-    if (type === 'generic') {
+     if (type === 'generic') {
+      const action = this.isGenericPresent ? 'Replace' : 'Upload';
       this.modalHeading =
-        'Upload Generic ' + this.selectedPackage + ' Package File';
+        action + ' Generic ' + this.selectedPackage + ' Package File';
     } else {
-      this.modalHeading = 'Upload ' + this.selectedPackage + ' Package File';
+      this.modalHeading =
+        'Upload Platform ' + this.selectedPackage + ' Package File';
     }
 
     // Open the modal programmatically

@@ -373,17 +373,7 @@ button:disabled {
 
 .modaltitle {
   margin: 0 10px 0px 10px;
-  border-image: linear-gradient(
-    to right,
-    rgb(0, 178, 220) 25%,
-    rgb(253, 183, 59) 25%,
-    rgb(253, 183, 59) 50%,
-    rgb(146, 200, 73) 50%,
-    rgb(146, 200, 73) 75%,
-    rgb(245, 130, 51) 75%
-  );
-  border-image-slice: 1;
-  border-image-width: 0px 0px 4px 0px;
+  border: 0;
 }
 
 /**
@@ -476,4 +466,957 @@ button:disabled {
 
 ::ng-deep .mat-mdc-tab-body.mat-mdc-tab-body-active.mat-mdc-tab-body-content{
   overflow-y: hidden !important;
+}
+
+/**
+ * Styles for the asynchronous installation progress block (spinner,
+ * current-phase message and step indicators) shown in the logs card.
+ */
+
+.install-progress {
+  padding: 14px 8px 6px;
+}
+
+.create-progress {
+  padding-bottom: 14px;
+}
+
+.install-progress-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 24px;
+}
+
+.install-progress-message {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #06667d;
+}
+
+.install-progress-message.install-success {
+  color: #1f8a4c;
+}
+
+.install-progress-message.install-failed {
+  color: #c0392b;
+}
+
+.install-progress-context {
+  margin-top: 4px;
+  color: #7a8790;
+  font-size: 0.78rem;
+}
+
+/* Small rotating ring used as the "job running" indicator. */
+.install-spinner {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border: 2.5px solid #d7e6ea;
+  border-top-color: #00b2dc;
+  border-radius: 50%;
+  animation: install-spin 0.8s linear infinite;
+  flex: 0 0 auto;
+}
+
+.install-spinner-sm {
+  width: 14px;
+  height: 14px;
+  border-width: 2px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+@keyframes install-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.install-stepper {
+  display: flex;
+  align-items: flex-start;
+  margin-top: 18px;
+  padding: 0 2px;
+}
+
+.install-step {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 0;
+  color: #8999a2;
+  cursor: help;
+}
+
+.install-step:not(:last-child)::after {
+  content: '';
+  height: 2px;
+  flex: 1 1 auto;
+  margin: 0 8px;
+  background: #dbe7eb;
+}
+
+.install-step.completed:not(:last-child)::after {
+  background: #3f9b70;
+}
+
+.install-step-marker {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #d3e2e7;
+  border-radius: 50%;
+  background: #fff;
+  flex: 0 0 20px;
+}
+
+.install-step-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #cbdde3;
+}
+
+.install-step-label {
+  order: -1;
+  max-width: 118px;
+  margin-right: 8px;
+  font-size: 0.76rem;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.install-step.completed {
+  color: #3f9b70;
+}
+
+.install-step.completed .install-step-marker {
+  border-color: #238b59;
+  background: #238b59;
+}
+
+.install-step.completed .install-step-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+}
+
+.install-step.failed {
+  color: #c0392b;
+  font-weight: 400;
+}
+
+.install-step.failed .install-step-marker {
+  border-color: #c0392b;
+  background: #c0392b;
+}
+
+.install-step.failed .install-step-dot {
+  width: 6px;
+  height: 6px;
+  background: #fff;
+}
+
+.install-step.active {
+  color: #06667d;
+  font-weight: 400;
+}
+
+.install-step.active .install-step-label {
+  max-width: 130px;
+  padding: 7px 10px;
+  margin-right: 8px;
+  border-radius: 4px;
+  border: 1px solid #00b2dc;
+  background: #e8f8fb;
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}
+
+.install-step.active .install-step-marker {
+  border-color: #00b2dc;
+  background: #00b2dc;
+  box-shadow: 0 0 0 3px rgba(0, 178, 220, 0.16);
+}
+
+.install-step.active .install-step-dot {
+  background: #fff;
+}
+
+/* Keep the labels readable when the progress row no longer has room. */
+@media (max-width: 767.98px) {
+  .install-stepper {
+    display: block;
+    margin-top: 14px;
+  }
+
+  .install-step {
+    min-height: 34px;
+  }
+
+  .install-step:not(:last-child)::after {
+    position: absolute;
+    top: 20px;
+    left: 9px;
+    width: 2px;
+    height: 14px;
+    margin: 0;
+  }
+
+  .install-step-label,
+  .install-step.active .install-step-label {
+    max-width: none;
+    margin-left: 9px;
+    margin-right: 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    border-color: transparent;
+    color: inherit;
+    white-space: normal;
+  }
+}
+
+.pm-install-error {
+  margin: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: #fdecea;
+  color: #c0392b;
+  font-size: 0.85rem;
+}
+
+/* Spinner shown inside the disabled Install button while a job is running. */
+.install-btn-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 6px;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: install-spin 0.8s linear infinite;
+  vertical-align: middle;
+}
+
+.upload-progress-section {
+  flex: 1 0 100%;
+  width: 100%;
+  margin: 0 0 10px;
+  padding: 0;
+}
+
+.upload-progress-text,
+.upload-progress-percent {
+  flex: 0 0 auto;
+  color: #495057;
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
+.upload-progress-percent {
+  min-width: 32px;
+  text-align: right;
+}
+
+.upload-progress-section mat-progress-bar {
+  height: 4px;
+  border-radius: 3px;
+  overflow: hidden;
+  --mdc-linear-progress-active-indicator-color: #00b2dc;
+  --mdc-linear-progress-track-color: #e2e6ea;
+}
+
+.rdktheme-dark .upload-progress-section mat-progress-bar {
+  --mdc-linear-progress-track-color: #636979;
+}
+
+.rdk-theme-stripe {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 0%,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%,
+    rgb(245, 130, 51) 100%
+  );
+}
+
+::ng-deep body.dark .modal-content {
+  background: #272f3c !important;
+  color: #fff;
+}
+
+::ng-deep body.dark .modal-header,
+::ng-deep body.dark .modal-footer {
+  border-color: #dddddd4d;
+}
+
+::ng-deep body.dark .custom-title,
+::ng-deep body.dark .col-form-label,
+::ng-deep body.dark .upload-progress-text,
+::ng-deep body.dark .upload-progress-percent {
+  color: #fff !important;
+}
+
+::ng-deep body.dark .form-control {
+  background: #1e2025fa;
+  color: #fff;
+  border-color: #636979;
+}
+
+::ng-deep body.dark .form-control::file-selector-button {
+  background: #636979;
+  color: #fff;
+  border-color: #636979;
+}
+
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.pm-container {
+  padding-bottom: 12px;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Restore the original compact tab switching pattern for this dialog. */
+::ng-deep .ticket-sec .mat-mdc-tab-group,
+::ng-deep .ticket-sec .mat-mdc-tab-nav-bar {
+  --mdc-tab-indicator-active-indicator-color: transparent !important;
+  --mat-tab-header-active-focus-indicator-color: transparent !important;
+  --mat-tab-header-active-hover-indicator-color: transparent !important;
+}
+
+::ng-deep .ticket-sec .mat-mdc-tab.mdc-tab {
+  flex-grow: 0 !important;
+}
+
+::ng-deep .ticket-sec .mat-mdc-tab.mdc-tab--active {
+  border-bottom: 47px solid #fff !important;
+  border-right: 25px solid transparent !important;
+  font-size: 0.87rem !important;
+  letter-spacing: 0 !important;
+}
+
+::ng-deep .ticket-sec .mat-mdc-tab-label-container,
+::ng-deep .ticket-sec .mdc-tab,
+::ng-deep .ticket-sec .mdc-tab__content {
+  height: 50px !important;
+}
+
+::ng-deep .ticket-sec .mat-mdc-tab-labels {
+  height: 35px !important;
+  letter-spacing: 0 !important;
+}
+
+::ng-deep .ticket-sec .mdc-tab__text-label {
+  font-size: 0.87rem !important;
+  letter-spacing: 0 !important;
+}
+
+::ng-deep .ticket-sec .mat-mdc-tab.mdc-tab--active .mdc-tab__text-label {
+  color: #06667d !important;
+}
+
+/* Header row: centered title, device chip pinned right */
+.pm-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 49px;
+  box-sizing: border-box;
+  padding: 0 12px 4px 12px;
+  background: #fff;
+  border-style: solid;
+  border-color: transparent;
+  border-image: linear-gradient(
+    to right,
+    rgb(0, 178, 220) 25%,
+    rgb(253, 183, 59) 25%,
+    rgb(253, 183, 59) 50%,
+    rgb(146, 200, 73) 50%,
+    rgb(146, 200, 73) 75%,
+    rgb(245, 130, 51) 75%
+  );
+  border-image-slice: 1;
+  border-image-width: 0 0 4px 0;
+  min-width: 0;
+}
+
+.pm-title {
+  font-weight: 500;
+  margin: 0;
+  font-size: 0.9rem;
+  text-align: center;
+  color: #06667d;
+  letter-spacing: 0;
+  border: 0 !important;
+  border-image: none !important;
+  padding: 0;
+}
+
+.device-chip {
+  position: absolute;
+  right: 10px;
+  top: 8px;
+  transform: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  border: 1px solid #d0d7de;
+  background: #fff;
+  font-size: 0.72rem;
+  color: #06667d;
+  font-weight: 400;
+}
+
+.device-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #2ecc71;
+  display: inline-block;
+}
+
+/* Tab body */
+.pm-tab-body {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+.pm-subtitle {
+  color: #495057;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding-left: 4px;
+  margin-bottom: 12px;
+}
+
+.pm-subtitle-strong {
+  font-weight: 500;
+  color: #495057;
+}
+
+/* Row of three top action buttons */
+.pm-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.pm-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  color: #06667d;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  border: 1px solid #dfe4ea;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 1px 2px rgba(20, 40, 60, 0.04);
+  transition: background-color 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.pm-action-btn:hover:not(:disabled) {
+  background: #f6fbfd;
+  border-color: #7ed3e3;
+  box-shadow: 0 2px 6px rgba(20, 40, 60, 0.06);
+}
+
+.pm-action-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.pm-action-primary {
+  background: #00b2dc;
+  color: #fff;
+  border-color: #00b2dc;
+  box-shadow: 0 1px 3px rgba(0, 178, 220, 0.35);
+}
+
+.pm-action-primary:hover:not(:disabled) {
+  background: #009fc6;
+  border-color: #009fc6;
+  color: #fff;
+}
+
+.pm-action-icon {
+  width: 16px;
+  height: 16px;
+  color: #06667d;
+  font-size: 0.9rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.pm-action-primary .pm-action-icon {
+  color: #fff;
+}
+
+/* "Present" indicator badge next to the generic-package button */
+.generic-present-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 16px;
+  background: #e8f7ee;
+  color: #1e8e4a;
+  border: 1px solid #b6e5c4;
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.badge-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #1e8e4a;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+/* Generic cards used for the packages list and the logs panel */
+.pm-card {
+  border: 1px solid #e2e6ea;
+  border-radius: 6px;
+  background: #fafbfc;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(20, 40, 60, 0.04);
+}
+
+.pm-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: #f4f6f8;
+  border-bottom: 1px solid #e2e6ea;
+}
+
+.pm-card-title {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.pm-section-title {
+  color: #495057;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 0.85rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.pm-count {
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: #6c757d;
+}
+
+.pm-card-header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.pm-search {
+  border: 1px solid #dfe4ea;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  width: min(200px, 100%);
+  min-width: 0;
+  background: #fff;
+  outline: none;
+  color: #2c3e50;
+}
+
+.pm-search::placeholder {
+  color: #98a4b0;
+}
+
+.pm-search:focus {
+  border-color: #7ed3e3;
+}
+
+.pm-icon-btn {
+  border: 1px solid #dfe4ea;
+  background: #fff;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #4b6072;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pm-icon-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.pm-icon-btn:hover {
+  background: #f6fbfd;
+  border-color: #7ed3e3;
+  color: #2c3e50;
+}
+
+.pm-card-body {
+  padding: 10px 14px;
+  background: #fff;
+}
+
+/* Available packages list */
+.pm-packages {
+  max-height: 190px;
+  overflow-y: auto;
+}
+
+.pm-package-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #dfe4ea;
+  border-radius: 6px;
+  padding: 7px 12px;
+  margin-bottom: 5px;
+  background: #fff;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.pm-package-row:hover {
+  background: #f4fbfd;
+}
+
+.pm-package-row.selected {
+  background: #f8f9fa;
+  border-color: #00b2dc;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  box-shadow: 0 0 0 1px #00b2dc inset;
+}
+
+.pm-package-row input[type='radio'] {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  border: 1px solid #00b2dc;
+  border-radius: 50%;
+  background: #fff;
+  flex: 0 0 16px;
+  cursor: pointer;
+}
+
+.pm-package-row input[type='radio']:checked {
+  background: radial-gradient(circle, #00b2dc 0 5px, #fff 5.5px);
+}
+
+.pm-package-label {
+  cursor: pointer;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: #495057;
+  margin: 0;
+  flex: 1;
+}
+
+.pm-empty {
+  color: #6c757d;
+  font-size: 0.85rem;
+  padding: 10px 4px;
+  text-align: center;
+}
+
+/* Logs panel */
+.pm-logs {
+  min-height: 130px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.pm-logs-placeholder {
+  color: #8a9198;
+  font-style: italic;
+  font-size: 0.85rem;
+}
+
+.install-log-divider {
+  margin: 8px 8px 0;
+  padding-top: 8px;
+  border-top: 1px solid #e3eaed;
+  color: #6c757d;
+  font-size: 0.76rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pm-autoscroll {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: #2c3e50;
+  margin: 0;
+  cursor: pointer;
+}
+
+.pm-autoscroll input[type='checkbox'] {
+  accent-color: #00b2dc;
+  cursor: pointer;
+}
+
+/* Sticky install bar at the bottom */
+.pm-install-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid #e2e6ea;
+  border-left: 3px solid #00b2dc;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(20, 40, 60, 0.04);
+}
+
+.pm-install-title {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #06667d;
+}
+
+.pm-install-sub {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 2px;
+}
+
+.pm-install-selected {
+  font-weight: 400;
+  color: #2c3e50;
+}
+
+.pm-install-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Override the legacy absolute positioning of the Install / Close buttons
+   when they live inside the new install bar layout. */
+.pm-install-actions .close-btn {
+  position: static;
+  right: auto;
+  margin: 0;
+}
+
+.pm-install-actions .install-btn {
+  margin: 0;
+}
+
+@media (max-width: 767.98px) {
+  .pm-container {
+    padding: 0 4px 10px;
+  }
+
+  .pm-header {
+    height: auto;
+    min-height: 49px;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px 10px 12px;
+  }
+
+  .pm-title {
+    flex: 1 1 100%;
+    text-align: left;
+  }
+
+  .device-chip {
+    position: static;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .pm-tab-body {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .pm-subtitle {
+    line-height: 1.4;
+  }
+
+  .pm-actions {
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .pm-action-btn {
+    flex: 1 1 calc(50% - 8px);
+    justify-content: center;
+    min-height: 40px;
+    padding: 8px 10px;
+    text-align: center;
+  }
+
+  .pm-card-header {
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .pm-card-title,
+  .pm-card-header-right {
+    width: 100%;
+  }
+
+  .pm-card-header-right {
+    justify-content: flex-end;
+  }
+
+  .pm-search {
+    flex: 1 1 auto;
+  }
+
+  .pm-card-body {
+    padding: 9px 10px;
+  }
+
+  .pm-packages {
+    max-height: 30vh;
+  }
+
+  .pm-logs {
+    min-height: 110px;
+    max-height: 30vh;
+  }
+
+  .pm-install-bar {
+    align-items: stretch;
+    flex-direction: column;
+    padding: 12px;
+  }
+
+  .pm-install-actions {
+    justify-content: flex-end;
+  }
+
+  .pm-install-actions .close-btn {
+    min-width: 76px;
+  }
+
+  .custom-modal {
+    width: auto;
+    max-width: none;
+    margin: 12px;
+  }
+
+  .modal-footer {
+    gap: 8px;
+    padding: 1rem;
+  }
+
+  .modal-footer .modal-btns {
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 479.98px) {
+  .pm-action-btn {
+    flex-basis: 100%;
+  }
+
+  .pm-card-header-right {
+    justify-content: stretch;
+  }
+
+  .pm-search {
+    width: auto;
+  }
+
+  .pm-autoscroll {
+    font-size: 0.75rem;
+  }
+
+  .pm-install-actions {
+    width: 100%;
+  }
+
+  .pm-install-actions .close-btn {
+    flex: 1 1 0;
+  }
+
+  .custom-modal {
+    margin: 8px;
+  }
+
+  .modal-header,
+  .modal-footer {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  .modal-body {
+    padding: 0.75rem;
+  }
+
+  .modal-body .container {
+    margin-top: 0.5rem !important;
+  }
+
+  .modal-body .row > label,
+  .modal-body .row > div {
+    width: 100%;
+  }
+
+  .modal-body .row > label {
+    padding-bottom: 0.35rem;
+  }
 }
