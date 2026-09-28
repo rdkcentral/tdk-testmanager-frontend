@@ -18,13 +18,13 @@ http://www.apache.org/licenses/LICENSE-2.0
 * limitations under the License.
 */
 import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { Component, OnInit,HostListener } from '@angular/core';
+import { Component, OnInit, HostListener } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
   ColDef,
   IMultiFilterParams,
   RowSelectedEvent,
-  SelectionChangedEvent
+  SelectionChangedEvent,
 } from 'ag-grid-community';
 
 import 'ag-grid-community/styles/ag-grid.css';
@@ -157,6 +157,34 @@ export class UserListComponent implements OnInit {
       } as IMultiFilterParams,
     },
     {
+      headerName: 'Status',
+      field: 'userStatus',
+      filter: 'agMultiColumnFilter',
+      flex: 1,
+      cellRenderer: (params: any) => {
+        const status = params.value;
+        if (status === 'PENDING') {
+          return '<span class="badge bg-warning text-dark">PENDING</span>';
+        } else if (status === 'APPROVED') {
+          return '<span class="badge bg-success">APPROVED</span>';
+        } else if (status === 'REJECTED') {
+          return '<span class="badge bg-danger">Rejected</span>';
+        }
+        return status;
+      },
+      filterParams: {
+        filters: [
+          {
+            filter: 'agTextColumnFilter',
+            display: 'subMenu',
+          },
+          {
+            filter: 'agSetColumnFilter',
+          },
+        ],
+      } as IMultiFilterParams,
+    },
+    {
       headerName: 'Action',
       field: '',
       sortable: false,
@@ -164,6 +192,8 @@ export class UserListComponent implements OnInit {
       cellRendererParams: (params: any) => ({
         onEditClick: this.userEdit.bind(this),
         onDeleteClick: this.delete.bind(this),
+        onApproveClick: this.approveUser.bind(this),
+        onRejectClick: this.rejectUser.bind(this),
         selectedRowCount: () => this.selectedRowCount,
         lastSelectedNodeId: this.lastSelectedNodeId,
       }),
@@ -200,7 +230,7 @@ export class UserListComponent implements OnInit {
     private http: HttpClient,
     private router: Router,
     private usermanageservice: UserManagementService,
-    private _snakebar: MatSnackBar
+    private _snakebar: MatSnackBar,
   ) {}
 
   /**
@@ -343,5 +373,69 @@ export class UserListComponent implements OnInit {
   userEdit(user: any): void {
     localStorage.setItem('user', JSON.stringify(user));
     this.router.navigate(['configure/edit-user']);
+  }
+
+  /**
+   * Approves a pending or rejected user.
+   * @param data - The user data to be approved.
+   */
+  approveUser(data: any): void {
+    if (
+      confirm("Are you sure you want to approve user '" + data.userName + "'?")
+    ) {
+      this.usermanageservice.approveUser(data.userName).subscribe({
+        next: (res) => {
+          this._snakebar.open(res.message, '', {
+            duration: 2000,
+            panelClass: ['success-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+          this.ngOnInit();
+        },
+        error: (err) => {
+          this._snakebar.open(err.message, '', {
+            duration: 3000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        },
+      });
+    }
+  }
+
+  /**
+   * Rejects a pending user.
+   * @param data - The user data to be rejected.
+   */
+  rejectUser(data: any): void {
+    if (
+      confirm(
+        "Are you sure you want to reject user '" +
+          data.userName +
+          "'? The user will be deleted and can register again.",
+      )
+    ) {
+      this.usermanageservice.rejectUser(data.userName).subscribe({
+        next: (res) => {
+          this._snakebar.open(res.message, '', {
+            duration: 2000,
+            panelClass: ['success-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+          this.ngOnInit();
+        },
+        error: (err) => {
+          this._snakebar.open(err.message, '', {
+            duration: 3000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        },
+      });
+    }
   }
 }
