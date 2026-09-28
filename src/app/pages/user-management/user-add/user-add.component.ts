@@ -19,7 +19,16 @@ http://www.apache.org/licenses/LICENSE-2.0
 */
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, AbstractControlOptions, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  AbstractControlOptions,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators,
+} from '@angular/forms';
 import { MaterialModule } from '../../../material/material.module';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
@@ -29,21 +38,24 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 @Component({
   selector: 'app-user-add',
   standalone: true,
-  imports: [CommonModule, HttpClientModule, ReactiveFormsModule, MaterialModule],
+  imports: [
+    CommonModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    MaterialModule,
+  ],
   templateUrl: './user-add.component.html',
-  styleUrl: './user-add.component.css'
+  styleUrl: './user-add.component.css',
 })
 export class UserAddComponent implements OnInit {
-
   userForm!: FormGroup;
   userFormSubmitted = false;
   isPasswordVisible: boolean | undefined;
   visible = true;
   allGroupName: any;
-  allRoles: any
+  allRoles: any;
   errormessage!: string;
-  loggedInUser:any;
-
+  loggedInUser: any;
 
   /**
    * Constructor for UserAddComponent.
@@ -53,41 +65,67 @@ export class UserAddComponent implements OnInit {
    * @param usermanageserice UserManagementService for user management operations
    * @param _snakebar MatSnackBar for notifications
    */
-  constructor(private http: HttpClient, private fb: FormBuilder, private router: Router,
+  constructor(
+    private http: HttpClient,
+    private fb: FormBuilder,
+    private router: Router,
     private usermanageserice: UserManagementService,
-    private _snakebar: MatSnackBar
-  ) { 
-    this.loggedInUser = JSON.parse(localStorage.getItem('loggedinUser')|| '{}');
+    private _snakebar: MatSnackBar,
+  ) {
+    this.loggedInUser = JSON.parse(
+      localStorage.getItem('loggedinUser') || '{}',
+    );
   }
-
-
 
   /**
    * Initialize the component and set up the user form and subscriptions.
    */
   ngOnInit(): void {
-   /**
+    /**
      * Regular expression for email validation.
      */
-    let emailregex: RegExp = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    this.userForm = new FormGroup({
-      username: new FormControl<string | null>('', { validators: [Validators.required, Validators.minLength(4)] }),
-      useremail: new FormControl<string | null>('', { validators: [Validators.required, Validators.pattern(emailregex)] }),
-      displayname: new FormControl<string | null>('', { validators: [Validators.required,this.noLeadingSpacesValidator] }),
-      userpassword: new FormControl<string | null>('', { validators: [Validators.required, Validators.minLength(6)] }),
-      retypepassword: new FormControl<string | null>('', { validators: Validators.required }),
-      usergroupname: new FormControl<string | null>(''),
-      rolename: new FormControl<string | null>('', { validators: Validators.required }),
-      categoryname: new FormControl<string | null>('', { validators: Validators.required })
-    }, <AbstractControlOptions>{ validators: this.passwordMatchValidator('userpassword', 'retypepassword') });
+    let emailregex: RegExp =
+      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    this.userForm = new FormGroup(
+      {
+        username: new FormControl<string | null>('', {
+          validators: [Validators.required, Validators.minLength(4)],
+        }),
+        useremail: new FormControl<string | null>('', {
+          validators: [Validators.required, Validators.pattern(emailregex)],
+        }),
+        displayname: new FormControl<string | null>('', {
+          validators: [Validators.required, this.noLeadingSpacesValidator],
+        }),
+        userpassword: new FormControl<string | null>('', {
+          validators: [Validators.required, Validators.minLength(6)],
+        }),
+        retypepassword: new FormControl<string | null>('', {
+          validators: Validators.required,
+        }),
+        usergroupname: new FormControl<string | null>(''),
+        rolename: new FormControl<string | null>('', {
+          validators: Validators.required,
+        }),
+        categoryname: new FormControl<string | null>('', {
+          validators: Validators.required,
+        }),
+      },
+      <AbstractControlOptions>{
+        validators: this.passwordMatchValidator(
+          'userpassword',
+          'retypepassword',
+        ),
+      },
+    );
 
-    this.usermanageserice.getGroupName().subscribe(res => {
-      this.allGroupName = res
-    })
+    this.usermanageserice.getGroupName().subscribe((res) => {
+      this.allGroupName = res;
+    });
 
-    this.usermanageserice.getAllRole().subscribe(res => {
+    this.usermanageserice.getAllRole().subscribe((res) => {
       this.allRoles = res;
-    })
+    });
     this.userForm.get('username')?.valueChanges.subscribe((value) => {
       const cleanedValue = value.replace(/\s+/g, '');
       if (cleanedValue !== value) {
@@ -120,13 +158,12 @@ export class UserAddComponent implements OnInit {
         });
       }
     });
-    this.displayname.valueChanges.subscribe(value => {
+    this.displayname.valueChanges.subscribe((value) => {
       if (value && value.startsWith(' ')) {
         this.displayname.setValue(value.trimStart(), { emitEvent: false });
       }
     });
   }
-  
 
   /**
    * Getter for the displayname form control.
@@ -135,8 +172,6 @@ export class UserAddComponent implements OnInit {
   get displayname(): AbstractControl {
     return this.userForm.get('displayname')!;
   }
-
-
 
   /**
    * Validator to check for leading spaces in a form control value.
@@ -148,8 +183,6 @@ export class UserAddComponent implements OnInit {
     return value.startsWith(' ') ? { noLeadingSpaces: true } : null;
   }
 
-
-
   /**
    * Custom validator for password match.
    * @param newpassword The new password input field name.
@@ -160,44 +193,41 @@ export class UserAddComponent implements OnInit {
     return (formGroup: FormGroup) => {
       let password = formGroup['controls'][newpassword];
       let confirmPassword = formGroup['controls'][confirmpassword];
-      if (confirmPassword.errors && !confirmPassword.errors['passwordMatchValidator']) {
-        return
+      if (
+        confirmPassword.errors &&
+        !confirmPassword.errors['passwordMatchValidator']
+      ) {
+        return;
       }
       if (password.value !== confirmPassword.value) {
-        confirmPassword.setErrors({ passwordMatchValidator: true })
+        confirmPassword.setErrors({ passwordMatchValidator: true });
       } else {
-        confirmPassword.setErrors(null)
+        confirmPassword.setErrors(null);
       }
-    }
+    };
   }
-
-
 
   /**
    * Navigates back to the user management page.
    */
-  goBack() :void{
-    this.router.navigate(["configure/user-management"]);
+  goBack(): void {
+    this.router.navigate(['configure/user-management']);
   }
-
-
 
   /**
    * Resets the user form.
    */
-  reset():void {
+  reset(): void {
     this.userForm.reset();
   }
-
-  
 
   /**
    * Handles the user form submission.
    */
-  onuserSubmit() :void{
+  onuserSubmit(): void {
     this.userFormSubmitted = true;
     if (this.userForm.invalid) {
-      return
+      return;
     } else {
       let obj = {
         userName: this.userForm.value.username,
@@ -206,33 +236,31 @@ export class UserAddComponent implements OnInit {
         userGroupName: this.userForm.value.usergroupname,
         userRoleName: this.userForm.value.rolename,
         userDisplayName: this.userForm.value.displayname,
-        userCategory: this.userForm.value.categoryname
-      }
+        userCategory: this.userForm.value.categoryname,
+        userStatus: 'APPROVED',
+      };
       this.usermanageserice.createUser(obj).subscribe({
         next: (res) => {
           this._snakebar.open(res.message, '', {
             duration: 3000,
             panelClass: ['success-msg'],
             horizontalPosition: 'end',
-            verticalPosition: 'top'
-          })
+            verticalPosition: 'top',
+          });
           setTimeout(() => {
-            this.router.navigate(["configure/user-management"]);
+            this.router.navigate(['configure/user-management']);
             this.userForm.reset();
           }, 1000);
-
         },
         error: (err) => {
           this._snakebar.open(err.message, '', {
             duration: 2000,
             panelClass: ['err-msg'],
             horizontalPosition: 'end',
-            verticalPosition: 'top'
-          })
-        }
-      })
+            verticalPosition: 'top',
+          });
+        },
+      });
     }
   }
-
-
 }

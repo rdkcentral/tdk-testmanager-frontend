@@ -22,33 +22,41 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class UserManagementService {
-
   /**
    * Constructor for UserManagementService.
    * @param http HttpClient for HTTP requests
    * @param authService AuthService for authentication and API token
    * @param config Application configuration injected as APP_CONFIG
    */
-  constructor(private http: HttpClient, private authService: AuthService,
-    @Inject('APP_CONFIG') private config: any
-  ) { }
+  constructor(
+    private http: HttpClient,
+    private authService: AuthService,
+    @Inject('APP_CONFIG') private config: any,
+  ) {}
 
   /**
    * Options for HTTP requests with authorization header.
    */
-  private options = { headers: new HttpHeaders().set('Authorization', this.authService.getApiToken()) };
+  private options = {
+    headers: new HttpHeaders().set(
+      'Authorization',
+      this.authService.getApiToken(),
+    ),
+  };
 
   /**
    * Gets all users.
    * @returns Observable with the list of users.
    */
   getAlluser(): Observable<any> {
-    return this.http.get(`${this.config.apiUrl}api/v1/users/findAll`, this.options);
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/users/findAll`,
+      this.options,
+    );
   }
 
   /**
@@ -58,9 +66,12 @@ export class UserManagementService {
    */
   deleteUser(id: string): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.delete(`${this.config.apiUrl}api/v1/users/delete?id=${id}`, { headers });
+    return this.http.delete(
+      `${this.config.apiUrl}api/v1/users/delete?id=${id}`,
+      { headers },
+    );
   }
 
   /**
@@ -68,7 +79,10 @@ export class UserManagementService {
    * @returns Observable with the list of group names.
    */
   getGroupName(): Observable<any> {
-    return this.http.get(`${this.config.apiUrl}api/v1/usergroup/findall`, this.options);
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/usergroup/findall`,
+      this.options,
+    );
   }
 
   /**
@@ -76,7 +90,10 @@ export class UserManagementService {
    * @returns Observable with the list of roles.
    */
   getAllRole(): Observable<any> {
-    return this.http.get(`${this.config.apiUrl}api/v1/userrole/findall`, this.options);
+    return this.http.get(
+      `${this.config.apiUrl}api/v1/userrole/findall`,
+      this.options,
+    );
   }
 
   /**
@@ -86,9 +103,11 @@ export class UserManagementService {
    */
   createUser(data: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.post(`${this.config.apiUrl}api/v1/users/create`, data, { headers })
+    return this.http.post(`${this.config.apiUrl}api/v1/users/create`, data, {
+      headers,
+    });
   }
 
   /**
@@ -98,10 +117,43 @@ export class UserManagementService {
    */
   updateUser(data: any): Observable<any> {
     const headers = new HttpHeaders({
-      'Authorization': this.authService.getApiToken()
+      Authorization: this.authService.getApiToken(),
     });
-    return this.http.put(`${this.config.apiUrl}api/v1/users/update`, data, { headers, observe: 'response'})
+    return this.http.put(`${this.config.apiUrl}api/v1/users/update`, data, {
+      headers,
+      observe: 'response',
+    });
   }
 
+  /**
+   * Approves a pending user by username.
+   * @param userName The username of the user to approve.
+   * @returns Observable with the approval result.
+   */
+  approveUser(userName: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.put(
+      `${this.config.apiUrl}api/v1/users/approveUser?userName=${encodeURIComponent(userName)}`,
+      {},
+      { headers },
+    );
+  }
 
+  /**
+   * Rejects a pending user by username.
+   * @param userName The username of the user to reject.
+   * @returns Observable with the rejection result.
+   */
+  rejectUser(userName: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.put(
+      `${this.config.apiUrl}api/v1/users/rejectUser?userName=${encodeURIComponent(userName)}`,
+      {},
+      { headers },
+    );
+  }
 }
