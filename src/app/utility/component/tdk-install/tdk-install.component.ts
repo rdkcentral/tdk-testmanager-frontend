@@ -99,8 +99,6 @@ export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
   // Search text used to filter the available platform packages list.
   packageSearch: string = '';
 
-  // Auto-scroll the logs panel as new log lines arrive.
-  autoScroll: boolean = true;
   private lastLogsLength: number = 0;
 
   // --- Asynchronous installation job state ---
@@ -108,23 +106,22 @@ export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
   installJobId: string | null = null;
   installPhase: string | null = null;
   installStatus: string | null = null; // 'RUNNING' | 'SUCCESS' | 'FAILED'
+  installationDirectory: string = '';
   installResult: { statusCode: number; logs: string } | null = null;
   installErrorMessage: string | null = null;
   private pollingTimer: ReturnType<typeof setInterval> | null = null;
-  private readonly POLL_INTERVAL_MS = 1500;
+  private readonly POLL_INTERVAL_MS = 5000;
 
   // User-friendly labels and display order for installation phases.
   readonly phaseLabels: Record<string, string> = {
     QUEUED: 'Waiting to start',
-    COPYING_PACKAGE: 'Copying package to device',
-    COPYING_SCRIPT: 'Copying installation script',
+    COPYING_PACKAGE_AND_SCRIPT: 'Copying package and installation script',
     INSTALLING: 'Installing package',
     VERIFYING: 'Verifying installation',
   };
   readonly phaseShortLabels: Record<string, string> = {
     QUEUED: 'Waiting to start',
-    COPYING_PACKAGE: 'Copying package',
-    COPYING_SCRIPT: 'Copying script',
+    COPYING_PACKAGE_AND_SCRIPT: 'Copying package and script',
     INSTALLING: 'Installing',
     VERIFYING: 'Verifying',
   };
@@ -179,7 +176,7 @@ export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
    * arrives, if the user has left the "Auto-scroll" checkbox enabled.
    */
   ngAfterViewChecked(): void {
-    if (!this.autoScroll || !this.logsContainer) {
+    if (!this.logsContainer) {
       return;
     }
     const currentLength = (this.createlogs || '').length;
@@ -267,10 +264,39 @@ export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
       return;
     }
     try {
-      await navigator.clipboard.writeText(this.createlogs);
+      if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+        await navigator.clipboard.writeText(this.createlogs);
+      } else {
+        this.copyLogsWithFallback();
+      }
       this._snakebar.open('Logs copied to clipboard', '', { duration: 2000 });
     } catch {
-      this._snakebar.open('Unable to copy logs', '', { duration: 2000 });
+      try {
+        this.copyLogsWithFallback();
+        this._snakebar.open('Logs copied to clipboard', '', { duration: 2000 });
+      } catch {
+        this._snakebar.open('Unable to copy logs', '', { duration: 2000 });
+      }
+    }
+  }
+
+  private copyLogsWithFallback(): void {
+    const textArea = document.createElement('textarea');
+    textArea.value = this.createlogs;
+    textArea.setAttribute('readonly', '');
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+    document.body.appendChild(textArea);
+    let copied = false;
+    try {
+      textArea.select();
+      copied = document.execCommand('copy');
+    } finally {
+      textArea.remove();
+    }
+
+    if (!copied) {
+      throw new Error('Clipboard copy failed');
     }
   }
 
@@ -400,6 +426,7 @@ export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
    * @returns {void}
    */
   onInstallPackage(): void {
+    const installationDirectory = this.installationDirectory.trim() || '/';
     if (this.isInstalling || !this.selectedPackageName) {
       return;
     }
@@ -422,7 +449,8 @@ export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
       .installPackages(
         installPackageObj.type,
         installPackageObj.device,
-        installPackageObj.packageName
+        installPackageObj.packageName,
+        installationDirectory
       )
       .subscribe({
         next: (job) => {
@@ -781,6 +809,7 @@ export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
   onTabClick(event: any) {
     let label = event.tab.textLabel;
     this.selectedPackage = label;
+    this.installationDirectory = '';
     this.clearLogs();
     this.packageNames = []; // Clear old list
     this.loadPackage = true;

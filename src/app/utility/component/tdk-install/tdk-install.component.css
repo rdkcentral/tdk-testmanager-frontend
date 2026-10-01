@@ -1194,21 +1194,6 @@ button:disabled {
   letter-spacing: 0.04em;
 }
 
-.pm-autoscroll {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.8rem;
-  color: #2c3e50;
-  margin: 0;
-  cursor: pointer;
-}
-
-.pm-autoscroll input[type='checkbox'] {
-  accent-color: #00b2dc;
-  cursor: pointer;
-}
-
 /* Sticky install bar at the bottom */
 .pm-install-bar {
   display: flex;
@@ -1238,6 +1223,44 @@ button:disabled {
 .pm-install-selected {
   font-weight: 400;
   color: #2c3e50;
+}
+
+.pm-install-directory {
+  display: flex;
+  flex: 1 1 260px;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 340px;
+}
+
+.pm-install-directory label {
+  color: #6c757d;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.pm-install-directory input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #dfe4ea;
+  border-radius: 6px;
+  background: #fff;
+  color: #2c3e50;
+  font-size: 0.8rem;
+  outline: none;
+}
+
+.pm-install-directory input::placeholder {
+  color: #98a4b0;
+}
+
+.pm-install-directory input:focus {
+  border-color: #7ed3e3;
+}
+
+.pm-install-directory input:disabled {
+  background: #f1f3f5;
+  cursor: not-allowed;
 }
 
 .pm-install-actions {
@@ -1344,6 +1367,11 @@ button:disabled {
     padding: 12px;
   }
 
+  .pm-install-directory {
+    width: 100%;
+    max-width: none;
+  }
+
   .pm-install-actions {
     justify-content: flex-end;
   }
@@ -1379,10 +1407,6 @@ button:disabled {
 
   .pm-search {
     width: auto;
-  }
-
-  .pm-autoscroll {
-    font-size: 0.75rem;
   }
 
   .pm-install-actions {

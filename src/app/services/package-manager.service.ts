@@ -70,13 +70,24 @@ export class PackageManagerService {
    * @param type The type of the package to be installed.
    * @param device The target device where the package will be installed.
    * @param packageName The name of the package to be installed.
+   * @param installationDirectory The directory on the target device where the package is installed.
    * @returns Observable that emits the job creation response `{ jobId, phase, status, result }`.
    */
-  installPackages(type:string,device:string,packageName:string): Observable<any> {
+  installPackages(
+    type: string,
+    device: string,
+    packageName: string,
+    installDirectory: string
+  ): Observable<any> {
     const headers = new HttpHeaders({
       'Authorization': this.authService.getApiToken()
     });
-     const body = new URLSearchParams({ type, device, packageName });
+     const body = new URLSearchParams({
+       type,
+       device,
+       packageName,
+       installDirectory,
+     });
     return this.http.post(`${this.config.apiUrl}api/v1/packagemanager/installPackage`, body.toString(), {
       headers: headers.set('Content-Type', 'application/x-www-form-urlencoded'),
     });

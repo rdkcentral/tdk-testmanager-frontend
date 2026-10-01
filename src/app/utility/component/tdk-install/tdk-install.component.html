@@ -204,11 +204,6 @@ limitations under the License.
       <div class="pm-card-header">
         <div class="pm-card-title pm-section-title">Package Creation / Installation Logs</div>
         <div class="pm-card-header-right">
-          <label class="pm-autoscroll">
-            <input type="checkbox" [(ngModel)]="autoScroll"
-              [ngModelOptions]="{ standalone: true }" />
-            Auto-scroll
-          </label>
           <button
             type="button"
             class="pm-icon-btn"
@@ -338,6 +333,19 @@ limitations under the License.
           Selected package:
           <span class="pm-install-selected">{{ selectedPackageName }}</span>
         </div>
+      </div>
+      <div class="pm-install-directory">
+        <label for="installation-directory">Installation Directory (Optional)</label>
+        <input
+          id="installation-directory"
+          type="text"
+          [(ngModel)]="installationDirectory"
+          [ngModelOptions]="{ standalone: true }"
+          placeholder="Default: /"
+          autocomplete="off"
+          [disabled]="isLoading || isInstalling"
+          matTooltip="Optional. Leave blank to install in the default '/' directory, or enter an absolute path on the target device (e.g. /opt/tdk)."
+        />
       </div>
       <div class="pm-install-actions">
         <button
