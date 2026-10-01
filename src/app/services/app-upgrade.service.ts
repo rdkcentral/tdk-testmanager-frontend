@@ -39,7 +39,7 @@ export class AppUpgradeService {
   constructor(
     private http: HttpClient,
     private authService: AuthService,
-    @Inject('APP_CONFIG') private config: any
+    @Inject('APP_CONFIG') private config: any,
   ) {}
 
   /**
@@ -57,7 +57,7 @@ export class AppUpgradeService {
     return this.http.post(
       `${this.config.apiUrl}api/v1/app-upgrade/uploadWarFile`,
       formData,
-      { headers, reportProgress: true, observe: 'events' }
+      { headers, reportProgress: true, observe: 'events' },
     );
   }
 
@@ -69,14 +69,14 @@ export class AppUpgradeService {
    */
   upgradeServiceApplication(
     backupLocation: string,
-    warLocation: string
+    warLocation: string,
   ): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: this.authService.getApiToken(),
     });
     return this.http.post(
       `${this.config.apiUrl}api/v1/app-upgrade/upgradeApplication?backupLocation=${backupLocation}&uploadLocation=${warLocation}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -101,7 +101,7 @@ export class AppUpgradeService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/app-upgrade/deploymentLogs`,
-      { headers }
+      { headers },
     );
   }
 
@@ -120,7 +120,7 @@ export class AppUpgradeService {
     return this.http.post(
       `${this.config.nodeApiUrl}appupgrade/tdkUIUpgrade/uploadBuild`,
       formData,
-      { headers, reportProgress: true, observe: 'events' }
+      { headers, reportProgress: true, observe: 'events' },
     );
   }
 
@@ -129,13 +129,16 @@ export class AppUpgradeService {
    * @param uploadLocation The uploaded build file location
    * @returns Observable of the upgrade response
    */
-  upgradeFrontendApplication(uploadLocation: string, backupLocation :String): Observable<any> {
+  upgradeFrontendApplication(
+    uploadLocation: string,
+    backupLocation: String,
+  ): Observable<any> {
     const headers = new HttpHeaders({
       Authorization: this.authService.getApiToken(),
     });
     return this.http.post(
       `${this.config.nodeApiUrl}appupgrade/tdkUIUpgrade/upgradeApplication?backupPath=${backupLocation}&uploadLocation=${uploadLocation}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -150,7 +153,7 @@ export class AppUpgradeService {
     });
     return this.http.get(
       `${this.config.nodeApiUrl}appupgrade/tdkUIUpgrade/deploymentLog?path=${deploymentLogPath}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -165,7 +168,7 @@ export class AppUpgradeService {
 
     return this.http.get(
       `${this.config.apiUrl}api/v1/app-upgrade/runLiquibase`,
-      { headers }
+      { headers },
     );
   }
 
@@ -180,7 +183,7 @@ export class AppUpgradeService {
 
     return this.http.get(
       `${this.config.apiUrl}api/v1/app-upgrade/data-recovery/execute`,
-      { headers }
+      { headers },
     );
   }
 
@@ -196,7 +199,7 @@ export class AppUpgradeService {
 
     return this.http.get(
       `${this.config.apiUrl}api/v1/app-upgrade/getListOfAllChangesSince?since=${sinceDate}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -212,16 +215,16 @@ export class AppUpgradeService {
 
     return this.http.get(
       `${this.config.apiUrl}api/v1/app-upgrade/exportChangeBasedOnTime?since=${sinceDate}`,
-      { headers, responseType: 'blob' }
+      { headers, responseType: 'blob' },
     );
   }
 
   /**
    * Generates a WAR (Web Application Archive) file for the specified release tag.
-   * 
+   *
    * @param releaseTag - The release tag identifier used for WAR generation
    * @returns An Observable that emits the response from the WAR generation API endpoint
-   * 
+   *
    * @remarks
    * This method makes an authenticated POST request to the app-upgrade service
    * to trigger WAR file generation for deployment purposes.
@@ -242,11 +245,41 @@ export class AppUpgradeService {
 
   /**
    * Generates a URL for streaming WAR generation logs for a specific execution.
-   * 
+   *
    * @param executionId - The unique identifier of the execution to retrieve logs for
    * @returns The complete URL string for accessing the WAR generation log stream endpoint
    */
   getWarGenerationLogStreamUrl(executionId: string): string {
     return `${this.config.apiUrl}/api/v1/app-upgrade/war-generation/logs?executionId=${executionId}`;
+  }
+
+  /**
+   * Triggers Angular build generation for the specified release tag or branch name.
+   *
+   * @param releaseTag - The release tag or branch name used for Angular build generation
+   * @returns An Observable that emits the response from the Angular build generation API endpoint
+   */
+  generateAngularBuild(releaseTag: string): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    return this.http.post(
+      `${this.config.nodeApiUrl}appupgrade/tdkUIUpgrade/angularBuildGeneration`,
+      null,
+      {
+        headers,
+        params: { releaseTag },
+      },
+    );
+  }
+
+  /**
+   * Generates a URL for streaming Angular build generation logs for a specific execution.
+   *
+   * @param executionId - The unique identifier of the execution to retrieve logs for
+   * @returns The complete URL string for accessing the Angular build generation log stream endpoint
+   */
+  getAngularBuildLogStreamUrl(executionId: string): string {
+    return `${this.config.nodeApiUrl}appupgrade/tdkUIUpgrade/angularBuildGeneration/logs?executionId=${executionId}`;
   }
 }

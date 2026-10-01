@@ -17,7 +17,14 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  NgZone,
+} from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -39,11 +46,13 @@ import { map } from 'rxjs/operators';
  * AppFrontendUpgradeComponent
  * -------------------------------------------------
  * This component provides the UI and logic for upgrading the Angular application frontend.
- * It handles file upload, upgrade initiation, progress tracking, and log display.
+ * It handles both automated build generation (via tag/branch) and manual build upload,
+ * similar to the backend service upgrade page.
  *
  * Features:
- * - Stepper/tab-based UI for build upload and upgradation steps
- * - File upload with validation and progress
+ * - Toggle between Build Generation and Build Upload
+ * - Automated Angular build generation with real-time log streaming via SSE
+ * - Manual build file upload with validation and progress tracking
  * - Upgrade process initiation and status tracking
  * - Display of upgradation and deployment logs
  * - Uses Angular Material and Bootstrap for UI
@@ -62,7 +71,7 @@ import { map } from 'rxjs/operators';
   templateUrl: './app-frontend-upgrade.component.html',
   styleUrl: './app-frontend-upgrade.component.css',
 })
-export class AppFrontendUpgradeComponent {
+export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
   @ViewChild('fileInput') fileInput!: ElementRef;
   @ViewChild('tabGroup') tabGroup!: MatTabGroup;
 
@@ -92,6 +101,17 @@ export class AppFrontendUpgradeComponent {
   upgradeInProgress: boolean = false;
 
   isUpgradeCompleted: boolean = false;
+
+  // Build Generation / Upload toggle
+  buildTabIndex = 0;
+  buildGenerationForm: FormGroup;
+  buildGenerationFormSubmitted = false;
+  buildGenerationInProgress = false;
+  buildGenerationExecutionId: string | null = null;
+  buildGenerationStatus: string | null = null;
+  buildGenerationLogs: string = '';
+  private buildLogEventSource: EventSource | null = null;
+
   /**
    * Constructor: Initializes forms and injects required services.
    */
@@ -99,7 +119,8 @@ export class AppFrontendUpgradeComponent {
     private fb: FormBuilder,
     private snackBar: MatSnackBar,
     private dialogRef: MatDialogRef<AppFrontendUpgradeComponent>,
-    private appFrontendUpgradeService: AppUpgradeService
+    private appFrontendUpgradeService: AppUpgradeService,
+    private ngZone: NgZone,
   ) {
     // Initialize forms
     this.uploadForm = this.fb.group({
@@ -110,6 +131,11 @@ export class AppFrontendUpgradeComponent {
       backupLocation: [''],
       buildLocation: ['', Validators.required],
     });
+
+    // Initialize build generation form
+    this.buildGenerationForm = this.fb.group({
+      releaseTag: ['', Validators.required],
+    });
   }
 
   /**
@@ -117,6 +143,14 @@ export class AppFrontendUpgradeComponent {
    */
   ngOnInit(): void {
     // Any initialization code can go here
+  }
+
+  /**
+   * Angular lifecycle hook for component destruction.
+   * Cleans up SSE connection.
+   */
+  ngOnDestroy(): void {
+    this.closeLogStream();
   }
 
   /**
@@ -172,7 +206,6 @@ export class AppFrontendUpgradeComponent {
    * Fetches deployment logs from the backend service.
    */
   fetchDeploymentLogs() {
-    // Replace this with your actual API call to get deployment logs
     const deploymentLogPath = '/mnt/appUpgrade/deployment_logs';
     this.appFrontendUpgradeService
       .getFrontEndDeploymentLogs(deploymentLogPath)
@@ -203,6 +236,14 @@ export class AppFrontendUpgradeComponent {
    */
   onTabClick(event: any) {
     this.selectedTabIndex = event.index;
+  }
+
+  /**
+   * Switches between build generation and build upload tabs.
+   * @param tabIndex Tab index to switch to (0 = generation, 1 = upload)
+   */
+  switchBuildTab(tabIndex: number): void {
+    this.buildTabIndex = tabIndex;
   }
 
   /**
@@ -244,7 +285,7 @@ export class AppFrontendUpgradeComponent {
           if (this.progress !== 100) {
             this.progress = 100; // Ensure progress completes
           }
-        })
+        }),
       );
 
     upload$.subscribe({
@@ -253,10 +294,10 @@ export class AppFrontendUpgradeComponent {
           this.uploadComplete = true;
           console.log('Upload complete:', event.body);
 
-          const warLocationControl = this.upgradeForm.get('buildLocation');
-          if (warLocationControl) {
-            warLocationControl.setValue(event.body.buildlocation);
-            warLocationControl.updateValueAndValidity();
+          const buildLocationControl = this.upgradeForm.get('buildLocation');
+          if (buildLocationControl) {
+            buildLocationControl.setValue(event.body.buildlocation);
+            buildLocationControl.updateValueAndValidity();
           }
 
           this.snackBar.open(event.body.message, '', {
@@ -276,6 +317,170 @@ export class AppFrontendUpgradeComponent {
         });
       },
     });
+  }
+
+  /**
+   * Initiates Angular build generation for a given release tag or branch name.
+   * Establishes SSE connection for real-time log streaming.
+   */
+  generateBuild(): void {
+    this.buildGenerationFormSubmitted = true;
+    if (this.buildGenerationForm.invalid) {
+      return;
+    }
+
+    const releaseTag = this.buildGenerationForm.get('releaseTag')?.value;
+    this.appFrontendUpgradeService.generateAngularBuild(releaseTag).subscribe({
+      next: (response) => {
+        if (response.data?.status === 'RUNNING' && response.data?.executionId) {
+          this.buildGenerationExecutionId = response.data.executionId;
+          this.buildGenerationInProgress = true;
+          this.buildGenerationLogs = '';
+          this.buildGenerationStatus = 'PENDING';
+          this.initializeLogStreaming();
+        } else {
+          this.buildGenerationInProgress = false;
+        }
+      },
+      error: (err) => {
+        this.buildGenerationInProgress = false;
+        this.snackBar.open(err.error?.message || err.message, '', {
+          duration: 2000,
+          panelClass: ['err-msg'],
+          horizontalPosition: 'end',
+          verticalPosition: 'top',
+        });
+      },
+    });
+  }
+
+  /**
+   * Initializes Server-Sent Events (SSE) connection for real-time log streaming.
+   * Listens for log, status, complete, and error events from backend.
+   */
+  private initializeLogStreaming(): void {
+    if (!this.buildGenerationExecutionId) return;
+
+    const logStreamUrl =
+      this.appFrontendUpgradeService.getAngularBuildLogStreamUrl(
+        this.buildGenerationExecutionId,
+      );
+    this.buildLogEventSource = new EventSource(logStreamUrl);
+
+    // Listen for status updates
+    this.buildLogEventSource.addEventListener('status', (event) => {
+      this.ngZone.run(() => {
+        const statusData = JSON.parse(event.data);
+        if (statusData.message) {
+          this.buildGenerationLogs += statusData.message + '\n';
+          this.scrollToBottomOfLogs();
+        }
+      });
+    });
+
+    // Listen for log events
+    this.buildLogEventSource.addEventListener('log', (event) => {
+      this.ngZone.run(() => {
+        if (event.data && event.data.trim() !== '') {
+          try {
+            const logData = JSON.parse(event.data);
+            if (logData.message) {
+              this.buildGenerationLogs += logData.message + '\n';
+            }
+          } catch {
+            // If parsing fails, append raw data
+            this.buildGenerationLogs += event.data + '\n';
+          }
+          this.scrollToBottomOfLogs();
+        }
+      });
+    });
+
+    // Listen for completion event
+    this.buildLogEventSource.addEventListener('complete', (event) => {
+      this.ngZone.run(() => {
+        const completeData = JSON.parse(event.data);
+        this.buildGenerationStatus = completeData.status;
+        this.buildGenerationInProgress = false;
+
+        // Add completion message to logs
+        const completionMsg = `\n=== ${completeData.status} ===\n${completeData.message}\n`;
+        this.buildGenerationLogs += completionMsg;
+        this.scrollToBottomOfLogs();
+
+        // Update form with build location if successful
+        if (completeData.status === 'SUCCESS' && completeData.upgradeDir) {
+          this.upgradeForm.patchValue({
+            buildLocation: completeData.upgradeDir,
+          });
+
+          this.snackBar.open('Angular build generated successfully!', '', {
+            duration: 5000,
+            panelClass: ['success-msg'],
+          });
+        } else if (completeData.status === 'FAILED') {
+          this.snackBar.open(
+            `Angular build generation failed: ${completeData.message}`,
+            '',
+            {
+              duration: 5000,
+              panelClass: ['err-msg'],
+            },
+          );
+        }
+
+        this.closeLogStream();
+      });
+    });
+
+    // Listen for error events from backend
+    this.buildLogEventSource.addEventListener('error', (event: any) => {
+      this.ngZone.run(() => {
+        if (event.data) {
+          const errorData = JSON.parse(event.data);
+          this.buildGenerationStatus = errorData.status || 'ERROR';
+          this.buildGenerationInProgress = false;
+
+          const errorMsg = `\n=== ERROR ===\n${errorData.message || 'Unknown error occurred'}\n`;
+          this.buildGenerationLogs += errorMsg;
+          this.scrollToBottomOfLogs();
+
+          this.snackBar.open(
+            errorData.message || 'Angular build generation error',
+            '',
+            {
+              duration: 5000,
+              panelClass: ['err-msg'],
+            },
+          );
+
+          this.closeLogStream();
+        }
+      });
+    });
+
+    // Handle SSE connection errors
+    this.buildLogEventSource.onerror = () => {
+      this.ngZone.run(() => {
+        if (this.buildGenerationInProgress) {
+          this.buildGenerationLogs +=
+            '\n[Connection lost. Please check your network and try again.]\n';
+          this.scrollToBottomOfLogs();
+          this.buildGenerationStatus = 'ERROR';
+          this.buildGenerationInProgress = false;
+          this.closeLogStream();
+
+          this.snackBar.open(
+            'Connection lost during Angular build generation',
+            '',
+            {
+              duration: 5000,
+              panelClass: ['err-msg'],
+            },
+          );
+        }
+      });
+    };
   }
 
   /**
@@ -301,7 +506,10 @@ export class AppFrontendUpgradeComponent {
       uploadLocation: this.upgradeForm.value.buildLocation,
     };
     this.appFrontendUpgradeService
-      .upgradeFrontendApplication(upgradeObj.uploadLocation,upgradeObj.backupPath)
+      .upgradeFrontendApplication(
+        upgradeObj.uploadLocation,
+        upgradeObj.backupPath,
+      )
       .subscribe({
         next: (res) => {
           setTimeout(() => {
@@ -347,17 +555,56 @@ export class AppFrontendUpgradeComponent {
     // Reset forms
     this.uploadForm.reset();
     this.upgradeForm.reset();
+    this.buildGenerationForm.reset();
 
     // Reset submission flags
     this.uploadFormSubmitted = false;
     this.upgradeFormSubmitted = false;
+    this.buildGenerationFormSubmitted = false;
+
+    // Reset build generation state
+    this.buildGenerationInProgress = false;
+    this.buildGenerationExecutionId = null;
+    this.buildGenerationStatus = null;
+    this.buildGenerationLogs = '';
   }
 
   /**
    * Closes the dialog and resets forms.
    */
   close() {
+    this.closeLogStream();
     this.resetForms();
     this.dialogRef.close();
+  }
+
+  /**
+   * Scrolls the log display to show the most recent entries.
+   */
+  private scrollToBottomOfLogs(): void {
+    setTimeout(() => {
+      const logsElement = document.querySelector('.build-generation-logs');
+      if (logsElement) {
+        logsElement.scrollTop = logsElement.scrollHeight;
+      }
+    }, 100);
+  }
+
+  /**
+   * Closes the SSE connection and cleans up resources.
+   */
+  private closeLogStream(): void {
+    if (this.buildLogEventSource) {
+      this.buildLogEventSource.close();
+      this.buildLogEventSource = null;
+    }
+  }
+
+  /**
+   * Determines if user can proceed to upgrade step.
+   * @returns true if file upload or build generation completed successfully
+   */
+  canProceedToUpgrade(): boolean {
+    return this.uploadComplete || this.buildGenerationStatus === 'SUCCESS';
   }
 }
