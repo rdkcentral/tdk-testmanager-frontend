@@ -127,6 +127,7 @@ export class UserAddComponent implements OnInit {
       this.allRoles = res;
     });
     this.userForm.get('username')?.valueChanges.subscribe((value) => {
+      if (value == null) return;
       const cleanedValue = value.replace(/\s+/g, '');
       if (cleanedValue !== value) {
         this.userForm.get('username')?.setValue(cleanedValue, {
@@ -135,6 +136,7 @@ export class UserAddComponent implements OnInit {
       }
     });
     this.userForm.get('useremail')?.valueChanges.subscribe((value) => {
+      if (value == null) return;
       const cleanedValue = value.replace(/\s+/g, '');
       if (cleanedValue !== value) {
         this.userForm.get('useremail')?.setValue(cleanedValue, {
@@ -143,6 +145,7 @@ export class UserAddComponent implements OnInit {
       }
     });
     this.userForm.get('userpassword')?.valueChanges.subscribe((value) => {
+      if (value == null) return;
       const cleanedValue = value.replace(/\s+/g, '');
       if (cleanedValue !== value) {
         this.userForm.get('userpassword')?.setValue(cleanedValue, {
@@ -151,6 +154,7 @@ export class UserAddComponent implements OnInit {
       }
     });
     this.userForm.get('retypepassword')?.valueChanges.subscribe((value) => {
+      if (value == null) return;
       const cleanedValue = value.replace(/\s+/g, '');
       if (cleanedValue !== value) {
         this.userForm.get('retypepassword')?.setValue(cleanedValue, {
@@ -237,7 +241,6 @@ export class UserAddComponent implements OnInit {
         userRoleName: this.userForm.value.rolename,
         userDisplayName: this.userForm.value.displayname,
         userCategory: this.userForm.value.categoryname,
-        userStatus: 'APPROVED',
       };
       this.usermanageserice.createUser(obj).subscribe({
         next: (res) => {

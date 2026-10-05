@@ -105,9 +105,13 @@ export class UserManagementService {
     const headers = new HttpHeaders({
       Authorization: this.authService.getApiToken(),
     });
-    return this.http.post(`${this.config.apiUrl}api/v1/users/create`, data, {
-      headers,
-    });
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/users/admin/create`,
+      data,
+      {
+        headers,
+      },
+    );
   }
 
   /**
