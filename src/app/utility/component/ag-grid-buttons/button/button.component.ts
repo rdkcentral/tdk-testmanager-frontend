@@ -296,7 +296,7 @@ export class ButtonComponent implements OnInit {
           this.showRejectButton = true;
           this.showEditButton = false;
           this.deleteShowHide = false;
-        } else {
+        } else if (userStatus === 'ACTIVE') {
           // ACTIVE users: show only Edit and Delete buttons
           this.showApproveButton = false;
           this.showRejectButton = false;

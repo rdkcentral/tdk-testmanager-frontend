@@ -167,8 +167,6 @@ export class UserListComponent implements OnInit {
           return '<span class="badge bg-warning text-dark">PENDING</span>';
         } else if (status === 'APPROVED') {
           return '<span class="badge bg-success">APPROVED</span>';
-        } else if (status === 'REJECTED') {
-          return '<span class="badge bg-danger">Rejected</span>';
         }
         return status;
       },
@@ -234,20 +232,27 @@ export class UserListComponent implements OnInit {
   ) {}
 
   /**
+   * Loads the user list and clears the loader for empty results as well.
+   */
+  private loadUsers(): void {
+    this.showLoader = true;
+    this.usermanageservice.getAlluser().subscribe({
+      next: (data) => {
+        this.rowData = data?.data ?? [];
+        this.showLoader = false;
+      },
+      error: () => {
+        this.rowData = [];
+        this.showLoader = false;
+      },
+    });
+  }
+
+  /**
    * The method to initialize the component.
    */
   ngOnInit(): void {
-    this.showLoader = true;
-    this.usermanageservice.getAlluser().subscribe((data) => {
-      this.rowData = data.data;
-      if (
-        this.rowData == null ||
-        this.rowData == undefined ||
-        this.rowData.length > 0
-      ) {
-        this.showLoader = false;
-      }
-    });
+    this.loadUsers();
     this.adjustPaginationToScreenSize();
   }
 
@@ -351,7 +356,7 @@ export class UserListComponent implements OnInit {
             horizontalPosition: 'end',
             verticalPosition: 'top',
           });
-          this.ngOnInit();
+          this.loadUsers();
         },
         error: (err) => {
           this._snakebar.open(err.message, '', {
@@ -391,7 +396,7 @@ export class UserListComponent implements OnInit {
             horizontalPosition: 'end',
             verticalPosition: 'top',
           });
-          this.ngOnInit();
+          this.loadUsers();
         },
         error: (err) => {
           this._snakebar.open(err.message, '', {
@@ -425,7 +430,7 @@ export class UserListComponent implements OnInit {
             horizontalPosition: 'end',
             verticalPosition: 'top',
           });
-          this.ngOnInit();
+          this.loadUsers();
         },
         error: (err) => {
           this._snakebar.open(err.message, '', {
