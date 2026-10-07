@@ -42,8 +42,8 @@ interface customcellRenderparams extends ICellRendererParams {
     >
       <mat-icon class="extra-icon approve">check_circle</mat-icon>
     </button>
-    <span *ngIf="showApproveButton && showRejectButton"
-      >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span
+    <span *ngIf="showApproveButton && showRejectButton && isUserManagementPage"
+      >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span
     >
     <button
       *ngIf="showRejectButton"
@@ -53,16 +53,19 @@ interface customcellRenderparams extends ICellRendererParams {
     >
       <mat-icon class="extra-icon reject">cancel</mat-icon>
     </button>
-    <span *ngIf="showEditButton && !isUserManagementPage">&nbsp;</span>
     <button
       *ngIf="showEditButton"
       class="btn  btn-sm delete-btn"
       (click)="onEditClick($event)"
       matTooltip="{{ textforedit }}"
-      [ngStyle]="{ 'margin-left': isUserManagementPage ? '8px' : '0px' }"
+      [ngStyle]="{ 'margin-left': isUserManagementPage ? '6px' : '0px' }"
     >
       <mat-icon class="extra-icon edit">edit</mat-icon>
     </button>
+    <span
+      *ngIf="showEditButton && isUserManagementPage && shouldShowDeleteButton()"
+      >&nbsp;&nbsp;&nbsp;&nbsp;</span
+    >
     <!-- <button [disabled]="isButtonDisabled()" class="btn btn-primary btn-sm delete-btn" (click)="onEditClick($event)"><mat-icon class="delete-icon">edit</mat-icon></button> -->
     &nbsp;
     <button
@@ -73,13 +76,13 @@ interface customcellRenderparams extends ICellRendererParams {
     >
       <mat-icon class="extra-icon edit">content_copy</mat-icon>
     </button>
-    <span *ngIf="!isUserManagementPage">&nbsp;</span>
-    <span *ngIf="isUserManagementPage">&nbsp;&nbsp;&nbsp;</span>
+    &nbsp;
     <button
       *ngIf="shouldShowDeleteButton()"
       class="btn  btn-sm delete-btn"
       (click)="onDeleteClick($event)"
       matTooltip="Delete"
+      [ngStyle]="{ 'margin-left': isUserManagementPage ? '8px' : '0px' }"
     >
       <mat-icon class="delete-icon extra-icon">delete_forever</mat-icon>
     </button>
@@ -247,6 +250,11 @@ export class ButtonComponent implements OnInit {
    * Sets up button visibility and text based on the current route.
    */
   ngOnInit(): void {
+    // Reset user-management flags for all pages
+    this.isUserManagementPage = false;
+    this.showApproveButton = false;
+    this.showRejectButton = false;
+
     if (this.route.snapshot.url[0].path === 'devices') {
       this.downloadShowHide = true;
       this.textforedit = 'Edit/View';

@@ -114,7 +114,7 @@ export class UserListComponent implements OnInit {
       headerName: 'Role',
       field: 'userRoleName',
       filter: 'agMultiColumnFilter',
-      flex: 2,
+      flex: 1,
       filterParams: {
         filters: [
           {
@@ -133,7 +133,7 @@ export class UserListComponent implements OnInit {
       headerName: 'Category',
       field: 'userCategory',
       filter: 'agMultiColumnFilter',
-      flex: 2,
+      flex: 1,
       valueFormatter: (params) => {
         if (params.value === 'RDKV') {
           return 'Video';
@@ -186,6 +186,9 @@ export class UserListComponent implements OnInit {
       headerName: 'Action',
       field: '',
       sortable: false,
+      width: 150,
+      suppressSizeToFit: true,
+      suppressMenu: true,
       cellRenderer: ButtonComponent,
       cellRendererParams: (params: any) => ({
         onEditClick: this.userEdit.bind(this),
