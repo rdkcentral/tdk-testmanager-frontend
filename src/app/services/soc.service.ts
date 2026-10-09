@@ -23,6 +23,7 @@ import { Observable } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
+import { saveAs } from 'file-saver';
 
 @Injectable({
   providedIn: 'root',
@@ -45,7 +46,7 @@ export class SocService {
     private http: HttpClient,
     private authService: AuthService,
     @Inject('APP_CONFIG') private config: any,
-    private router: Router
+    private router: Router,
   ) {
     this.router.events
       .pipe(filter((event) => event instanceof NavigationEnd))
@@ -113,7 +114,7 @@ export class SocService {
   private options = {
     headers: new HttpHeaders().set(
       'Authorization',
-      this.authService.getApiToken()
+      this.authService.getApiToken(),
     ),
   };
 
@@ -128,7 +129,7 @@ export class SocService {
     });
     return this.http.get(
       `${this.config.apiUrl}api/v1/soc/findallbycategory?category=${category}`,
-      { headers }
+      { headers },
     );
   }
 
@@ -175,5 +176,41 @@ export class SocService {
     return this.http.delete(`${this.config.apiUrl}api/v1/soc/delete?id=${id}`, {
       headers,
     });
+  }
+
+  /**
+   * Downloads all SOCs by category as a single XML file.
+   * @param category The category to download SOCs for.
+   */
+  downloadAllSocs(category: string): void {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    this.http
+      .get(`${this.config.apiUrl}api/v1/soc/downloadXML?category=${category}`, {
+        headers,
+        responseType: 'blob',
+      })
+      .subscribe((blob) => {
+        saveAs(blob, `socs_${category}.xml`);
+      });
+  }
+
+  /**
+   * Uploads a SOC XML file for bulk import.
+   * @param file The XML file to upload.
+   * @returns Observable with the upload result.
+   */
+  uploadSocXML(file: File): Observable<any> {
+    const headers = new HttpHeaders({
+      Authorization: this.authService.getApiToken(),
+    });
+    const formData: FormData = new FormData();
+    formData.append('file', file, file.name);
+    return this.http.post(
+      `${this.config.apiUrl}api/v1/soc/uploadxml`,
+      formData,
+      { headers },
+    );
   }
 }

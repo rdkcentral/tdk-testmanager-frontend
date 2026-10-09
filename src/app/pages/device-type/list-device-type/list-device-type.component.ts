@@ -17,9 +17,21 @@ http://www.apache.org/licenses/LICENSE-2.0
 * See the License for the specific language governing permissions and
 * limitations under the License.
 */
-import { Component, OnInit, HostListener } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  HostListener,
+  ElementRef,
+  Renderer2,
+  ViewChild,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { AgGridAngular } from 'ag-grid-angular';
 import {
   ColDef,
@@ -122,18 +134,30 @@ export class ListDeviceTypeComponent implements OnInit {
   preferedCategory!: string;
   showLoader = false;
 
+  // Upload XML form properties
+  @ViewChild('uploadDeviceTypeModal', { static: false })
+  uploadDeviceTypeModal?: ElementRef;
+  uploadXMLForm!: FormGroup;
+  uploadFormSubmitted = false;
+  uploadFileName!: File | null;
+  uploadFileError: string | null = null;
+
   /**
    * Constructor for ListDeviceTypeComponent.
    * @param router Angular Router for navigation
    * @param authservice Service for authentication and config
    * @param service Service for device type operations
    * @param _snakebar Service for showing snack bar notifications
+   * @param fb FormBuilder for reactive forms
+   * @param renderer Renderer2 for DOM manipulation
    */
   constructor(
     private router: Router,
     private authservice: AuthService,
     private service: DevicetypeService,
     private _snakebar: MatSnackBar,
+    private fb: FormBuilder,
+    private renderer: Renderer2,
   ) {
     this.preferedCategory = localStorage.getItem('preferedCategory') || '';
   }
@@ -195,6 +219,10 @@ export class ListDeviceTypeComponent implements OnInit {
       ];
     }
     this.adjustPaginationToScreenSize();
+
+    this.uploadXMLForm = this.fb.group({
+      uploadXml: [null, Validators.required],
+    });
   }
 
   /**
@@ -319,5 +347,108 @@ export class ListDeviceTypeComponent implements OnInit {
     this.authservice.selectedConfigVal = 'RDKV';
     this.authservice.showSelectedCategory = 'Video';
     this.router.navigate(['/configure']);
+  }
+
+  /**
+   * Download all device types as a single XML file.
+   */
+  downloadAllDeviceTypes(): void {
+    if (this.rowData && this.rowData.length > 0) {
+      this.service.downloadAllDeviceTypes(this.configureName);
+    } else {
+      this._snakebar.open('No data available for download', '', {
+        duration: 2000,
+        panelClass: ['err-msg'],
+        horizontalPosition: 'end',
+        verticalPosition: 'top',
+      });
+    }
+  }
+
+  /**
+   * Handles file selection for upload.
+   * @param event The file input change event.
+   */
+  onFileChange(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      if (file.type === 'text/xml' || file.name.endsWith('.xml')) {
+        this.uploadFileName = file;
+        this.uploadFileError = null;
+      } else {
+        this.uploadFileName = null;
+        this.uploadFileError = 'Please upload a valid XML file.';
+        this.uploadXMLForm.get('uploadXml')?.reset();
+      }
+    }
+  }
+
+  /**
+   * Resets the upload form and related state.
+   */
+  resetUploadForm(): void {
+    this.uploadXMLForm.reset();
+    this.uploadFileName = null;
+    this.uploadFileError = null;
+    this.uploadFormSubmitted = false;
+  }
+
+  /**
+   * Closes the upload modal.
+   */
+  private closeModal(): void {
+    if (this.uploadDeviceTypeModal) {
+      const modalElement = this.uploadDeviceTypeModal.nativeElement;
+      const bsModal = (window as any).bootstrap?.Modal?.getInstance(
+        modalElement,
+      );
+      if (bsModal) {
+        bsModal.hide();
+      } else {
+        // Fallback: trigger the dismiss button
+        const dismissBtn = modalElement.querySelector(
+          '[data-bs-dismiss="modal"]',
+        ) as HTMLElement;
+        if (dismissBtn) {
+          dismissBtn.click();
+        }
+      }
+    }
+  }
+
+  /**
+   * Handles the upload form submission.
+   */
+  uploadXMLSubmit(): void {
+    this.uploadFormSubmitted = true;
+    if (this.uploadXMLForm.invalid || this.uploadFileError != null) {
+      return;
+    }
+    if (this.uploadFileName) {
+      this.uploadFileError = null;
+      this.service.uploadDeviceTypeXML(this.uploadFileName).subscribe({
+        next: (res: any) => {
+          this._snakebar.open(res.message, '', {
+            duration: 1000,
+            panelClass: ['success-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+          this.resetUploadForm();
+          this.closeModal();
+          this.ngOnInit();
+        },
+        error: (err: any) => {
+          this._snakebar.open(err.message, '', {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+          this.closeModal();
+          this.resetUploadForm();
+        },
+      });
+    }
   }
 }

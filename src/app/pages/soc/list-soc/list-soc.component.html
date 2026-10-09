@@ -15,40 +15,159 @@ limitations under the License.
 
 <!-- Main container for the SoC list page -->
 <div class="container-fluid">
-    <!-- Row for the page title and action buttons -->
-    <div class="row borders-btm mt-2">
-        <!-- Column for the page title -->
-        <div class="col-md-11">
-            <h1 class="title">{{categoryName}} SoC List</h1>
+  <!-- Row for the page title and action buttons -->
+  <div class="row borders-btm">
+    <!-- Left column for spacing -->
+    <div class="col-md-4"></div>
+    <!-- Center column for the page title -->
+    <div class="col-md-3">
+      <h1 class="title">{{ categoryName }} SoC List</h1>
+    </div>
+    <!-- Column for the action buttons -->
+    <div class="col-md-5">
+      <!-- Button group for back and create actions -->
+      <div class="btns-group">
+        <button
+          type="button"
+          class="download-btn"
+          (click)="downloadAllSocs()"
+          matTooltip="Download all {{ categoryName }} SoCs as XML"
+        >
+          <i class="bi bi-cloud-arrow-down-fill download-icon"></i>
+        </button>
+        <button
+          type="button"
+          class="download-btn"
+          matTooltip="Upload SoC XML File"
+          data-bs-toggle="modal"
+          data-bs-target="#uploadSocModal"
+        >
+          <i class="bi bi-cloud-arrow-up-fill download-icon"></i>
+        </button>
+        <button class="back-btn" (click)="goBack()" matTooltip="Back">
+          <i class="bi bi-arrow-return-left icon-size"></i>
+        </button>
+        <button
+          class="create-btn"
+          (click)="createSoc()"
+          matTooltip="Create {{ categoryName }} SoC"
+        >
+          <i class="bi bi-plus-circle-fill icon-size"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Loader row shown when loading -->
+  <div class="row loader-row" *ngIf="showLoader">
+    <app-loader></app-loader>
+  </div>
+  <!-- No Data row -->
+  <div
+    class="row loader-row"
+    style="top: 45%; left: 47%"
+    *ngIf="isNoDataVisible && !showLoader"
+  >
+    <span>No Rows to Show</span>
+  </div>
+  <!-- Row for the ag-grid table section -->
+  <div class="grid-container" [class]="themeClass">
+    <ag-grid-angular
+      style="width: 100%; height: 100%"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [suppressRowClickSelection]="true"
+      [rowSelection]="rowSelection"
+      [rowData]="rowData"
+      [class]="themeClass"
+      [pagination]="true"
+      [paginationPageSize]="paginationPageSize"
+      [paginationPageSizeSelector]="paginationPageSizeSelector"
+      (gridReady)="onGridReady($event)"
+      [tooltipShowDelay]="tooltipShowDelay"
+      [animateRows]="true"
+      [gridOptions]="gridOptions"
+      (rowSelected)="onRowSelected($event)"
+      (selectionChanged)="onSelectionChanged($event)"
+      [context]="this"
+    ></ag-grid-angular>
+  </div>
+</div>
+<!-- Upload SoC XML Modal -->
+<div
+  class="modal fade"
+  #uploadSocModal
+  id="uploadSocModal"
+  data-bs-backdrop="static"
+  data-bs-keyboard="false"
+  tabindex="-1"
+  aria-labelledby="uploadSocModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog custom-modal">
+    <div class="modal-content">
+      <form [formGroup]="uploadXMLForm" (ngSubmit)="uploadXMLSubmit()">
+        <div class="modal-header modaltitle">
+          <h1 class="modal-title custom-title" id="uploadSocModalLabel">
+            Upload SoC XML File
+          </h1>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+            (click)="resetUploadForm()"
+          ></button>
         </div>
-        <!-- Column for the action buttons -->
-        <div class="col-md-1">
-            <!-- Button group for back and create actions -->
-            <div class="btns-grp">
-                <button class="back-btn" (click)="goBack()" matTooltip="Back"><i class="bi bi-arrow-return-left icon-size"></i></button>
-                <button class="create-btn" (click)="createSoc()" matTooltip="Create {{categoryName}} SoC">
-                    <i class="bi bi-plus-circle-fill icon-size"></i>
-                </button>
+        <div class="modal-body">
+          <div class="container mt-4">
+            <div class="row mb-3">
+              <label for="uploadfile" class="col-md-4 col-form-label"
+                >Select the SoC XML file<span
+                  style="color: red; margin-left: 0.75em"
+                  >*</span
+                ></label
+              >
+              <div class="col-md-8">
+                <input
+                  class="form-control form-control-sm"
+                  id="uploadfile"
+                  type="file"
+                  formControlName="uploadXml"
+                  (change)="onFileChange($event)"
+                />
+                <div
+                  *ngIf="
+                    uploadFormSubmitted &&
+                    uploadXMLForm.controls['uploadXml']?.errors
+                  "
+                  class="text-danger"
+                >
+                  <small
+                    *ngIf="
+                      uploadXMLForm.controls['uploadXml']?.errors?.['required']
+                    "
+                    >Please upload the SoC xml file.</small
+                  >
+                </div>
+                <small *ngIf="uploadFileError" class="errorupload">{{
+                  uploadFileError
+                }}</small>
+              </div>
             </div>
+          </div>
         </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="modal-btns"
+            data-bs-dismiss="modal"
+            (click)="resetUploadForm()"
+          >
+            Close
+          </button>
+          <button type="submit" class="modal-btns">Upload</button>
+        </div>
+      </form>
     </div>
-    <!-- Loader row shown when loading -->
-    <div class="row loader-row" *ngIf="showLoader">
-        <app-loader></app-loader>
-    </div> 
-    <!-- No Data row -->
-    <div class="row loader-row" style="top: 45%;left:47%" *ngIf="isNoDataVisible && !showLoader">
-      <span>No Rows to Show</span>
-    </div>
-    <!-- Row for the ag-grid table section -->
-    <div class="grid-container" [class]="themeClass">
-            <ag-grid-angular style="width: 100%; height: 100%;" [columnDefs]="columnDefs"
-                [defaultColDef]="defaultColDef" [suppressRowClickSelection]="true" [rowSelection]="rowSelection"
-                [rowData]="rowData" [class]="themeClass" [pagination]="true" [paginationPageSize]="paginationPageSize"
-                [paginationPageSizeSelector]="paginationPageSizeSelector" (gridReady)="onGridReady($event)"
-                [tooltipShowDelay]="tooltipShowDelay" [animateRows]="true" [gridOptions]="gridOptions" (rowSelected)="onRowSelected($event) "
-                (selectionChanged)="onSelectionChanged($event) " [context]="this"></ag-grid-angular>
-                
-    
-    </div>
+  </div>
 </div>
