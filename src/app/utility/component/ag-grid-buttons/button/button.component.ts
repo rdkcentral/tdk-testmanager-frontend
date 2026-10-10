@@ -33,14 +33,40 @@ interface customcellRenderparams extends ICellRendererParams {
   standalone: true,
   imports: [MaterialModule, CommonModule],
   template: `
-    <!-- <button [disabled]="isButtonDisabled()" class="btn btn-primary btn-sm delete-btn" (click)="onEditClick($event)"><mat-icon class="delete-icon">edit</mat-icon></button> -->
     <button
+      *ngIf="showApproveButton"
+      class="btn btn-sm delete-btn"
+      (click)="onApproveClick($event)"
+      matTooltip="Approve"
+      [ngStyle]="{ 'margin-left': isUserManagementPage ? '8px' : '0px' }"
+    >
+      <mat-icon class="extra-icon approve">check_circle</mat-icon>
+    </button>
+    <span *ngIf="showApproveButton && showRejectButton && isUserManagementPage"
+      >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span
+    >
+    <button
+      *ngIf="showRejectButton"
+      class="btn btn-sm delete-btn"
+      (click)="onRejectClick($event)"
+      matTooltip="Reject"
+    >
+      <mat-icon class="extra-icon reject">cancel</mat-icon>
+    </button>
+    <button
+      *ngIf="showEditButton"
       class="btn  btn-sm delete-btn"
       (click)="onEditClick($event)"
       matTooltip="{{ textforedit }}"
+      [ngStyle]="{ 'margin-left': isUserManagementPage ? '6px' : '0px' }"
     >
       <mat-icon class="extra-icon edit">edit</mat-icon>
     </button>
+    <span
+      *ngIf="showEditButton && isUserManagementPage && shouldShowDeleteButton()"
+      >&nbsp;&nbsp;&nbsp;&nbsp;</span
+    >
+    <!-- <button [disabled]="isButtonDisabled()" class="btn btn-primary btn-sm delete-btn" (click)="onEditClick($event)"><mat-icon class="delete-icon">edit</mat-icon></button> -->
     &nbsp;
     <button
       *ngIf="downloadSriptZip"
@@ -56,6 +82,7 @@ interface customcellRenderparams extends ICellRendererParams {
       class="btn  btn-sm delete-btn"
       (click)="onDeleteClick($event)"
       matTooltip="Delete"
+      [ngStyle]="{ 'margin-left': isUserManagementPage ? '8px' : '0px' }"
     >
       <mat-icon class="delete-icon extra-icon">delete_forever</mat-icon>
     </button>
@@ -149,6 +176,12 @@ interface customcellRenderparams extends ICellRendererParams {
       .download {
         color: #00b2dc;
       }
+      .approve {
+        color: #28a745;
+      }
+      .reject {
+        color: #dc3545;
+      }
       .download-config {
         margin-left: -15px;
       }
@@ -190,6 +223,10 @@ export class ButtonComponent implements OnInit {
   downloadScriptMd = false;
   deleteShowHide = true;
   downloadConfigShow = false;
+  showApproveButton = false;
+  showRejectButton = false;
+  showEditButton = true;
+  isUserManagementPage = false;
 
   /**
    * ag-Grid lifecycle method for cell renderer initialization.
@@ -213,6 +250,11 @@ export class ButtonComponent implements OnInit {
    * Sets up button visibility and text based on the current route.
    */
   ngOnInit(): void {
+    // Reset user-management flags for all pages
+    this.isUserManagementPage = false;
+    this.showApproveButton = false;
+    this.showRejectButton = false;
+
     if (this.route.snapshot.url[0].path === 'devices') {
       this.downloadShowHide = true;
       this.textforedit = 'Edit/View';
@@ -250,6 +292,25 @@ export class ButtonComponent implements OnInit {
         this.viewShowHide = false;
         this.downloadConfigShow = true;
         this.viewShowHide = false;
+      }
+
+      // Show approve/reject buttons based on user status in the user-management grid
+      if (this.route.snapshot.url[1].path === 'user-management') {
+        this.isUserManagementPage = true;
+        const userStatus = this.params?.node?.data?.userStatus;
+        if (userStatus === 'PENDING') {
+          // PENDING users: show only Approve and Reject buttons
+          this.showApproveButton = true;
+          this.showRejectButton = true;
+          this.showEditButton = false;
+          this.deleteShowHide = false;
+        } else if (userStatus === 'ACTIVE') {
+          // ACTIVE users: show only Edit and Delete buttons
+          this.showApproveButton = false;
+          this.showRejectButton = false;
+          this.showEditButton = true;
+          this.deleteShowHide = true;
+        }
       }
     }
   }
@@ -356,6 +417,26 @@ export class ButtonComponent implements OnInit {
   onDownloadMd(data: any) {
     if (this.params.onDownloadMd) {
       this.params.onDownloadMd(this.params.node.data);
+    }
+  }
+
+  /**
+   * Handles the approve button click event.
+   * @param $event The click event object.
+   */
+  onApproveClick($event: any) {
+    if (this.params.onApproveClick instanceof Function) {
+      this.params.onApproveClick(this.params.node.data);
+    }
+  }
+
+  /**
+   * Handles the reject button click event.
+   * @param $event The click event object.
+   */
+  onRejectClick($event: any) {
+    if (this.params.onRejectClick instanceof Function) {
+      this.params.onRejectClick(this.params.node.data);
     }
   }
 }
