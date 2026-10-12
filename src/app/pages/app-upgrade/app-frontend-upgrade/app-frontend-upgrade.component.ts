@@ -41,6 +41,7 @@ import { finalize } from 'rxjs/operators';
 import { AppUpgradeService } from '../../../services/app-upgrade.service';
 import { HttpEventType } from '@angular/common/http';
 import { map } from 'rxjs/operators';
+import { AuthenticatedSSEClient } from '../../../utility/authenticated-sse-client';
 
 /**
  * AppFrontendUpgradeComponent
@@ -110,7 +111,7 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
   buildGenerationExecutionId: string | null = null;
   buildGenerationStatus: string | null = null;
   buildGenerationLogs: string = '';
-  private buildLogEventSource: EventSource | null = null;
+  // Note: buildLogEventSource is managed by injected sseClient service
 
   /**
    * Constructor: Initializes forms and injects required services.
@@ -121,6 +122,7 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
     private dialogRef: MatDialogRef<AppFrontendUpgradeComponent>,
     private appFrontendUpgradeService: AppUpgradeService,
     private ngZone: NgZone,
+    private sseClient: AuthenticatedSSEClient,
   ) {
     // Initialize forms
     this.uploadForm = this.fb.group({
@@ -329,13 +331,18 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
       return;
     }
 
+    // Set busy state and invalidate previous artifact immediately
+    this.buildGenerationInProgress = true;
+    this.buildGenerationStatus = null;
+    this.buildGenerationExecutionId = null;
+    this.buildGenerationLogs = '';
+    this.upgradeForm.patchValue({ buildLocation: '' });
+
     const releaseTag = this.buildGenerationForm.get('releaseTag')?.value;
     this.appFrontendUpgradeService.generateAngularBuild(releaseTag).subscribe({
       next: (response) => {
         if (response.data?.status === 'RUNNING' && response.data?.executionId) {
           this.buildGenerationExecutionId = response.data.executionId;
-          this.buildGenerationInProgress = true;
-          this.buildGenerationLogs = '';
           this.buildGenerationStatus = 'PENDING';
           this.initializeLogStreaming();
         } else {
@@ -356,6 +363,7 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
 
   /**
    * Initializes Server-Sent Events (SSE) connection for real-time log streaming.
+   * Uses injected authenticated SSE service that attaches Bearer token from AuthService.
    * Listens for log, status, complete, and error events from backend.
    */
   private initializeLogStreaming(): void {
@@ -365,12 +373,14 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
       this.appFrontendUpgradeService.getAngularBuildLogStreamUrl(
         this.buildGenerationExecutionId,
       );
-    this.buildLogEventSource = new EventSource(logStreamUrl);
+
+    // Use injected SSE service for authenticated streaming
+    this.sseClient.connect(logStreamUrl);
 
     // Listen for status updates
-    this.buildLogEventSource.addEventListener('status', (event) => {
+    this.sseClient.addEventListener('status', (data: string) => {
       this.ngZone.run(() => {
-        const statusData = JSON.parse(event.data);
+        const statusData = JSON.parse(data);
         if (statusData.message) {
           this.buildGenerationLogs += statusData.message + '\n';
           this.scrollToBottomOfLogs();
@@ -379,17 +389,17 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
     });
 
     // Listen for log events
-    this.buildLogEventSource.addEventListener('log', (event) => {
+    this.sseClient.addEventListener('log', (data: string) => {
       this.ngZone.run(() => {
-        if (event.data && event.data.trim() !== '') {
+        if (data && data.trim() !== '') {
           try {
-            const logData = JSON.parse(event.data);
+            const logData = JSON.parse(data);
             if (logData.message) {
               this.buildGenerationLogs += logData.message + '\n';
             }
           } catch {
             // If parsing fails, append raw data
-            this.buildGenerationLogs += event.data + '\n';
+            this.buildGenerationLogs += data + '\n';
           }
           this.scrollToBottomOfLogs();
         }
@@ -397,9 +407,9 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
     });
 
     // Listen for completion event
-    this.buildLogEventSource.addEventListener('complete', (event) => {
+    this.sseClient.addEventListener('complete', (data: string) => {
       this.ngZone.run(() => {
-        const completeData = JSON.parse(event.data);
+        const completeData = JSON.parse(data);
         this.buildGenerationStatus = completeData.status;
         this.buildGenerationInProgress = false;
 
@@ -434,10 +444,10 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
     });
 
     // Listen for error events from backend
-    this.buildLogEventSource.addEventListener('error', (event: any) => {
+    this.sseClient.addEventListener('error', (data: string) => {
       this.ngZone.run(() => {
-        if (event.data) {
-          const errorData = JSON.parse(event.data);
+        if (data) {
+          const errorData = JSON.parse(data);
           this.buildGenerationStatus = errorData.status || 'ERROR';
           this.buildGenerationInProgress = false;
 
@@ -458,29 +468,6 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
         }
       });
     });
-
-    // Handle SSE connection errors
-    this.buildLogEventSource.onerror = () => {
-      this.ngZone.run(() => {
-        if (this.buildGenerationInProgress) {
-          this.buildGenerationLogs +=
-            '\n[Connection lost. Please check your network and try again.]\n';
-          this.scrollToBottomOfLogs();
-          this.buildGenerationStatus = 'ERROR';
-          this.buildGenerationInProgress = false;
-          this.closeLogStream();
-
-          this.snackBar.open(
-            'Connection lost during Angular build generation',
-            '',
-            {
-              duration: 5000,
-              panelClass: ['err-msg'],
-            },
-          );
-        }
-      });
-    };
   }
 
   /**
@@ -594,17 +581,24 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
    * Closes the SSE connection and cleans up resources.
    */
   private closeLogStream(): void {
-    if (this.buildLogEventSource) {
-      this.buildLogEventSource.close();
-      this.buildLogEventSource = null;
+    if (this.sseClient) {
+      this.sseClient.close();
     }
   }
 
   /**
    * Determines if user can proceed to upgrade step.
-   * @returns true if file upload or build generation completed successfully
+   * Gates progression on the currently selected build method to prevent
+   * mixing artifacts from different tabs.
+   * @returns true if the current build method completed successfully
    */
   canProceedToUpgrade(): boolean {
-    return this.uploadComplete || this.buildGenerationStatus === 'SUCCESS';
+    if (this.buildTabIndex === 0) {
+      // Build Generation tab is active
+      return this.buildGenerationStatus === 'SUCCESS';
+    } else {
+      // Build Upload tab is active
+      return this.uploadComplete;
+    }
   }
 }

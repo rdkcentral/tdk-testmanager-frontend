@@ -426,7 +426,14 @@ http://www.apache.org/licenses/LICENSE-2.0
   color: #333;
 }
 
-/* Focus outline removal for toggle options */
+/* Focus outline removal for pointer interaction only */
 .toggle-option:focus {
   outline: none;
+}
+
+/* Keyboard focus indicator - visible for keyboard navigation only */
+.toggle-option:focus-visible {
+  outline: 2px solid #00b2dc;
+  outline-offset: 2px;
+  border-radius: 4px;
 }

@@ -55,6 +55,7 @@ limitations under the License.
                   type="button"
                   class="toggle-option"
                   [class.active]="buildTabIndex === 0"
+                  [attr.aria-pressed]="buildTabIndex === 0"
                   (click)="switchBuildTab(0)"
                 >
                   <span>Build Generation</span>
@@ -63,6 +64,7 @@ limitations under the License.
                   type="button"
                   class="toggle-option"
                   [class.active]="buildTabIndex === 1"
+                  [attr.aria-pressed]="buildTabIndex === 1"
                   (click)="switchBuildTab(1)"
                 >
                   <span>Build Upload</span>
