@@ -111,7 +111,8 @@ export class AuthenticatedSSEClient {
     this.currentData = '';
 
     this.url = url;
-    this.abortController = new AbortController();
+    const controller = new AbortController();
+    this.abortController = controller;
     const token = this.getAuthToken();
 
     // Build headers with Bearer token from AuthService
@@ -129,7 +130,7 @@ export class AuthenticatedSSEClient {
     fetch(this.url, {
       method: 'GET',
       headers,
-      signal: this.abortController.signal,
+      signal: controller.signal,
     })
       .then(async (response) => {
         if (!response.ok) {
@@ -137,14 +138,20 @@ export class AuthenticatedSSEClient {
             'error',
             `HTTP ${response.status}: ${response.statusText}`,
           );
-          this.isConnected = false;
+          if (this.abortController === controller) {
+            this.isConnected = false;
+            this.abortController = null;
+          }
           return;
         }
 
         // Read the response stream line by line
         if (!response.body) {
           this.dispatchEvent('error', 'No response body');
-          this.isConnected = false;
+          if (this.abortController === controller) {
+            this.isConnected = false;
+            this.abortController = null;
+          }
           return;
         }
 
@@ -171,11 +178,15 @@ export class AuthenticatedSSEClient {
               this.dispatchEvent('error', (error as Error).message);
             }
           } finally {
-            // If stream ended but was not intentionally aborted, emit transport error
-            if (!this.abortController?.signal.aborted) {
-              this.dispatchEvent('error', 'Stream ended unexpectedly');
+            // Only clear shared state if this stream is still the active one.
+            if (this.abortController === controller) {
+              // If stream ended but was not intentionally aborted, emit transport error
+              if (!controller.signal.aborted) {
+                this.dispatchEvent('error', 'Stream ended unexpectedly');
+              }
+              this.isConnected = false;
+              this.abortController = null;
             }
-            this.isConnected = false;
           }
         };
 
@@ -185,7 +196,10 @@ export class AuthenticatedSSEClient {
         if (error.name !== 'AbortError') {
           this.dispatchEvent('error', error.message);
         }
-        this.isConnected = false;
+        if (this.abortController === controller) {
+          this.isConnected = false;
+          this.abortController = null;
+        }
       });
   }
 
@@ -249,8 +263,11 @@ export class AuthenticatedSSEClient {
    * Closes the SSE connection and cleans up resources.
    */
   close(): void {
-    if (this.abortController) {
-      this.abortController.abort();
+    const controller = this.abortController;
+    if (controller) {
+      controller.abort();
+    }
+    if (this.abortController === controller) {
       this.abortController = null;
     }
     this.isConnected = false;
