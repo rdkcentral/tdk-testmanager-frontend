@@ -106,6 +106,10 @@ export class AuthenticatedSSEClient {
       return;
     }
 
+    // Reset parser state for clean parsing of new stream
+    this.currentEventType = 'message';
+    this.currentData = '';
+
     this.url = url;
     this.abortController = new AbortController();
     const token = this.getAuthToken();
@@ -167,6 +171,10 @@ export class AuthenticatedSSEClient {
               this.dispatchEvent('error', (error as Error).message);
             }
           } finally {
+            // If stream ended but was not intentionally aborted, emit transport error
+            if (!this.abortController?.signal.aborted) {
+              this.dispatchEvent('error', 'Stream ended unexpectedly');
+            }
             this.isConnected = false;
           }
         };
@@ -185,6 +193,7 @@ export class AuthenticatedSSEClient {
    * Processes a single line from the SSE stream.
    * Parses event type and data according to SSE protocol.
    * SSE format: "event: TYPE\ndata: payload\n\n"
+   * Preserves payload whitespace; removes only the protocol separator space.
    * @param line Line from SSE stream (e.g., "event: log" or "data: {...}")
    */
   private processLine(line: string): void {
@@ -199,13 +208,22 @@ export class AuthenticatedSSEClient {
     }
 
     if (line.startsWith('event:')) {
-      this.currentEventType = line.substring('event:'.length).trim();
+      let eventType = line.substring('event:'.length);
+      // Remove at most one leading space (SSE protocol allows "event: name" or "event:name")
+      if (eventType.startsWith(' ')) {
+        eventType = eventType.substring(1);
+      }
+      this.currentEventType = eventType;
       return;
     }
 
     if (line.startsWith('data:')) {
-      const data = line.substring('data:'.length).trim();
-      // For multi-line data, accumulate it
+      let data = line.substring('data:'.length);
+      // Remove at most one leading space (SSE protocol allows "data: payload" or "data:payload")
+      if (data.startsWith(' ')) {
+        data = data.substring(1);
+      }
+      // For multi-line data, accumulate it (preserving all payload whitespace)
       this.currentData += (this.currentData ? '\n' : '') + data;
       return;
     }
