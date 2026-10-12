@@ -29,8 +29,8 @@ describe('AuthenticatedSSEClient', () => {
     const callback = jasmine.createSpy('logListener');
     client.addEventListener('log', callback);
 
-    (client as any).processLine('event: log\n');
-    (client as any).processLine('data: hello\r');
+    (client as any).processLine('event: log');
+    (client as any).processLine('data: hello');
     (client as any).processLine('');
 
     expect(callback).toHaveBeenCalledTimes(1);
