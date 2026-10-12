@@ -76,6 +76,7 @@ export class AppUpgradeService {
     });
     return this.http.post(
       `${this.config.apiUrl}api/v1/app-upgrade/upgradeApplication?backupLocation=${backupLocation}&uploadLocation=${warLocation}`,
+      {},
       { headers },
     );
   }
@@ -138,6 +139,7 @@ export class AppUpgradeService {
     });
     return this.http.post(
       `${this.config.nodeApiUrl}appupgrade/tdkUIUpgrade/upgradeApplication?backupPath=${backupLocation}&uploadLocation=${uploadLocation}`,
+      {},
       { headers },
     );
   }

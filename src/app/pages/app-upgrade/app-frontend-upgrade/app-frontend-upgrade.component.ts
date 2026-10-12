@@ -111,6 +111,8 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
   buildGenerationExecutionId: string | null = null;
   buildGenerationStatus: string | null = null;
   buildGenerationLogs: string = '';
+  buildGenerationArtifactPath: string = ''; // Track generated build path separately
+  uploadArtifactPath: string = ''; // Track uploaded build path separately
   // Note: buildLogEventSource is managed by injected sseClient service
 
   /**
@@ -242,10 +244,25 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
 
   /**
    * Switches between build generation and build upload tabs.
+   * Syncs the form's buildLocation to the selected tab's artifact to prevent
+   * mixing artifacts from different methods.
    * @param tabIndex Tab index to switch to (0 = generation, 1 = upload)
    */
   switchBuildTab(tabIndex: number): void {
     this.buildTabIndex = tabIndex;
+
+    // Update buildLocation form field based on selected tab's artifact
+    if (tabIndex === 0) {
+      // Switching to Build Generation tab
+      this.upgradeForm.patchValue({
+        buildLocation: this.buildGenerationArtifactPath,
+      });
+    } else {
+      // Switching to Build Upload tab
+      this.upgradeForm.patchValue({
+        buildLocation: this.uploadArtifactPath,
+      });
+    }
   }
 
   /**
@@ -294,12 +311,14 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
       next: (event) => {
         if (event.type === HttpEventType.Response) {
           this.uploadComplete = true;
+          this.uploadArtifactPath = event.body.buildlocation;
           console.log('Upload complete:', event.body);
 
-          const buildLocationControl = this.upgradeForm.get('buildLocation');
-          if (buildLocationControl) {
-            buildLocationControl.setValue(event.body.buildlocation);
-            buildLocationControl.updateValueAndValidity();
+          // Update form only if Upload tab is currently active
+          if (this.buildTabIndex === 1) {
+            this.upgradeForm.patchValue({
+              buildLocation: this.uploadArtifactPath,
+            });
           }
 
           this.snackBar.open(event.body.message, '', {
@@ -420,9 +439,13 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
 
         // Update form with build location if successful
         if (completeData.status === 'SUCCESS' && completeData.upgradeDir) {
-          this.upgradeForm.patchValue({
-            buildLocation: completeData.upgradeDir,
-          });
+          this.buildGenerationArtifactPath = completeData.upgradeDir;
+          // Update form only if Build Generation tab is currently active
+          if (this.buildTabIndex === 0) {
+            this.upgradeForm.patchValue({
+              buildLocation: completeData.upgradeDir,
+            });
+          }
 
           this.snackBar.open('Angular build generated successfully!', '', {
             duration: 5000,
@@ -554,6 +577,8 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
     this.buildGenerationExecutionId = null;
     this.buildGenerationStatus = null;
     this.buildGenerationLogs = '';
+    this.buildGenerationArtifactPath = '';
+    this.uploadArtifactPath = '';
   }
 
   /**
