@@ -159,11 +159,11 @@ export class AuthenticatedSSEClient {
               if (done) break;
 
               buffer += decoder.decode(value, { stream: true });
-              const lines = buffer.split('\n');
+              const lines = buffer.split(/\r?\n/);
               buffer = lines.pop() || ''; // Keep incomplete line in buffer
 
               for (const line of lines) {
-                this.processLine(line);
+                this.processLine(line.replace(/\r$/, ''));
               }
             }
           } catch (error) {
@@ -197,7 +197,9 @@ export class AuthenticatedSSEClient {
    * @param line Line from SSE stream (e.g., "event: log" or "data: {...}")
    */
   private processLine(line: string): void {
-    if (!line.trim()) {
+    const normalizedLine = line.replace(/\r$/, '');
+
+    if (!normalizedLine.trim()) {
       // Empty line marks end of an event
       if (this.currentData) {
         this.dispatchEvent(this.currentEventType, this.currentData);
@@ -207,8 +209,8 @@ export class AuthenticatedSSEClient {
       return;
     }
 
-    if (line.startsWith('event:')) {
-      let eventType = line.substring('event:'.length);
+    if (normalizedLine.startsWith('event:')) {
+      let eventType = normalizedLine.substring('event:'.length);
       // Remove at most one leading space (SSE protocol allows "event: name" or "event:name")
       if (eventType.startsWith(' ')) {
         eventType = eventType.substring(1);
@@ -217,8 +219,8 @@ export class AuthenticatedSSEClient {
       return;
     }
 
-    if (line.startsWith('data:')) {
-      let data = line.substring('data:'.length);
+    if (normalizedLine.startsWith('data:')) {
+      let data = normalizedLine.substring('data:'.length);
       // Remove at most one leading space (SSE protocol allows "data: payload" or "data:payload")
       if (data.startsWith(' ')) {
         data = data.substring(1);
