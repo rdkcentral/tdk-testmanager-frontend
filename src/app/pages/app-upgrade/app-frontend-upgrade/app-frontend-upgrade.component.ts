@@ -41,7 +41,6 @@ import { finalize } from 'rxjs/operators';
 import { AppUpgradeService } from '../../../services/app-upgrade.service';
 import { HttpEventType } from '@angular/common/http';
 import { map } from 'rxjs/operators';
-import { AuthenticatedSSEClient } from '../../../utility/authenticated-sse-client';
 
 /**
  * AppFrontendUpgradeComponent
@@ -113,7 +112,6 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
   buildGenerationLogs: string = '';
   buildGenerationArtifactPath: string = ''; // Track generated build path separately
   uploadArtifactPath: string = ''; // Track uploaded build path separately
-  // Note: buildLogEventSource is managed by injected sseClient service
 
   /**
    * Constructor: Initializes forms and injects required services.
@@ -124,7 +122,6 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
     private dialogRef: MatDialogRef<AppFrontendUpgradeComponent>,
     private appFrontendUpgradeService: AppUpgradeService,
     private ngZone: NgZone,
-    private sseClient: AuthenticatedSSEClient,
   ) {
     // Initialize forms
     this.uploadForm = this.fb.group({
@@ -393,13 +390,11 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
         this.buildGenerationExecutionId,
       );
 
-    // Use injected SSE service for authenticated streaming
-    this.sseClient.connect(logStreamUrl);
+    const eventSource = new EventSource(logStreamUrl);
 
-    // Listen for status updates
-    this.sseClient.addEventListener('status', (data: string) => {
+    eventSource.addEventListener('status', (event: MessageEvent) => {
       this.ngZone.run(() => {
-        const statusData = JSON.parse(data);
+        const statusData = JSON.parse(event.data);
         if (statusData.message) {
           this.buildGenerationLogs += statusData.message + '\n';
           this.scrollToBottomOfLogs();
@@ -407,40 +402,34 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
       });
     });
 
-    // Listen for log events
-    this.sseClient.addEventListener('log', (data: string) => {
+    eventSource.addEventListener('log', (event: MessageEvent) => {
       this.ngZone.run(() => {
-        if (data && data.trim() !== '') {
+        if (event.data && event.data.trim() !== '') {
           try {
-            const logData = JSON.parse(data);
+            const logData = JSON.parse(event.data);
             if (logData.message) {
               this.buildGenerationLogs += logData.message + '\n';
             }
           } catch {
-            // If parsing fails, append raw data
-            this.buildGenerationLogs += data + '\n';
+            this.buildGenerationLogs += event.data + '\n';
           }
           this.scrollToBottomOfLogs();
         }
       });
     });
 
-    // Listen for completion event
-    this.sseClient.addEventListener('complete', (data: string) => {
+    eventSource.addEventListener('complete', (event: MessageEvent) => {
       this.ngZone.run(() => {
-        const completeData = JSON.parse(data);
+        const completeData = JSON.parse(event.data);
         this.buildGenerationStatus = completeData.status;
         this.buildGenerationInProgress = false;
 
-        // Add completion message to logs
         const completionMsg = `\n=== ${completeData.status} ===\n${completeData.message}\n`;
         this.buildGenerationLogs += completionMsg;
         this.scrollToBottomOfLogs();
 
-        // Update form with build location if successful
         if (completeData.status === 'SUCCESS' && completeData.upgradeDir) {
           this.buildGenerationArtifactPath = completeData.upgradeDir;
-          // Update form only if Build Generation tab is currently active
           if (this.buildTabIndex === 0) {
             this.upgradeForm.patchValue({
               buildLocation: completeData.upgradeDir,
@@ -462,35 +451,39 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
           );
         }
 
-        this.closeLogStream();
+        eventSource.close();
       });
     });
 
-    // Listen for error events from backend
-    this.sseClient.addEventListener('error', (data: string) => {
+    eventSource.addEventListener('error', (event: MessageEvent) => {
       this.ngZone.run(() => {
-        if (data) {
-          const errorData = JSON.parse(data);
-          this.buildGenerationStatus = errorData.status || 'ERROR';
-          this.buildGenerationInProgress = false;
+        const errorData = JSON.parse(event.data);
+        this.buildGenerationStatus = errorData.status || 'ERROR';
+        this.buildGenerationInProgress = false;
 
-          const errorMsg = `\n=== ERROR ===\n${errorData.message || 'Unknown error occurred'}\n`;
-          this.buildGenerationLogs += errorMsg;
-          this.scrollToBottomOfLogs();
+        const errorMsg = `\n=== ERROR ===\n${errorData.message || 'Unknown error occurred'}\n`;
+        this.buildGenerationLogs += errorMsg;
+        this.scrollToBottomOfLogs();
 
-          this.snackBar.open(
-            errorData.message || 'Angular build generation error',
-            '',
-            {
-              duration: 5000,
-              panelClass: ['err-msg'],
-            },
-          );
+        this.snackBar.open(
+          errorData.message || 'Angular build generation error',
+          '',
+          {
+            duration: 5000,
+            panelClass: ['err-msg'],
+          },
+        );
 
-          this.closeLogStream();
-        }
+        eventSource.close();
       });
     });
+
+    eventSource.onerror = () => {
+      this.ngZone.run(() => {
+        this.buildGenerationStatus = 'ERROR';
+        this.buildGenerationInProgress = false;
+      });
+    };
   }
 
   /**
@@ -606,9 +599,7 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
    * Closes the SSE connection and cleans up resources.
    */
   private closeLogStream(): void {
-    if (this.sseClient) {
-      this.sseClient.close();
-    }
+    // Native EventSource-based streaming does not require a custom close API.
   }
 
   /**
