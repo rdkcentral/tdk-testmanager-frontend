@@ -112,6 +112,9 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
   buildGenerationLogs: string = '';
   buildGenerationArtifactPath: string = ''; // Track generated build path separately
   uploadArtifactPath: string = ''; // Track uploaded build path separately
+  private activeEventSource: EventSource | null = null;
+  private buildGenerationSubscription: { unsubscribe?: () => void } | null =
+    null;
 
   /**
    * Constructor: Initializes forms and injects required services.
@@ -152,6 +155,10 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
    */
   ngOnDestroy(): void {
     this.closeLogStream();
+    if (this.buildGenerationSubscription) {
+      this.buildGenerationSubscription.unsubscribe?.();
+      this.buildGenerationSubscription = null;
+    }
   }
 
   /**
@@ -355,26 +362,31 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
     this.upgradeForm.patchValue({ buildLocation: '' });
 
     const releaseTag = this.buildGenerationForm.get('releaseTag')?.value;
-    this.appFrontendUpgradeService.generateAngularBuild(releaseTag).subscribe({
-      next: (response) => {
-        if (response.data?.status === 'RUNNING' && response.data?.executionId) {
-          this.buildGenerationExecutionId = response.data.executionId;
-          this.buildGenerationStatus = 'PENDING';
-          this.initializeLogStreaming();
-        } else {
+    this.buildGenerationSubscription = this.appFrontendUpgradeService
+      .generateAngularBuild(releaseTag)
+      .subscribe({
+        next: (response) => {
+          if (
+            response.data?.status === 'RUNNING' &&
+            response.data?.executionId
+          ) {
+            this.buildGenerationExecutionId = response.data.executionId;
+            this.buildGenerationStatus = 'PENDING';
+            this.initializeLogStreaming();
+          } else {
+            this.buildGenerationInProgress = false;
+          }
+        },
+        error: (err) => {
           this.buildGenerationInProgress = false;
-        }
-      },
-      error: (err) => {
-        this.buildGenerationInProgress = false;
-        this.snackBar.open(err.error?.message || err.message, '', {
-          duration: 2000,
-          panelClass: ['err-msg'],
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-        });
-      },
-    });
+          this.snackBar.open(err.error?.message || err.message, '', {
+            duration: 2000,
+            panelClass: ['err-msg'],
+            horizontalPosition: 'end',
+            verticalPosition: 'top',
+          });
+        },
+      });
   }
 
   /**
@@ -390,7 +402,10 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
         this.buildGenerationExecutionId,
       );
 
+    this.closeLogStream();
+
     const eventSource = new EventSource(logStreamUrl);
+    this.activeEventSource = eventSource;
 
     eventSource.addEventListener('status', (event: MessageEvent) => {
       this.ngZone.run(() => {
@@ -452,29 +467,55 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
         }
 
         eventSource.close();
+        if (this.activeEventSource === eventSource) {
+          this.activeEventSource = null;
+        }
       });
     });
 
     eventSource.addEventListener('error', (event: MessageEvent) => {
       this.ngZone.run(() => {
-        const errorData = JSON.parse(event.data);
-        this.buildGenerationStatus = errorData.status || 'ERROR';
-        this.buildGenerationInProgress = false;
+        if (event.data && event.data.trim() !== '') {
+          try {
+            const errorData = JSON.parse(event.data);
+            this.buildGenerationStatus = errorData.status || 'ERROR';
+            this.buildGenerationInProgress = false;
 
-        const errorMsg = `\n=== ERROR ===\n${errorData.message || 'Unknown error occurred'}\n`;
-        this.buildGenerationLogs += errorMsg;
-        this.scrollToBottomOfLogs();
+            const errorMsg = `\n=== ERROR ===\n${errorData.message || 'Unknown error occurred'}\n`;
+            this.buildGenerationLogs += errorMsg;
+            this.scrollToBottomOfLogs();
 
-        this.snackBar.open(
-          errorData.message || 'Angular build generation error',
-          '',
-          {
-            duration: 5000,
-            panelClass: ['err-msg'],
-          },
-        );
+            this.snackBar.open(
+              errorData.message || 'Angular build generation error',
+              '',
+              {
+                duration: 5000,
+                panelClass: ['err-msg'],
+              },
+            );
+          } catch {
+            this.buildGenerationStatus = 'ERROR';
+            this.buildGenerationInProgress = false;
+            this.buildGenerationLogs +=
+              '\n=== ERROR ===\nEventSource connection failed.\n';
+            this.scrollToBottomOfLogs();
+            this.snackBar.open('Angular build generation error', '', {
+              duration: 5000,
+              panelClass: ['err-msg'],
+            });
+          }
+        } else {
+          this.buildGenerationStatus = 'ERROR';
+          this.buildGenerationInProgress = false;
+          this.buildGenerationLogs +=
+            '\n=== ERROR ===\nEventSource connection failed.\n';
+          this.scrollToBottomOfLogs();
+        }
 
         eventSource.close();
+        if (this.activeEventSource === eventSource) {
+          this.activeEventSource = null;
+        }
       });
     });
 
@@ -599,7 +640,10 @@ export class AppFrontendUpgradeComponent implements OnInit, OnDestroy {
    * Closes the SSE connection and cleans up resources.
    */
   private closeLogStream(): void {
-    // Native EventSource-based streaming does not require a custom close API.
+    if (this.activeEventSource) {
+      this.activeEventSource.close();
+      this.activeEventSource = null;
+    }
   }
 
   /**
