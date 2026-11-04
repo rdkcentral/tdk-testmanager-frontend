@@ -50,6 +50,7 @@ limitations under the License.
     <!-- Row of three top actions -->
     <div class="pm-actions">
       <button
+        *ngIf="!isBroadband"
         type="button"
         class="pm-action-btn"
         (click)="openUploadModal('generic', $event)"
@@ -68,13 +69,14 @@ limitations under the License.
 
       <!-- Green "Present" badge shown only when the generic package exists -->
       <span
-        *ngIf="isGenericPresent && !isCheckingGeneric"
+        *ngIf="!isBroadband && isGenericPresent && !isCheckingGeneric"
         matTooltip="Generic package is available on the server"
       >
         <span class="badge-check">&#10003;</span> Present
       </span>
 
       <button
+        *ngIf="!isBroadband"
         type="button"
         class="pm-action-btn pm-action-primary"
         (click)="onCreatePackage()"
