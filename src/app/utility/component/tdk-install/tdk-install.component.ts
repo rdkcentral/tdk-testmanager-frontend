@@ -203,7 +203,7 @@ export class TdkInstallComponent implements AfterViewChecked, OnDestroy {
    * green "Present" indicator badge.
    */
   checkGenericPackagePresence(): void {
-    if (!this.deviceName || !this.selectedPackage) {
+    if (this.isBroadband || !this.deviceName || !this.selectedPackage) {
       return;
     }
     this.isCheckingGeneric = true;
