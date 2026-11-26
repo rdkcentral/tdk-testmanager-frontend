@@ -291,6 +291,7 @@ export class DevicesComponent {
    */
   findallbyCategory() {
     this.showLoader = true;
+    this.isNoDataVisible = false;
     this.service.findallbyCategory(this.selectedDeviceCategory).subscribe({
       next: (res) => {
         this.rowData = Array.isArray(res?.data) ? res.data : [];
@@ -319,6 +320,7 @@ export class DevicesComponent {
       },
       error: (err) => {
         this.showLoader = false;
+        this.isNoDataVisible = this.rowData.length === 0;
       },
     });
   }
